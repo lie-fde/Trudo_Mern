@@ -1,0 +1,194 @@
+import React, { useState , useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaFacebookF } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useForm } from "react-hook-form";
+import axios from "axios";
+
+export default function Login() {
+  const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+   const [message, setMessage] = useState("");
+   const navigate = useNavigate()
+
+   useEffect(() => {
+    
+    const token = localStorage.getItem('token')
+
+    if(token) navigate('/home')
+
+  if (message) console.log("Updated message:", message);
+}, [message],[navigate]);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      const cleanData = {
+        email: data.email.trim(),
+        password: data.password.trim(),
+      };
+
+      const response = await axios.post('http://localhost:4000/auth/users/login', {
+        userEmail : cleanData.email,
+        password : cleanData.password
+      })
+      
+      reset()
+      setMessage(response.data.message)
+      localStorage.setItem("token",response.data.token)
+       localStorage.setItem("userName",response.data.user.userName)
+       navigate("/home");
+       console.log(response.data.user.userName)
+    
+    } catch (err) {
+       if (err.response) {
+        setMessage(err.response.data.message);
+      } else {
+        setMessage("Error connecting to server");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-pink-500 via-pink-400 to-yellow-300 p-4 overflow-hidden">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-10">
+        <h1 className="text-3xl font-semibold text-center mb-2">Log in</h1>
+        <p className="text-center text-sm text-gray-500 mb-6">
+          New to True Donation?{" "}
+          <a href="/signup" className="underline text-gray-700">
+            Sign up for free
+          </a>
+        </p>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+          {/* Email */}
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-2">
+              Email address
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300 ${
+                errors.email ? "border-red-500" : ""
+              }`}
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Enter a valid email address",
+                },
+                validate: (value) => {
+                  const trimmed = value.trim();
+                  if (trimmed === "") return "Email cannot be empty or spaces only";
+                  if (/\s/.test(trimmed)) return "Email cannot contain spaces";
+                  return true;
+                },
+              })}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+            )}
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-2">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPass ? "text" : "password"}
+                placeholder="Enter your password"
+                className={`w-full px-4 py-3 border rounded-md pr-12 focus:outline-none focus:ring-2 focus:ring-pink-300 ${
+                  errors.password ? "border-red-500" : ""
+                }`}
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters",
+                  },
+                  validate: (value) => {
+                    const trimmed = value.trim();
+                    if (trimmed === "") return "Password cannot be empty or spaces only";
+                    if (/\s/.test(value)) return "Password cannot contain spaces";
+                    return true;
+                  },
+                })}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass((s) => !s)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              >
+                {showPass ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          {/* Forgot Password */}
+          <div className="flex justify-end">
+            <a href="#" className="text-sm text-gray-700 underline">
+              Forget password?
+            </a>
+          </div>
+
+          {/* Submit Button */}
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full px-6 py-3 text-white rounded-full text-lg transition ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-gray-700 hover:bg-gray-800"
+              }`}
+            >
+              {loading ? "Logging in..." : "Log in"}
+            </button>
+          </div>
+        </form>
+
+        {/* Divider */}
+        <div className="mt-6 flex items-center justify-center gap-4">
+          <div className="h-px w-24 bg-gray-200" />
+          <span className="text-xs text-gray-500">or</span>
+          <div className="h-px w-24 bg-gray-200" />
+        </div>
+
+        {/* Social Buttons */}
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <button
+            aria-label="Continue with Facebook"
+            className="flex items-center justify-center gap-2 px-3 py-2 border rounded-full bg-white hover:shadow-sm"
+          >
+            <FaFacebookF size={18} className="text-blue-600" />
+          </button>
+
+          <button
+            aria-label="Continue with Google"
+            className="flex items-center justify-center gap-2 px-3 py-2 border rounded-full bg-white hover:shadow-sm"
+          >
+            <FcGoogle size={20} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
