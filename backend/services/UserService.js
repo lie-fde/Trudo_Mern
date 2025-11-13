@@ -68,7 +68,43 @@ const verifyOtp = async (email,otp) => {
     return { message: "Account verified successfully" };
 }
 
+const resendOtp = async (email) => {
+ 
+    const  user = await UserRepository.findByEmail(email)
+    
+    if(!user) throw new Error("User not found")
 
+    if(user.isVerified) throw new Error("User already Verified");
+
+    await OtpRepository.deleteByEmail(email)
+
+    const otpCode = randomInt(100000,999999).toString()
+
+    await OtpRepository.create({
+        email,
+        otp:otpCode
+    })
+
+    const transporter = nodeMailer.createTransport({
+        service:"gmail",
+        auth:{
+            user:process.env.EMAIL_USER,
+            pass:process.env.EMAIL_PASS
+        }
+
+    })
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to:email,
+        subject: "Verify Your Email",
+        text: `Your OTP is ${otpCode}. It expires in 5 minutes.`,
+    })
+    
+     return { message: "New OTP sent successfully" };
+
+    
+}
 
 
 const login = async (userEmail,password) =>{
@@ -92,5 +128,5 @@ const login = async (userEmail,password) =>{
     }
 }
 
-export default {signup , login , verifyOtp};
+export default {signup , login , verifyOtp , resendOtp};
 

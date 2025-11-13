@@ -20,7 +20,6 @@ export const otpVerify = async(req,res) =>{
     try {
 
         const {email , otp} = req.body
-        console.log(email,otp)
         const result = await UserService.verifyOtp(email,otp);
 
         res.status(200).json(result)
@@ -29,6 +28,22 @@ export const otpVerify = async(req,res) =>{
 
         res.status(400).json({message:error.message})
         
+    }
+}
+
+
+export const resendOtp = async(req,res)=>{
+    try {
+
+        const {email} = req.body;
+        const result = await UserService.resendOtp(email)
+
+        res.status(200).json(result)
+
+        
+    } catch (error) {
+        
+        res.status(400).json({message:error.message})
     }
 }
 

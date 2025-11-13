@@ -12,7 +12,7 @@ const findByEmailAndOtp = async (email,otp) =>{
 
 
 const deleteByEmail = async (email) =>{
-    return await Otp.deleteOne({email});
+    return await Otp.deleteMany({email});
 }
 
 export  default {create,findByEmailAndOtp , deleteByEmail} 
