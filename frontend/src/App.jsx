@@ -5,6 +5,8 @@ import Signup from "./pages/authentication/SignUp";
 import Home from "./pages/authentication/home";
 import ProtectedRoute from "./components/ProtectedRoute";
 import VerifyOTP from "./pages/authentication/VerifyOtp";
+import ForgotPassword from "./pages/authentication/ForgotPassword";
+import ChangePassword from "./pages/authentication/ChangePassword";
 
 function App() {
 
@@ -17,6 +19,8 @@ function App() {
         <Route path="/signup" element={<Signup/>}/>
          <Route path="/"  element={ <Navigate to={'/home'} replace/>}/> 
          <Route path="/verify-otp" element={ <VerifyOTP/>}/>
+         <Route path="/forgot-password" element={<ForgotPassword/>}/>
+         <Route path="/change-password" element={<ChangePassword/>}/>
 
         <Route path="/home"  element={<ProtectedRoute><Home/></ProtectedRoute>} />
       </Routes>

@@ -15,4 +15,9 @@ const deleteByEmail = async (email) =>{
     return await Otp.deleteMany({email});
 }
 
-export  default {create,findByEmailAndOtp , deleteByEmail} 
+const saveOtp = async (email, otp) => {
+  return await Otp.create({ email, otp });
+};
+
+
+export  default {create,findByEmailAndOtp , deleteByEmail ,saveOtp} 

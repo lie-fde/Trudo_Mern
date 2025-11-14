@@ -1,6 +1,7 @@
 import  bcrypt  from 'bcrypt'
 import UserRepository from '../repositories/UserRepository.js'
 import OtpRepository from '../repositories/OtpRepository.js';
+import { verifyGenericOtp } from '../utils/otpHelper.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv'
 import {randomInt} from 'crypto'
@@ -53,17 +54,13 @@ const verifyOtp = async (email,otp) => {
     const otpRecord = await OtpRepository.findByEmailAndOtp(email,otp) 
 
 
-    if(!otpRecord) throw new Error("Invalid or otp Expired");
+   await verifyGenericOtp(email, otp);
 
-    const user = await UserRepository.findByEmail(email)
+  const user = await UserRepository.findByEmail(email);
+  if (!user) throw new Error("User Not Found");
 
-    if(!user) throw new Error("User Not Found");
-
-    user.isVerified = true
-
-    await user.save()
-
-    await OtpRepository.deleteByEmail(email)    
+  user.isVerified = true;
+  await user.save(); 
 
     return { message: "Account verified successfully" };
 }
@@ -128,5 +125,60 @@ const login = async (userEmail,password) =>{
     }
 }
 
-export default {signup , login , verifyOtp , resendOtp};
+
+const resetPassword = async (email, newPassword) => {
+  const user = await UserRepository.findByEmail(email);
+  if (!user) throw new Error('User not found');
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await UserRepository.updatePassword(email, hashedPassword);
+
+  return { message: 'Password reset successfully' };
+};
+
+
+const forgotPassword = async (email) => {
+  const user = await UserRepository.findByEmail(email);
+  if (!user) throw new Error('User not found');
+
+  // Generate OTP
+  const otpCode = randomInt(100000, 999999).toString();
+
+  // Delete any existing OTP
+  await OtpRepository.deleteByEmail(email);
+
+  // Save new OTP
+  await OtpRepository.saveOtp(email, otpCode);
+
+  // Send OTP via email
+  const transporter = nodeMailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Password Reset OTP',
+    text: `Your OTP for password reset is ${otpCode}. It expires in 5 minutes.`,
+  });
+
+  return { message: 'OTP sent to email for password reset' };
+};
+
+
+
+const verifyPasswordOtp = async (email, otp) => {
+
+    await verifyGenericOtp(email, otp);
+
+  return { message: 'OTP verified successfully' };
+};
+
+
+
+export default {signup , login , verifyOtp , resendOtp ,resetPassword ,forgotPassword , verifyPasswordOtp};
 

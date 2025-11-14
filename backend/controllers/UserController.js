@@ -67,3 +67,35 @@ export const login = async(req,res)=>{
         
     }
 }
+
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const response = await UserService.forgotPassword(email);
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
+export const verifyPasswordOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const response = await UserService.verifyPasswordOtp(email, otp);
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    const response = await UserService.resetPassword(email, newPassword);
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
