@@ -45,7 +45,7 @@ export default function ChangePassword() {
 
     try {
       const res = await axios.post(
-        "http://localhost:4000/auth/users/reset-password",
+        "http://localhost:4000/auth/users/change-password",
         {
           email,
           newPassword: password,

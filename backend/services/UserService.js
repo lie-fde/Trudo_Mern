@@ -109,6 +109,12 @@ const login = async (userEmail,password) =>{
     const user = await UserRepository.findByEmail(userEmail);
     if(!user || !user.isVerified) throw new Error("User don't exist!");
 
+    if(user.isBlocked) throw new Error("Your account has been blocked");
+
+    if(user.isDeleted) throw new Error("Your account has been deleted.");
+
+    if(user.isAdmin) throw new Error("Admins cannot log in here.")
+
     const validPassword = await bcrypt.compare(password,user.password);
 
     if(!validPassword) throw new Error("Invalid Password");
@@ -117,7 +123,7 @@ const login = async (userEmail,password) =>{
         expiresIn: '1d',
     })
 
-    return {message : 'Login Successfull', token,
+    return {message : 'Login Successful', token,
         user:{
             userName:user.userName,
             userEmail:user.userEmail
@@ -141,16 +147,12 @@ const forgotPassword = async (email) => {
   const user = await UserRepository.findByEmail(email);
   if (!user) throw new Error('User not found');
 
-  // Generate OTP
   const otpCode = randomInt(100000, 999999).toString();
 
-  // Delete any existing OTP
   await OtpRepository.deleteByEmail(email);
 
-  // Save new OTP
   await OtpRepository.saveOtp(email, otpCode);
 
-  // Send OTP via email
   const transporter = nodeMailer.createTransport({
     service: 'gmail',
     auth: {
@@ -179,6 +181,44 @@ const verifyPasswordOtp = async (email, otp) => {
 };
 
 
+ const googleLoginService = async (googleUser) => {
+  // googleUser is provided by Passport's strategy callback
 
-export default {signup , login , verifyOtp , resendOtp ,resetPassword ,forgotPassword , verifyPasswordOtp};
+  let user = await UserRepository.findByEmail(googleUser.userEmail);
+
+  // If user exists but not linked with Google, attach googleId
+  if (user && !user.googleId) {
+    user.googleId = googleUser.googleId;
+    user.avatar = googleUser.avatar || user.avatar;
+    await user.save();
+  }
+
+  // If no user exists, create one
+  if (!user) {
+    user = await UserRepository.create({
+      googleId: googleUser.googleId,
+      userName: googleUser.userName,
+      userEmail: googleUser.userEmail,
+      avatar: googleUser.avatar,
+    });
+  }
+
+  // Create JWT token
+  const token = jwt.sign(
+    { id: user._id, email: user.userEmail },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  return {token,
+    user: {
+      id: user._id,
+      name: user.userName,
+      email: user.userEmail,
+      avatar: user.avatar,
+    },
+  };
+};
+
+export default {signup , login , verifyOtp , resendOtp ,resetPassword ,forgotPassword , verifyPasswordOtp,googleLoginService};
 

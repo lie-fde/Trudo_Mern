@@ -1,4 +1,7 @@
 import UserService from "../services/UserService.js";
+import dotenv from 'dotenv'
+
+dotenv.config({path:"../.env"})
 
 
 export const register = async(req,res) =>{
@@ -97,5 +100,19 @@ export const resetPassword = async (req, res) => {
     res.status(200).json(response);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+
+export const googleCallbackController = async (req, res) => {
+  try {
+    const {token , user} = await UserService.googleLoginService(req.user);
+
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/google-success?token=${token}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}`
+    );
+  } catch (err) {
+    console.error("Google Auth Error:", err);
+    return res.redirect("/login");
   }
 };

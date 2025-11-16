@@ -5,6 +5,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [showPass, setShowPass] = useState(false);
@@ -12,14 +13,13 @@ export default function Login() {
    const [message, setMessage] = useState("");
    const navigate = useNavigate()
 
-   useEffect(() => {
-    
-    const token = localStorage.getItem('token')
-
-    if(token) navigate('/home')
-
-  if (message) console.log("Updated message:", message);
-}, [message],[navigate]);
+useEffect(()=>{
+    const adminToken =localStorage.getItem("adminToken")
+     const token = localStorage.getItem('token')
+     if(token) navigate('/home')
+     if(adminToken) navigate('/admin/dashboard')
+      if (message) console.log("Updated message:", message);
+  },[message],[navigate])
 
   const {
     register,
@@ -44,9 +44,9 @@ export default function Login() {
       reset()
       setMessage(response.data.message)
       localStorage.setItem("token",response.data.token)
-       localStorage.setItem("userName",response.data.user.userName)
+      localStorage.setItem("userName",response.data.user.userName)
+       toast.success("Logged in successfully!")
        navigate("/home");
-       console.log(response.data.user.userName)
     
     } catch (err) {
        if (err.response) {
@@ -144,7 +144,7 @@ export default function Login() {
 
           {/* Forgot Password */}
           <div className="flex justify-end">
-            <a href="#" className="text-sm text-gray-700 underline">
+            <a href="/forgot-password" className="text-sm text-gray-700 underline">
               Forget password?
             </a>
           </div>
@@ -173,21 +173,23 @@ export default function Login() {
         </div>
 
         {/* Social Buttons */}
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <button
-            aria-label="Continue with Facebook"
-            className="flex items-center justify-center gap-2 px-3 py-2 border rounded-full bg-white hover:shadow-sm"
-          >
-            <FaFacebookF size={18} className="text-blue-600" />
-          </button>
+        <div className="mt-2 grid grid-cols-1 gap-3">
+       
 
           <button
+            onClick={() => window.location.replace("http://localhost:4000/auth/users/google")}
             aria-label="Continue with Google"
             className="flex items-center justify-center gap-2 px-3 py-2 border rounded-full bg-white hover:shadow-sm"
           >
             <FcGoogle size={20} />
+            Google
           </button>
         </div>
+      {message && (
+  <p className="mt-4 text-center text-red-600 text-sm font-semibold">
+    {message}
+  </p>
+)}
       </div>
     </div>
   );

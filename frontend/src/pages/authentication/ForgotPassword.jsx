@@ -37,10 +37,11 @@ export default function ForgotPassword() {
       const res = await axios.post("http://localhost:4000/auth/users/forgot-password", {
         email,
       });
-
+      console.log(res.data.message)
       setMessage(res.data.message);
+      console.log(message)
       localStorage.setItem("resetEmail", email); // store for next step
-      navigate("/change-password");
+      navigate("/verify-otp-password");
     } catch (err) {
       setMessage(err.response?.data?.message || "Error sending reset link");
     } finally {
