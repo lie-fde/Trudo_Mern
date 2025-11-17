@@ -20,13 +20,7 @@ export default function Signup() {
     if(token) navigate('/home')
    },[navigate])
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    reset,
-    formState: { errors },
-  } = useForm();
+  const {register,handleSubmit,watch,reset,formState: { errors },} = useForm();
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -64,7 +58,7 @@ export default function Signup() {
         <h1 className="text-2xl font-semibold text-center mb-3">Sign Up</h1>
 
         <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-2.5">
-          {/* Full Name */}
+   
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
               Full Name
@@ -92,7 +86,7 @@ export default function Signup() {
             )}
           </div>
 
-          {/* Email */}
+
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
               Email
@@ -120,7 +114,7 @@ export default function Signup() {
             )}
           </div>
 
-          {/* Mobile Number */}
+
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
               Mobile Number
@@ -148,7 +142,7 @@ export default function Signup() {
             )}
           </div>
 
-          {/* Password */}
+
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
               Password
@@ -186,7 +180,7 @@ export default function Signup() {
             )}
           </div>
 
-          {/* Confirm Password */}
+
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
               Confirm Password
@@ -227,7 +221,7 @@ export default function Signup() {
             )}
           </div>
 
-          {/* Already have account */}
+
           <p className="text-center text-xs text-gray-500 pt-1">
             Already have an account?{" "}
             <a href="/login" className="underline text-gray-700">
@@ -235,7 +229,7 @@ export default function Signup() {
             </a>
           </p>
 
-          {/* Submit Button */}
+
           <button
             type="submit"
             disabled={loading}
@@ -248,17 +242,18 @@ export default function Signup() {
             {loading ? "Signing up..." : "Sign Up"}
           </button>
 
-          {/* Divider */}
+    
           <div className="mt-2 flex items-center justify-center gap-3">
             <div className="h-px w-16 bg-gray-200" />
             <span className="text-xs text-gray-500">Or Register with</span>
             <div className="h-px w-16 bg-gray-200" />
           </div>
 
-          {/* Google Button */}
+
           <div className="mt-1.5">
             <button
               type="button"
+               onClick={() => window.location.replace("http://localhost:4000/auth/users/google")}
               className="w-full flex items-center justify-center gap-2 px-2 py-1.5 border rounded-full bg-white hover:shadow-sm"
             >
               <FcGoogle size={16} />

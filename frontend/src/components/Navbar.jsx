@@ -17,7 +17,6 @@ const handleLogout = () => {
     confirmButtonText: "Yes, Logout",
   }).then((result) => {
     if (result.isConfirmed) {
-      // Remove user data
       localStorage.removeItem("token");
       localStorage.removeItem("userName");
      
@@ -35,12 +34,12 @@ const handleLogout = () => {
 
   return (
     <nav className="w-full bg-black text-white py-4 px-6 flex items-center justify-between shadow-md">
-      {/* Logo */}
+    
       <h1 className="text-xl font-semibold tracking-wide cursor-pointer" onClick={() => navigate("/")}>
         Trudo
       </h1>
 
-      {/* Nav Options */}
+ 
       <div className="hidden md:flex gap-6 text-sm items-center">
         <button className="hover:text-gray-300 transition">Home</button>
         <button className="hover:text-gray-300 transition">Donate</button>
@@ -50,7 +49,7 @@ const handleLogout = () => {
         <button className="hover:text-gray-300 transition">Contact us</button>
       </div>
 
-      {/* Right Side */}
+
       <div className="flex items-center gap-3">
         {userName ? (
           <>

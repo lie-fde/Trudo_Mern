@@ -19,7 +19,6 @@ export default function VerifyOTP() {
     navigate("/login")
   }}, [])
 
-  // Timer countdown
   useEffect(() => {
     if (timer > 0) {
       const interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
@@ -61,9 +60,8 @@ export default function VerifyOTP() {
     }
   };
 
-  // ✅ NEW: Handle Resend OTP
   const handleResendOtp = async () => {
-    if (timer > 0) return; // prevent multiple clicks before timer ends
+    if (timer > 0) return; 
     setResending(true);
 
     try {
@@ -72,7 +70,7 @@ export default function VerifyOTP() {
       });
 
       setMessage(response.data.message);
-      setTimer(60); // restart timer (60 seconds)
+      setTimer(60); 
     } catch (err) {
       setMessage(err.response?.data?.message || "Error resending OTP");
     } finally {
@@ -102,7 +100,6 @@ export default function VerifyOTP() {
           ))}
         </div>
 
-        {/* Countdown timer */}
         <p className="text-gray-500 text-sm mb-2">
           Resend available in{" "}
           <span className="font-semibold">
@@ -110,7 +107,6 @@ export default function VerifyOTP() {
           </span>
         </p>
 
-        {/* ✅ Resend clickable text */}
         <p className="text-gray-600 text-sm mb-4">
           Didn’t receive a code?{" "}
           <span

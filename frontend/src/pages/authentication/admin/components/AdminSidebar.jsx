@@ -1,17 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Gift,
-  Users,
-  Calendar,
-  FileText,
-  LogOut,
-  ChevronLeft,
-  ChevronRight,
-  ClipboardList,
-  UserCheck,
-} from "lucide-react";
+import {LayoutDashboard,Gift,Users,Calendar,FileText,LogOut,ChevronLeft,ChevronRight,ClipboardList,UserCheck,} from "lucide-react";
 import Swal from "sweetalert2";
 
 
@@ -29,8 +18,6 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
     confirmButtonText: "Yes, logout"
   }).then((result) => {
     if (result.isConfirmed) {
-
-      // remove auth
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminName");
 
@@ -52,7 +39,6 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
       className={`relative flex flex-col justify-between bg-white h-screen border-r transition-all duration-300 shadow-sm z-30`}
       style={{ width: collapsed ? 80 : 256 }}
     >
-      {/* ---- Toggle Button ---- */}
       <button
         onClick={() => setCollapsed(!collapsed)}
         className="absolute top-4 -right-3 bg-white border border-gray-300 rounded-full shadow p-1 hover:bg-gray-100 transition z-40"
@@ -64,7 +50,6 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
         )}
       </button>
 
-      {/* ---- Top Section ---- */}
       <div>
         <h1
           className={`text-xl font-semibold px-6 py-4 transition-all ${
@@ -120,7 +105,6 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
         </ul>
       </div>
 
-      {/* ---- Bottom Section ---- */}
       <div className="p-4">
         <button
           onClick={()=> handleLogout()}

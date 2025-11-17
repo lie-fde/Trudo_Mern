@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AdminSidebar from "./components/AdminSidebar";
 import AdminNavbar from "./components/AdminNavbar";
-import {
-  Mail,
-  Smartphone,
-  MapPin,
-  User,
-  Globe,
-  CalendarDays,
-  IndianRupee,
-} from "lucide-react";
+import {Mail,Smartphone,MapPin,User,Globe,CalendarDays,IndianRupee,} from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Swal from 'sweetalert2'
@@ -19,7 +11,7 @@ const MySwal = withReactContent(Swal)
 
 export default function UserDetails() {
   const [collapsed, setCollapsed] = useState(false);
-  const [tab, setTab] = useState("donations"); // donations | events
+  const [tab, setTab] = useState("donations"); 
   const [isBlocked, setIsBlocked] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -205,16 +197,10 @@ const handleunblockUser = () => {
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
-      {/* Sidebar */}
       <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-
-      {/* Main Content */}
       <div className="flex-1 flex flex-col">
         <AdminNavbar collapsed={collapsed} />
-
-        {/* MAIN */}
         <div className="p-8 mt-16">
-          {/* Top section with buttons */}
           <div className="flex justify-between items-center mb-2">
             <div>
               <h1 className="text-2xl font-semibold">User Details</h1>
@@ -239,16 +225,15 @@ const handleunblockUser = () => {
           </div>
 
           <div className="grid grid-cols-12 gap-6 mt-6">
-            {/* LEFT PROFILE CARD */}
+  
             <div className="col-span-4 bg-white shadow rounded-lg p-6">
-              {/* Avatar */}
+
               <div className="flex flex-col items-center pb-6 border-b">
                 <div className="w-full h-28 bg-gray-200 rounded-lg"></div>
                 <div className="-mt-12 w-24 h-24 bg-gray-400 rounded-full"></div>
                 <h2 className="mt-3 font-semibold text-gray-800">{user.userName}</h2>
               </div>
 
-              {/* Info */}
               <div className="mt-6 space-y-4 text-sm text-gray-700">
                 <DetailItem icon={<User size={16} />} label="Full Name" value={user.userName} />
                 <DetailItem icon={<Mail size={16} />} label="Email" value={user.userEmail} />
@@ -263,9 +248,7 @@ const handleunblockUser = () => {
               </div>
             </div>
 
-            {/* RIGHT SIDE */}
             <div className="col-span-8 space-y-6">
-              {/* SUMMARY CARDS */}
               <div className="grid grid-cols-2 gap-6">
                 <SummaryCard
                   icon={<IndianRupee />}
@@ -279,7 +262,6 @@ const handleunblockUser = () => {
                 />
               </div>
 
-              {/* TAB SWITCHER */}
               <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
                 <div className="flex gap-4">
                   <TabButton
@@ -307,7 +289,6 @@ const handleunblockUser = () => {
                 </div>
               </div>
 
-              {/* TABLE */}
               <div className="bg-white shadow rounded-lg overflow-hidden">
                 <table className="w-full text-left text-sm">
                   <thead className="bg-black text-white">
@@ -349,8 +330,6 @@ const handleunblockUser = () => {
                   </tbody>
                 </table>
               </div>
-
-              {/* PAGINATION */}
               <Pagination />
             </div>
           </div>
@@ -360,9 +339,6 @@ const handleunblockUser = () => {
   );
 }
 
-/* ------------------------------------------------------ */
-/*                    REUSABLE COMPONENTS                 */
-/* ------------------------------------------------------ */
 
 const DetailItem = ({ icon, label, value }) => (
   <div className="flex items-start gap-3">

@@ -1,15 +1,9 @@
 import React, { useState } from "react";
 import AdminSidebar from "./components/AdminSidebar";
 import AdminNavbar from "./components/AdminNavbar";
-import {
-  Users,
-  HandCoins,
-  IndianRupee,
-  CalendarDays,
-} from "lucide-react";
+import {Users,HandCoins,IndianRupee,CalendarDays,} from "lucide-react";
 
 export default function AdminDashboard() {
-  // lift collapsed state here and share with sidebar + navbar
   const [collapsed, setCollapsed] = useState(false);
 
   const cards = [
@@ -21,15 +15,10 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
-      {/* pass collapsed + setter to Sidebar */}
       <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
-      {/* main area */}
       <div className="flex-1 flex flex-col">
-        {/* navbar needs collapsed value */}
         <AdminNavbar collapsed={collapsed} />
-
-        {/* content: mt to offset fixed navbar height */}
         <div className="p-8 mt-16">
           <h1 className="text-2xl font-semibold text-gray-800 mb-8">
             Dashboard Overview
@@ -49,8 +38,7 @@ export default function AdminDashboard() {
               </div>
             ))}
           </div>
-
-          {/* rest of page content goes here */}
+          
         </div>
       </div>
     </div>

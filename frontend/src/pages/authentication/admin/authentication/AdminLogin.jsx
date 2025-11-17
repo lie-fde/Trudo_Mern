@@ -16,11 +16,7 @@ export default function AdminLogin() {
      if(token) navigate('/home')
   },[navigate])
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const {register,handleSubmit,formState: { errors },} = useForm();
 
   const onSubmit = async (data) => {
     try {
@@ -39,18 +35,16 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
-      {/* ✅ Branding Header */}
       <div className="p-6">
         <h1 className="text-2xl font-bold text-gray-800">Trudo</h1>
       </div>
 
-      {/* ✅ Centered Login Card */}
       <div className="flex flex-1 items-center justify-center">
         <div className="bg-white w-full max-w-sm p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold text-center mb-6">Admin Login</h2>
 
           <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Email */}
+
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Email
@@ -78,7 +72,6 @@ export default function AdminLogin() {
               )}
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Password
@@ -115,7 +108,7 @@ export default function AdminLogin() {
               )}
             </div>
 
-            {/* Submit Button */}
+
             <button
               type="submit"
               className="w-full bg-green-800 text-white py-2 rounded-md text-sm hover:bg-green-900 transition"
@@ -124,7 +117,6 @@ export default function AdminLogin() {
             </button>
           </form>
 
-          {/* Error / Success Message */}
           {message && (
             <p className="text-center text-red-500 text-sm mt-4">{message}</p>
           )}

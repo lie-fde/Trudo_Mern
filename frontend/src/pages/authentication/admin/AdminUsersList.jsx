@@ -12,11 +12,10 @@ export default function UsersList() {
   const [search, setSearch] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 7; // 🔥 SHOW 8 USERS PER PAGE
+  const usersPerPage = 7; 
 
   const navigate = useNavigate();
 
-  // Fetch Users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -29,7 +28,6 @@ export default function UsersList() {
     fetchUsers();
   }, []);
 
-  // Pagination Logic
   const filteredUsers = users.filter((u) =>
     u.userName.toLowerCase().includes(search.toLowerCase())
   );
@@ -61,14 +59,12 @@ const handleBlockUser = (id, isBlocked) => {
     if (result.isConfirmed) {
       try {
 
-        // API CALL
         if (!isBlocked) {
           await axios.patch(`http://localhost:4000/admin/users/block/${id}`);
         } else {
           await axios.patch(`http://localhost:4000/admin/users/unblock/${id}`);
         }
 
-        // SUCCESS POPUP
         Swal.fire({
           title: isBlocked ? "Unblocked!" : "Blocked!",
           text: isBlocked 
@@ -79,7 +75,6 @@ const handleBlockUser = (id, isBlocked) => {
           showConfirmButton: false,
         });
 
-        // 🔥 Update UI (very important)
         setUsers((prev) =>
           prev.map((user) =>
             user._id === id ? { ...user, isBlocked: !isBlocked } : user
@@ -116,7 +111,7 @@ const handleBlockUser = (id, isBlocked) => {
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
-                  setCurrentPage(1); // reset pagination when searching
+                  setCurrentPage(1); 
                 }}
               />
             </div>
@@ -200,7 +195,6 @@ const handleBlockUser = (id, isBlocked) => {
             </table>
           </div>
 
-          {/* Pagination */}
           <div className="flex justify-center mt-4 gap-2">
             <button
               onClick={() => goToPage(currentPage - 1)}

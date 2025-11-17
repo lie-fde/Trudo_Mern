@@ -1,27 +1,14 @@
 import React from "react";
 import Navbar from "../../components/Navbar.jsx"
-import { useNavigate } from "react-router-dom";
 import frontImage from '../../assets/Front image .png'
 
 export default function Home() {
-  const navigate = useNavigate();
   const userName = localStorage.getItem("userName") || "Guest";
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    navigate("/login", { replace: true });
-  };
 
   return (
     <div className="min-h-screen bg-[#f8f9fb] flex flex-col">
-      {/* Navbar */}
       <Navbar />
-
-      {/* Hero Section */}
       <div className="flex flex-col lg:flex-row items-center justify-between px-10 lg:px-20 py-16 gap-10">
-
-        {/* Left Text */}
         <div className="lg:w-1/2">
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
             Transparent Giving <br />
@@ -42,7 +29,6 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Right Image */}
         <div className="lg:w-1/2 flex justify-center">
           <img
             src={frontImage}

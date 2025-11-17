@@ -24,7 +24,7 @@ app.use('/auth/admin',AdminAuthRoutes)
 app.use('/admin',AdminRoutes)
 
 app.get('/',(req,res)=>{
-    res.send("🚀 MERN Backend with Controller-Service-Repository running!")
+    res.send(" MERN Backend with Controller-Service-Repository running!")
 })
 
 app.listen(PORT,"0.0.0.0", async ()=>{

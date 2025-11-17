@@ -1,6 +1,5 @@
 import React, { useState , useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaFacebookF } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useForm } from "react-hook-form";
@@ -19,14 +18,9 @@ useEffect(()=>{
      if(token) navigate('/home')
      if(adminToken) navigate('/admin/dashboard')
       if (message) console.log("Updated message:", message);
-  },[message],[navigate])
+  },[message ,navigate])
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm();
+  const {register,handleSubmit,reset, formState: { errors },} = useForm();
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -71,7 +65,6 @@ useEffect(()=>{
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-          {/* Email */}
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-2">
               Email address
@@ -101,7 +94,6 @@ useEffect(()=>{
             )}
           </div>
 
-          {/* Password */}
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-2">
               Password
@@ -142,14 +134,14 @@ useEffect(()=>{
             )}
           </div>
 
-          {/* Forgot Password */}
+     
           <div className="flex justify-end">
             <a href="/forgot-password" className="text-sm text-gray-700 underline">
               Forget password?
             </a>
           </div>
 
-          {/* Submit Button */}
+        
           <div>
             <button
               type="submit"
@@ -165,14 +157,13 @@ useEffect(()=>{
           </div>
         </form>
 
-        {/* Divider */}
+  
         <div className="mt-6 flex items-center justify-center gap-4">
           <div className="h-px w-24 bg-gray-200" />
           <span className="text-xs text-gray-500">or</span>
           <div className="h-px w-24 bg-gray-200" />
         </div>
 
-        {/* Social Buttons */}
         <div className="mt-2 grid grid-cols-1 gap-3">
        
 

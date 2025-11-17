@@ -109,9 +109,9 @@ const login = async (userEmail,password) =>{
     const user = await UserRepository.findByEmail(userEmail);
     if(!user || !user.isVerified) throw new Error("User don't exist!");
 
-    if(user.isBlocked) throw new Error("Your account has been blocked");
+     if(user.isDeleted) throw new Error("Your account has been deleted.");
 
-    if(user.isDeleted) throw new Error("Your account has been deleted.");
+    if(user.isBlocked) throw new Error("Your account has been blocked");
 
     if(user.isAdmin) throw new Error("Admins cannot log in here.")
 
@@ -182,18 +182,15 @@ const verifyPasswordOtp = async (email, otp) => {
 
 
  const googleLoginService = async (googleUser) => {
-  // googleUser is provided by Passport's strategy callback
 
   let user = await UserRepository.findByEmail(googleUser.userEmail);
 
-  // If user exists but not linked with Google, attach googleId
   if (user && !user.googleId) {
     user.googleId = googleUser.googleId;
     user.avatar = googleUser.avatar || user.avatar;
     await user.save();
   }
 
-  // If no user exists, create one
   if (!user) {
     user = await UserRepository.create({
       googleId: googleUser.googleId,
@@ -203,7 +200,6 @@ const verifyPasswordOtp = async (email, otp) => {
     });
   }
 
-  // Create JWT token
   const token = jwt.sign(
     { id: user._id, email: user.userEmail },
     process.env.JWT_SECRET,

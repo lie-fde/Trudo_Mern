@@ -1,21 +1,14 @@
 import React from "react";
-import { useEffect } from "react";
 import { Bell, ChevronDown } from "lucide-react";
 
-/**
- * AdminNavbar receives `collapsed` boolean so it can align with the sidebar width.
- * When sidebar collapsed is true -> sidebar width = 80px
- * When sidebar collapsed is false -> width = 256px
- */
 export default function AdminNavbar({ collapsed }) {
 
 
-    const adminName =localStorage.getItem("adminName") || "SHIBIN M S"
+  const adminName =localStorage.getItem("adminName") || "SHIBIN M S"
 
-  // compute left offset and width dynamically
   const sidebarWidth = collapsed ? 80 : 256;
   const leftPx = `${sidebarWidth}px`;
-  const widthCalc = `calc(100% - ${sidebarWidth}px)`; // inline style works nicely here
+  const widthCalc = `calc(100% - ${sidebarWidth}px)`; 
 
   return (
     <div

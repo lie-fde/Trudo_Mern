@@ -20,7 +20,6 @@ router.post("/forgot-password",forgotPassword)
 
 router.post('/verify-password-otp', verifyPasswordOtp);
 
-// Google login route
 router.get("/google",passport.authenticate("google", { scope: ["profile", "email"] }));
 
 router.get("/google/callback",passport.authenticate("google", { session: false, failureRedirect: "/login" }),

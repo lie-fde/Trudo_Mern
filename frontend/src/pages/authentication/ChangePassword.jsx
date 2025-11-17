@@ -9,7 +9,7 @@ export default function ChangePassword() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // 👁️ toggle for password
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
   const email = localStorage.getItem("resetEmail");
@@ -69,7 +69,6 @@ export default function ChangePassword() {
         <h1 className="text-2xl font-bold mb-6">Enter new Password</h1>
 
         <form onSubmit={handleSubmit} noValidate>
-          {/* Password Field with Eye Toggle 👁️ */}
           <div className="relative mb-3">
             <input
               type={showPassword ? "text" : "password"}
@@ -81,7 +80,6 @@ export default function ChangePassword() {
               } rounded-md px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400`}
             />
 
-            {/* 👁️ Eye Icon */}
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
@@ -91,7 +89,6 @@ export default function ChangePassword() {
             </button>
           </div>
 
-          {/* Confirm Password */}
           <input
             type="password"
             placeholder="Confirm new password"

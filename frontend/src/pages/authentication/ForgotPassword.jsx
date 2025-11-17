@@ -9,7 +9,6 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ Custom email validation using regex
   const validateEmail = (value) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/; 
     return emailRegex.test(value);
@@ -20,7 +19,6 @@ export default function ForgotPassword() {
     setMessage("");
     setError("");
 
-    // ✅ Manual email validation before request
     if (!email.trim()) {
       setError("Email is required");
       return;
@@ -40,7 +38,7 @@ export default function ForgotPassword() {
       console.log(res.data.message)
       setMessage(res.data.message);
       console.log(message)
-      localStorage.setItem("resetEmail", email); // store for next step
+      localStorage.setItem("resetEmail", email);
       navigate("/verify-otp-password");
     } catch (err) {
       setMessage(err.response?.data?.message || "Error sending reset link");
