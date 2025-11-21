@@ -1,7 +1,6 @@
-import UserService from "../services/UserService.js";
+import UserService from "../../services/UserService.js";
 import dotenv from 'dotenv'
-
-dotenv.config({path:"../.env"})
+import jwt from 'jsonwebtoken'
 
 
 export const register = async(req,res) =>{
@@ -50,6 +49,22 @@ export const resendOtp = async(req,res)=>{
     }
 }
 
+export const resendOtpPassword = async(req,res)=>{
+    try {
+
+        const {email} = req.body;
+        const result = await UserService.resendPasswordOtp(email)
+
+        res.status(200).json(result)
+
+        
+    } catch (error) {
+        
+        res.status(400).json({message:error.message})
+    }
+}
+
+
 
 
 
@@ -61,7 +76,20 @@ export const login = async(req,res)=>{
 
         const data = await UserService.login(userEmail,password);
 
-        res.status(200).json(data);
+        const {refreshToken,accessToken,user}= data
+
+        res.cookie("refreshToken",refreshToken,{
+          httpOnly : true,
+          secure: true,
+          sameSite : "strict",
+          maxAge: 2*24*60*60*1000
+        });
+
+
+
+        res.status(200).json({
+          message: 'Login Successful', accessToken , user
+        });
 
         
     } catch (error) {
@@ -116,3 +144,58 @@ export const googleCallbackController = async (req, res) => {
     return res.redirect("/login");
   }
 };
+
+export const fetchUsersforPagination = async(req,res) =>{
+  try {
+
+    const page = parseInt(req.query.page )  || 1
+    const limit = parseInt(req.query.limit) || 10
+    
+    const data = await UserService.getAllUsersPaginated(page,limit)
+
+    res.status(200).json({
+      message:"success",
+      data
+    })
+    
+  } catch (error) {
+    
+    res.status(500).json({
+      message:error.message
+    })
+  }
+}
+
+
+export const refreshTokenController = async (req, res) => {
+  try {
+    const response = await UserService.refreshAccessToken(req.cookies.refreshToken);
+    return res.status(200).json(response);
+
+  } catch (err) {
+    return res.status(401).json({ message: err.message });
+  }
+};
+
+export const logoutController = (req, res) => {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false, 
+    sameSite: "strict"
+  });
+
+  return res.status(200).json({ message: "Logged out successfully" });
+};
+
+export const getMe = async (req,res) =>{
+       try {
+
+        const response = await UserService.getMeUser(req.user.id)
+        return res.status(200).json({   userName: response.userName,
+            userEmail: response.userEmail}
+        )
+        
+       } catch (error) {
+         return res.status(400).json({ message : error.message})
+       }
+}

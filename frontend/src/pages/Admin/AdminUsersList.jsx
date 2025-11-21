@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import AdminSidebar from "./components/AdminSidebar";
-import AdminNavbar from "./components/AdminNavbar";
+import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
+import AdminNavbar from "../../components/Admin/AdminNavbar.jsx";
 import { Search, Eye } from "lucide-react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2'
+import { blockUser, fetchUsersList, unblockUser } from "../../services/adminService.js";
 
 export default function UsersList() {
   const [collapsed, setCollapsed] = useState(false);
@@ -19,7 +19,7 @@ export default function UsersList() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/admin/users");
+        const res = await fetchUsersList()
         setUsers(res.data.users);
       } catch (err) {
         console.log("Error fetching users:", err);
@@ -60,9 +60,9 @@ const handleBlockUser = (id, isBlocked) => {
       try {
 
         if (!isBlocked) {
-          await axios.patch(`http://localhost:4000/admin/users/block/${id}`);
+          await blockUser(id)
         } else {
-          await axios.patch(`http://localhost:4000/admin/users/unblock/${id}`);
+          await unblockUser(id)
         }
 
         Swal.fire({
@@ -228,3 +228,4 @@ const handleBlockUser = (id, isBlocked) => {
     </div>
   );
 }
+

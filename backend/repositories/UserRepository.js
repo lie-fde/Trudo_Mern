@@ -28,7 +28,12 @@ const unblockUser = async(id)=>{
 
 const deleteUser = async(id) => await User.findByIdAndUpdate(id,{isDeleted:true},{new : true})
 
+const getUsersPaginated = async(skip,limit) => await User.find().skip(skip).limit(limit)
+
+const countUsers = async() => await User.countDocuments()
 
 
 
-export default {create , findByEmail , findById ,updatePassword , findAllUsers , blockUser , unblockUser ,deleteUser} ;
+export default {create , findByEmail , findById ,updatePassword , findAllUsers , blockUser , unblockUser ,deleteUser , getUsersPaginated,
+  countUsers
+} ;

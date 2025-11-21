@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { adminLogin } from "../../services/authService";
 
 export default function AdminLogin() {
   const [showPass, setShowPass] = useState(false);
@@ -20,11 +20,7 @@ export default function AdminLogin() {
 
   const onSubmit = async (data) => {
     try {
-      const res = await axios.post("http://localhost:4000/auth/admin/login", {
-        adminEmail: data.email,
-        password: data.password,
-      });
-
+      const res = await adminLogin(data.email,data.password)
       localStorage.setItem("adminToken", res.data.token);
       localStorage.setItem("adminName", res.data.admin.adminName);
       navigate("/admin/dashboard");

@@ -1,12 +1,16 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { setCredentials } from "../../store/authSlice";
+import api from "../../api/api";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const userName = localStorage.getItem("userName");
+  const userName = useSelector((state)=>state.auth.userName)
+  const dispatch = useDispatch()
 
-const handleLogout = () => {
+const handleLogout =  () => {
   Swal.fire({
     title: "Are you sure?",
     text: "You will be logged out from your account.",
@@ -15,10 +19,14 @@ const handleLogout = () => {
     confirmButtonColor: "#3085d6",
     cancelButtonColor: "#d33",
     confirmButtonText: "Yes, Logout",
-  }).then((result) => {
+  }).then(async(result) => {
     if (result.isConfirmed) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userName");
+      await api.post('auth/users/logout') 
+
+      dispatch(setCredentials({
+      accessToken: null,
+      userName: null
+     }))
      
       Swal.fire({
        icon: "success",
@@ -27,7 +35,7 @@ const handleLogout = () => {
        timer: 1500,
        showConfirmButton: false
 });
-      navigate("/login", { replace: true });
+      navigate("/home", { replace: true });
     }
   });
 };

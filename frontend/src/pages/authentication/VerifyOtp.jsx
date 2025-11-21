@@ -1,8 +1,6 @@
-
-
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { resendOtp, verifyOtp } from '../../services/authService';
 
 export default function VerifyOTP() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -43,10 +41,7 @@ export default function VerifyOTP() {
     const otpGot = otp.join('');
 
     try {
-      const response = await axios.post('http://localhost:4000/auth/users/verify-otp', {
-        email,
-        otp: otpGot
-      });
+      const response = await verifyOtp(email,otpGot)
 
       setMessage(response.data.message);
       localStorage.removeItem("tempEmail");
@@ -65,9 +60,7 @@ export default function VerifyOTP() {
     setResending(true);
 
     try {
-      const response = await axios.post('http://localhost:4000/auth/users/resend-otp', {
-        email,
-      });
+      const response = await resendOtp(email)
 
       setMessage(response.data.message);
       setTimer(60); 

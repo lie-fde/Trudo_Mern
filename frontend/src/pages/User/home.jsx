@@ -1,9 +1,15 @@
 import React from "react";
-import Navbar from "../../components/Navbar.jsx"
+import Navbar from "../../components/User/Navbar.jsx"
 import frontImage from '../../assets/Front image .png'
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
-  const userName = localStorage.getItem("userName") || "Guest";
+
+
+  const userName = useSelector((state)=> state.auth.userName)
+
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen bg-[#f8f9fb] flex flex-col">
@@ -22,7 +28,8 @@ export default function Home() {
           </p>
 
           <button
-            onClick={() => alert("Feature coming soon")}
+            // onClick={() => alert("Feature coming soon")}
+            onClick={()=> navigate('/me')}
             className="bg-black text-white px-6 py-3 rounded-md mt-6 hover:bg-gray-800 transition"
           >
             Create a Campaign

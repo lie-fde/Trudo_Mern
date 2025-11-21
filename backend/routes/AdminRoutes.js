@@ -1,5 +1,5 @@
 import express from 'express'
-import { fetchAllUsers , fetchUser ,softDelete , block , unblock} from '../controllers/AdminController.js'
+import { fetchAllUsers , fetchUser ,softDelete , block , unblock} from '../controllers/AdminController/AdminController.js'
 
 const router = express.Router()
 

@@ -1,5 +1,5 @@
-import AdminService from "../services/AdminService.js"
-import UserService from "../services/UserService.js"
+import AdminService from "../../services/AdminService.js"
+import UserService from "../../services/UserService.js"
 
 export const adminLogin = async (req,res)=>{
     try {

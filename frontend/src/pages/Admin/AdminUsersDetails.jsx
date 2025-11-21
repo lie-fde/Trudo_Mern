@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import AdminSidebar from "./components/AdminSidebar";
-import AdminNavbar from "./components/AdminNavbar";
+import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
+import AdminNavbar from "../../components/Admin/AdminNavbar.jsx";
 import {Mail,Smartphone,MapPin,User,Globe,CalendarDays,IndianRupee,} from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { blockUser, deleteUser, getUserDetails, unblockUser } from "../../services/adminService.js";
 
 const MySwal = withReactContent(Swal)
 
@@ -19,6 +19,7 @@ export default function UserDetails() {
   
    const {id} = useParams()
    const navigate = useNavigate()
+
    useEffect(()=>{
     
     if(!id) {
@@ -34,7 +35,7 @@ export default function UserDetails() {
 
    const fetchUserdetails = async () =>{
      try {
-        const res = await axios.get(`http://localhost:4000/admin/users/${id}`)
+        const res = await getUserDetails(id)
         setUser(res.data.user)
         setIsBlocked(res.data.user.isBlocked);
      } 
@@ -117,7 +118,7 @@ export default function UserDetails() {
     if (result.isConfirmed) {
       try {
        
-         await axios.patch(`http://localhost:4000/admin/users/delete/${id}`);
+         await deleteUser(id)
    
 
         Swal.fire({
@@ -148,7 +149,7 @@ export default function UserDetails() {
     if (result.isConfirmed) {
       try {
         
-        await axios.patch(`http://localhost:4000/admin/users/block/${id}`);
+        await blockUser(id)
 
         Swal.fire({
           title: "Blocked",
@@ -177,7 +178,7 @@ const handleunblockUser = () => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        await axios.patch(`http://localhost:4000/admin/users/unblock/${id}`);
+        await unblockUser(id)
 
         Swal.fire({
           title: "Unblocked!",

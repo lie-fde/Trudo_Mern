@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import AdminSidebar from "./components/AdminSidebar";
-import AdminNavbar from "./components/AdminNavbar";
+import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
+import AdminNavbar from "../../components/Admin/AdminNavbar.jsx";
 import {Users,HandCoins,IndianRupee,CalendarDays,} from "lucide-react";
 
 export default function AdminDashboard() {

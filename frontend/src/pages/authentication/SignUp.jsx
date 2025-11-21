@@ -4,7 +4,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import axios from "axios";
+import { googleSign, signUp } from "../../services/authService";
 
 
 export default function Signup() {
@@ -29,13 +29,8 @@ export default function Signup() {
       setLoading(false);
       navigate('/verify-otp')
       try {
-
-        const response = await axios.post("http://localhost:4000/auth/users/signup",{
-          userName : data.fullName,
-          userEmail: data.email,
-          mobileNumber: data.mobile,
-          password:data.password
-        })
+                                
+        const response = await signUp(data.fullName, data.email, data.mobile, data.password  )
        
         setMessage(response.data.message)
         console.log(message)        
@@ -253,7 +248,7 @@ export default function Signup() {
           <div className="mt-1.5">
             <button
               type="button"
-               onClick={() => window.location.replace("http://localhost:4000/auth/users/google")}
+               onClick={() => window.location.replace(googleSign())}
               className="w-full flex items-center justify-center gap-2 px-2 py-1.5 border rounded-full bg-white hover:shadow-sm"
             >
               <FcGoogle size={16} />

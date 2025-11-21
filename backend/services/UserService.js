@@ -104,6 +104,46 @@ const resendOtp = async (email) => {
 }
 
 
+
+const resendPasswordOtp = async (email) => {
+ 
+    const  user = await UserRepository.findByEmail(email)
+    
+    if(!user) throw new Error("User not found")
+
+    await OtpRepository.deleteByEmail(email)
+
+    const otpCode = randomInt(100000,999999).toString()
+
+    await OtpRepository.create({
+        email,
+        otp:otpCode
+    })
+
+    const transporter = nodeMailer.createTransport({
+        service:"gmail",
+        auth:{
+            user:process.env.EMAIL_USER,
+            pass:process.env.EMAIL_PASS
+        }
+
+    })
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to:email,
+        subject: "Verify Your Email",
+        text: `Your OTP is ${otpCode}. It expires in 5 minutes.`,
+    })
+    
+     return { message: "New OTP sent successfully" };
+
+    
+}
+
+
+
+
 const login = async (userEmail,password) =>{
 
     const user = await UserRepository.findByEmail(userEmail);
@@ -119,11 +159,13 @@ const login = async (userEmail,password) =>{
 
     if(!validPassword) throw new Error("Invalid Password");
 
-    const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{
-        expiresIn: '1d',
+    const accessToken = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'10s'})
+
+    const refreshToken = jwt.sign({id:user._id},process.env.JWT_REFRESH_SECRET,{
+        expiresIn: '2d',
     })
 
-    return {message : 'Login Successful', token,
+    return { accessToken, refreshToken,
         user:{
             userName:user.userName,
             userEmail:user.userEmail
@@ -200,13 +242,13 @@ const verifyPasswordOtp = async (email, otp) => {
     });
   }
 
-  const token = jwt.sign(
-    { id: user._id, email: user.userEmail },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
+const accessToken = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'10min'})
 
-  return {token,
+    const refreshToken = jwt.sign({id:user._id},process.env.JWT_REFRESH_SECRET,{
+        expiresIn: '2d',
+    })
+
+  return {accessToken,refreshToken,
     user: {
       id: user._id,
       name: user.userName,
@@ -216,5 +258,55 @@ const verifyPasswordOtp = async (email, otp) => {
   };
 };
 
-export default {signup , login , verifyOtp , resendOtp ,resetPassword ,forgotPassword , verifyPasswordOtp,googleLoginService};
+const getAllUsersPaginated = async (page,limit)=>{
+  const skip = (page-1)* limit
+  const users = await UserRepository.getUsersPaginated(skip,limit)
+  const total = await UserRepository.countUsers()
+
+  return {
+    users,
+    page,
+    total,
+    totalPage: Math.floor(total/limit)
+  }
+}
+
+const refreshAccessToken = async (refreshToken) => {
+  if (!refreshToken) throw new Error("Refresh token missing");
+
+  // Verify token
+  const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+  if (!decoded.id) throw new Error("Invalid refresh token");
+
+  // Fetch user
+  const user = await UserRepository.findById(decoded.id);
+  if (!user) throw new Error("User not found");
+
+  // Generate new access token
+  const accessToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_SECRET,
+    { expiresIn: "10s" }
+  );
+
+  return { accessToken , userName : user.userName};
+};
+
+
+
+const getMeUser = async (id) =>{
+  const user = await UserRepository.findById(id)
+   if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+}
+
+
+
+export default {signup , login , verifyOtp , resendOtp ,resendPasswordOtp ,resetPassword,forgotPassword , verifyPasswordOtp,
+  googleLoginService,getAllUsersPaginated ,getMeUser ,refreshAccessToken
+};
 

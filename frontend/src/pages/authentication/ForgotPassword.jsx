@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { forgotPassword } from "../../services/authService";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -32,9 +32,7 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:4000/auth/users/forgot-password", {
-        email,
-      });
+      const res = await forgotPassword(email)
       console.log(res.data.message)
       setMessage(res.data.message);
       console.log(message)

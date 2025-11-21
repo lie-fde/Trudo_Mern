@@ -1,10 +1,12 @@
-import React, { useState , useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import { toast } from "react-toastify";
+import { googleSign, loginUser } from "../../services/authService";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../../store/authSlice";
 
 export default function Login() {
   const [showPass, setShowPass] = useState(false);
@@ -12,15 +14,9 @@ export default function Login() {
    const [message, setMessage] = useState("");
    const navigate = useNavigate()
 
-useEffect(()=>{
-    const adminToken =localStorage.getItem("adminToken")
-     const token = localStorage.getItem('token')
-     if(token) navigate('/home')
-     if(adminToken) navigate('/admin/dashboard')
-      if (message) console.log("Updated message:", message);
-  },[message ,navigate])
-
   const {register,handleSubmit,reset, formState: { errors },} = useForm();
+  
+  const dispatch = useDispatch()
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -30,15 +26,15 @@ useEffect(()=>{
         password: data.password.trim(),
       };
 
-      const response = await axios.post('http://localhost:4000/auth/users/login', {
-        userEmail : cleanData.email,
-        password : cleanData.password
-      })
+      const response = await loginUser(cleanData.email,cleanData.password)
       
       reset()
       setMessage(response.data.message)
-      localStorage.setItem("token",response.data.token)
-      localStorage.setItem("userName",response.data.user.userName)
+
+      dispatch(setCredentials({
+        accessToken : response.data.accessToken,
+        userName : response.data.user.userName
+      }))
        toast.success("Logged in successfully!")
        navigate("/home");
     
@@ -168,7 +164,7 @@ useEffect(()=>{
        
 
           <button
-            onClick={() => window.location.replace("http://localhost:4000/auth/users/google")}
+            onClick={() => window.location.replace(googleSign())}
             aria-label="Continue with Google"
             className="flex items-center justify-center gap-2 px-3 py-2 border rounded-full bg-white hover:shadow-sm"
           >

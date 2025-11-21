@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { resetPassword } from "../../services/authService";
 
 export default function ChangePassword() {
   const [password, setPassword] = useState("");
@@ -44,13 +45,7 @@ export default function ChangePassword() {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        "http://localhost:4000/auth/users/change-password",
-        {
-          email,
-          newPassword: password,
-        }
-      );
+      const res = await resetPassword(email,password)
 
       setMessage(res.data.message || "Password reset successful!");
       localStorage.removeItem("resetEmail");
