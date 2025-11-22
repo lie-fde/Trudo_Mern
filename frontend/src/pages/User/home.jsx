@@ -29,7 +29,7 @@ export default function Home() {
 
           <button
             // onClick={() => alert("Feature coming soon")}
-            onClick={()=> navigate('/me')}
+            onClick={()=> navigate('/create-campaign')}
             className="bg-black text-white px-6 py-3 rounded-md mt-6 hover:bg-gray-800 transition"
           >
             Create a Campaign

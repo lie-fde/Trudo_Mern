@@ -159,7 +159,7 @@ const login = async (userEmail,password) =>{
 
     if(!validPassword) throw new Error("Invalid Password");
 
-    const accessToken = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'10s'})
+    const accessToken = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'1hr'})
 
     const refreshToken = jwt.sign({id:user._id},process.env.JWT_REFRESH_SECRET,{
         expiresIn: '2d',
@@ -242,7 +242,7 @@ const verifyPasswordOtp = async (email, otp) => {
     });
   }
 
-const accessToken = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'10min'})
+const accessToken = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'1hr'})
 
     const refreshToken = jwt.sign({id:user._id},process.env.JWT_REFRESH_SECRET,{
         expiresIn: '2d',
@@ -287,10 +287,10 @@ const refreshAccessToken = async (refreshToken) => {
   const accessToken = jwt.sign(
     { id: user._id },
     process.env.JWT_SECRET,
-    { expiresIn: "10s" }
+    { expiresIn: "1hr" }
   );
 
-  return { accessToken , userName : user.userName};
+  return { accessToken , userName : user.userName , userEmail : user.userEmail};
 };
 
 

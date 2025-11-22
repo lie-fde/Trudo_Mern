@@ -1,29 +1,39 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState , useEffect} from "react";
 import { useForm } from "react-hook-form";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { adminLogin } from "../../services/authService";
+import { useDispatch , useSelector} from "react-redux";
+import { toast } from "react-toastify";
+import { setAdminCredentials } from "../../store/adminAuthSlice";
 
 export default function AdminLogin() {
   const [showPass, setShowPass] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-
-  useEffect(()=>{
-    const adminToken =localStorage.getItem("adminToken")
-     const token = localStorage.getItem('token')
-     if(adminToken) navigate('/admin/dashboard')
-     if(token) navigate('/home')
-  },[navigate])
+  const dispatch = useDispatch()
 
   const {register,handleSubmit,formState: { errors },} = useForm();
+
+  const { adminAccessToken } = useSelector((state) => state.adminAuth);
+
+  useEffect(() => {
+    if (adminAccessToken) {
+      navigate("/admin/dashboard");
+    }
+  }, [adminAccessToken, navigate]);
+
 
   const onSubmit = async (data) => {
     try {
       const res = await adminLogin(data.email,data.password)
-      localStorage.setItem("adminToken", res.data.token);
-      localStorage.setItem("adminName", res.data.admin.adminName);
-      navigate("/admin/dashboard");
+       dispatch(setAdminCredentials({
+              adminAccessToken: res.data.adminAccessToken,
+              adminName: res.data.admin.adminName,
+              adminEmail: res.data.admin.adminEmail,
+            }))
+      toast.success("Logged in successfully!")
+       navigate("/admin/dashboard", { replace: true });
     } catch (err) {
       setMessage(err.response?.data?.message || "Login failed");
     }

@@ -2,9 +2,14 @@ import React, { useState } from "react";
 import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
 import AdminNavbar from "../../components/Admin/AdminNavbar.jsx";
 import {Users,HandCoins,IndianRupee,CalendarDays,} from "lucide-react";
+import { useSelector } from "react-redux";
 
 export default function AdminDashboard() {
   const [collapsed, setCollapsed] = useState(false);
+  const userName = useSelector((state)=> state.adminAuth.adminName)
+  const userEmail = useSelector((state)=> state.adminAuth.adminEmail)
+  console.log(userName)
+   console.log(userEmail)
 
   const cards = [
     { label: "Total Users", value: "5,423", icon: <Users size={28} className="text-green-700" /> },

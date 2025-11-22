@@ -116,7 +116,8 @@ api.interceptors.response.use(
                 store.dispatch(
                     setCredentials({
                         accessToken: res.data.accessToken,
-                        userName: res.data.userName
+                        userName: res.data.userName,
+                        userEmail : res.data.userEmail
                     })
                 );
 

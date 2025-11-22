@@ -93,15 +93,17 @@ import { useSelector } from "react-redux";
 import BlockRoute from "./router/blockRoute";
 import Loader from "./components/reusable/loader";
 import CreateCampaign from "./pages/createCampaign";
+import useAdminAutoLogin from "./hooks/useAdminAutoLogin";
 
 function App() {
     useAutoLogin();
-    const initialLoading = useSelector((state) => state.auth.initialLoading); // Changed!
-    const apiLoading = useSelector((state) => state.auth.apiLoading); // Optional: use for UI feedback
+    useAdminAutoLogin();
+    // const initialLoading = useSelector((state) => state.auth.initialLoading); // Changed!
+    // const apiLoading = useSelector((state) => state.auth.apiLoading); // Optional: use for UI feedback
    
-    if (initialLoading) {
-        return <Loader/>;
-    }
+    // if (initialLoading) {
+    //     return <Loader/>;
+    // }
     
   return (
     <>
@@ -139,7 +141,7 @@ function App() {
 
         <Route path="/home"  element={<Home/>} />
         <Route path="/me" element={<ProtectedRoute><Me/></ProtectedRoute>}/>
-        <Route path="/create-campaign" element={<CreateCampaign/>}/>
+        <Route path="/create-campaign" element={<ProtectedRoute><CreateCampaign/></ProtectedRoute>}/>
         
         <Route path="/buggy" element={<Buggy/>}/>
         <Route path="*" element={<NotFound/>}/>

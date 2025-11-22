@@ -2,11 +2,15 @@ import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {LayoutDashboard,Gift,Users,Calendar,FileText,LogOut,ChevronLeft,ChevronRight,ClipboardList,UserCheck,} from "lucide-react";
 import Swal from "sweetalert2";
+import { useDispatch } from "react-redux";
+import { setAdminCredentials } from "../../store/adminAuthSlice";
+import adminApi from "../../api/adminApi";
 
 
 
 const AdminSidebar = ({ collapsed, setCollapsed }) => {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
    const handleLogout = () => {
   Swal.fire({
     title: "Logout?",
@@ -16,10 +20,16 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
     confirmButtonColor: "#d33",
     cancelButtonColor: "#3085d6",
     confirmButtonText: "Yes, logout"
-  }).then((result) => {
+  }).then(async(result) => {
     if (result.isConfirmed) {
-      localStorage.removeItem("adminToken");
-      localStorage.removeItem("adminName");
+      
+      await adminApi.post('/auth/admin/logout')
+
+      dispatch(setAdminCredentials({
+         adminAccessToken: null,
+         adminName: null,
+        adminEmail: null,
+      }))
 
        Swal.fire({
         icon: "success",
@@ -29,7 +39,6 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
         showConfirmButton: false
       });
 
-      navigate("/admin/login");
     }
   });
 };

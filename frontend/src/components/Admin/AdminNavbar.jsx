@@ -1,10 +1,11 @@
 import React from "react";
 import { Bell, ChevronDown } from "lucide-react";
+import { useSelector } from "react-redux";
 
 export default function AdminNavbar({ collapsed }) {
 
 
-  const adminName =localStorage.getItem("adminName") || "SHIBIN M S"
+  const adminName = useSelector((state)=> state.adminAuth.adminName) || "SHIBIN M S"
 
   const sidebarWidth = collapsed ? 80 : 256;
   const leftPx = `${sidebarWidth}px`;

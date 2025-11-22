@@ -4,11 +4,13 @@ dotenv.config()
 import userRoutes from './routes/UserRoutes.js'
 import AdminAuthRoutes from './routes/AdminAuthRoutes.js'
 import AdminRoutes from './routes/AdminRoutes.js'
+import CampaignRoutes from './routes/CampaignRoutes.js'
 import connectDB from './config/db.js'
 import cors from 'cors'
 import "./config/passport.js";    
 import passport from "passport";
 import cookieParser from "cookie-parser";
+import cloudinary from './config/cloudinary.js';
 
 connectDB()
 
@@ -27,6 +29,7 @@ app.use(passport.initialize());
 app.use('/auth/users',userRoutes)
 app.use('/auth/admin',AdminAuthRoutes)
 app.use('/admin',AdminRoutes)
+app.use("/campaign", CampaignRoutes);
 
 app.get('/',(req,res)=>{
     res.send(" MERN Backend with Controller-Service-Repository running!")

@@ -1,3 +1,4 @@
+import adminApi from "../api/adminApi.js";
 import api from "../api/api.js";
 
 
@@ -61,7 +62,7 @@ export const resetPassword = (email,newPassword) =>{
 }
 
 export const adminLogin =(adminEmail,password) =>{
-    return api.post("/auth/admin/login",{
+    return adminApi.post("/auth/admin/login",{
         adminEmail,password
     })
 }

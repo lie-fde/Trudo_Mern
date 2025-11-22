@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useForm } from "react-hook-form";
@@ -33,10 +33,11 @@ export default function Login() {
 
       dispatch(setCredentials({
         accessToken : response.data.accessToken,
-        userName : response.data.user.userName
+        userName : response.data.user.userName,
+        userEmail: response.data.user.userEmail
       }))
        toast.success("Logged in successfully!")
-       navigate("/home");
+       navigate("/home" , {replace:true});
     
     } catch (err) {
        if (err.response) {

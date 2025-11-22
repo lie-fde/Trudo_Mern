@@ -1,10 +1,16 @@
 import express from 'express'
-import { adminLogin } from '../controllers/AdminController/AdminController.js'
+import { adminLogin, adminLogoutController, adminRefreshTokenController } from '../controllers/AdminController/AdminController.js'
 
 const router = express.Router()
 
 
 router.post('/login',adminLogin)
+
+router.post('/logout',adminLogoutController)
+
+router.get('/refresh-token',adminRefreshTokenController)
+
+
 
 
 

@@ -8,7 +8,19 @@ export const adminLogin = async (req,res)=>{
 
         const result = await AdminService.adminLogin(adminEmail,password)
 
-        res.status(200).json(result)
+        const {adminAccessToken,adminrefreshToken,admin}= result
+
+        res.cookie("adminrefreshToken",adminrefreshToken,{
+          httpOnly : true,
+          secure: true,
+          sameSite : "strict",
+          maxAge: 2*24*60*60*1000
+        });
+
+
+        res.status(200).json({
+          message: 'Login Successful', adminAccessToken , admin
+        });
         
     } catch (error) {
 
@@ -129,3 +141,28 @@ export const unblock = async (req,res)=>{
         
     }
 }
+
+
+export const adminRefreshTokenController = async (req, res) => {
+  try {
+    const response = await AdminService.refreshAdminAccessToken(
+      req.cookies.adminrefreshToken
+    );
+
+    return res.status(200).json(response);
+
+  } catch (err) {
+    return res.status(401).json({ message: err.message });
+  }
+};
+
+
+export const adminLogoutController = (req, res) => {
+  res.clearCookie("adminrefreshToken", {
+    httpOnly: true,
+    secure: false, 
+    sameSite: "strict"
+  });
+
+  return res.status(200).json({ message: "Admin logged out successfully" });
+};

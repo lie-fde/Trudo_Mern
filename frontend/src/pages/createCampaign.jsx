@@ -538,9 +538,10 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import DropZone from "../components/reusable/dropfile.jsx";
+import Swal from 'sweetalert2'
+import api from '../api/api.js'
+import { useSelector } from "react-redux";
 
-// Local sample path you uploaded (provided for tooling / dev use)
-const SAMPLE_UPLOAD_PATH = "/mnt/data/Screenshot 2025-11-21 091542.png";
 
 export default function CreateCampaign() {
   const {
@@ -554,7 +555,9 @@ export default function CreateCampaign() {
   } = useForm({
     mode: "onTouched",
   });
-
+  
+  const userName = useSelector((state)=> state.auth.userName)
+  const userEmail = useSelector((state)=> state.auth.userEmail)
   const [step, setStep] = useState(1);
   const orgType = watch("orgType");
 
@@ -584,71 +587,92 @@ export default function CreateCampaign() {
 
   const backStep = () => setStep(1);
 
-  // Final submit: validate everything, combine payload
-  const onFinalSubmit = async (data) => {
-    const requiredStep2 = [
-      "title",
-      "beneficiary",
-      "category",
-      "detail",
-      "location",
-      "amount",
-      "campaignImage",
-      "campaignDocs",
-    ];
+ const onFinalSubmit = async (data) => {
+  const step2Fields = [
+    "title",
+    "beneficiary",
+    "category",
+    "detail",
+    "location",
+    "amount",
+    "campaignImage",
+    "campaignDocs",
+  ];
 
-    const allFields = [
-      "fullName",
-      "email",
-      "phone",
-      "orgType",
-      "bankAcc",
-      "ifsc",
-      ...requiredStep2,
-    ];
+  let validateFields = [
+    "orgType",
+    "bankAcc",
+    "ifsc",
+    ...step2Fields,
+  ];
 
-    if (orgType === "Organization") {
-      allFields.push("orgName", "orgProof");
-    }
+  if (orgType === "Organization") {
+    validateFields.push("orgName", "orgProof");
+  }
 
-    const ok = await trigger(allFields);
-    if (!ok) {
-      setStep(1);
-      return;
-    }
+  // Validate everything
+  const ok = await trigger(validateFields);
+  if (!ok) {
+    setStep(1);
+    return;
+  }
 
-    const payload = {
-      page1: {
-        fullName: data.fullName,
-        email: data.email,
-        phone: data.phone,
-        orgType: data.orgType,
-        orgName: data.orgName || null,
-        bankAcc: data.bankAcc,
-        ifsc: data.ifsc,
-        orgProof: data.orgProof || null,
-      },
-      page2: {
-        title: data.title,
-        beneficiary: data.beneficiary,
-        category: data.category,
-        detail: data.detail,
-        location: data.location,
-        amount: data.amount,
-        campaignImage: data.campaignImage || null,
-        campaignDocs: data.campaignDocs || null,
-      },
-    };
+  // 🎯 SweetAlert confirmation
+  const result = await Swal.fire({
+    title: "Confirm Submission",
+    text: "Once submitted, this campaign cannot be edited. Continue?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, Submit",
+    cancelButtonText: "Cancel",
+  });
 
-    // TODO: replace with your API call (use FormData for files)
-    console.log("FINAL PAYLOAD:", payload);
-    alert("Campaign created (check console).");
-  };
+  if (!result.isConfirmed) return;
 
-  // Helper DropZone wrapper props we pass to the reusable component
-  // (DropZone must accept these props: label, name, accept, register, errors, watch, setValue, handleFile)
-  // The DropZone component itself will use watch(name) to show selected file name
+  // ---------------- FormData build ----------------
+  const formData = new FormData();
 
+  // Backend-exact fields
+  formData.append("organizationName", data.orgType === "Organization" ? data.orgName : "");
+  if (data.orgProof) formData.append("orgProof", data.orgProof);
+
+  formData.append("title", data.title);
+  formData.append("description", data.detail);
+  formData.append("category", data.category);
+  formData.append("location", data.location);
+
+  formData.append("campaignImage", data.campaignImage);
+  formData.append("campaignDocs", data.campaignDocs);
+
+  formData.append("targetAmount", data.amount);
+formData.append("beneficiaryName", data.beneficiary);
+
+
+  // bankDetails
+  formData.append("bankAcc", data.bankAcc);
+  formData.append("IFSCCode", data.ifsc);
+
+
+  try {
+     await api.post("/campaign/create", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      withCredentials:true,
+    });
+
+    Swal.fire({
+      title: "Success!",
+      text: "Campaign has been created successfully.",
+      icon: "success",
+    });
+
+  } catch (err) {
+    Swal.fire({
+      title: "Error!",
+      text: err.response?.data?.message || "Something went wrong.",
+      icon: "error",
+    });
+  }
+};
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 flex justify-center">
       <div className="w-full max-w-3xl bg-white p-8 rounded-xl shadow">
@@ -667,7 +691,7 @@ export default function CreateCampaign() {
                 </label>
                 <input
                   {...register("fullName", { required: "Full Name is required" })}
-                  placeholder="Enter full name"
+                  placeholder="Enter full name" value={userName}
                   className={`w-full mt-1 p-3 border rounded-md ${errors.fullName ? "border-red-500" : "border-gray-300"}`}
                 />
                 {errors.fullName && <p className="text-xs text-red-500 mt-1">{errors.fullName.message}</p>}
@@ -684,7 +708,7 @@ export default function CreateCampaign() {
                     required: "Email is required",
                     pattern: { value: /^\S+@\S+$/i, message: "Enter a valid email" },
                   })}
-                  placeholder="name@example.com"
+                  placeholder="name@example.com" value={userEmail}
                   className={`w-full mt-1 p-3 border rounded-md ${errors.email ? "border-red-500" : "border-gray-300"}`}
                 />
                 {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
@@ -934,3 +958,4 @@ export default function CreateCampaign() {
     </div>
   );
 }
+
