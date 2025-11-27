@@ -66,6 +66,11 @@ const campaignSchema = new mongoose.Schema(
       default: "Pending",
     },
 
+    rejectionReason: { 
+    type: String, 
+    default: null // Empty by default
+  },
+
     approvalDate: {
       type: Date,
       default: null,

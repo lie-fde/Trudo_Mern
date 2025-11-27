@@ -1,72 +1,3 @@
-// import React from "react";
-// import {BrowserRouter as Router, Routes , Route,  Navigate} from 'react-router-dom'
-// import Login from "./pages/authentication/Login";
-// import Signup from "./pages/authentication/SignUp";
-// import Home from "./pages/User/home";
-// import ProtectedRoute from "./router/ProtectedRoute";
-// import AdminProtectedRoute from "./router/AdminProtectedRoute";
-// import VerifyOTP from "./pages/authentication/VerifyOtp";
-// import ForgotPassword from "./pages/authentication/ForgotPassword";
-// import ChangePassword from "./pages/authentication/ChangePassword";
-// import VerifyOtpPassword from "./pages/authentication/VerifyOtpPassword";
-// import AdminLogin from "./pages/authentication/AdminLogin";
-// import AdminDashboard from "./pages/Admin/Dashboard";
-// import UsersList from "./pages/Admin/AdminUsersList";
-// import UserDetails from "./pages/Admin/AdminUsersDetails";
-// import Buggy from "./components/reusable/buggy"
-// import NotFound from "./pages/NotFound";
-// import GoogleSuccess from "./components/GoogleSuccess";
-// import useAutoLogin from "./hooks/useAutoLogin";
-// import { ToastContainer } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-// import Me from "./pages/me";
-// import { useSelector } from "react-redux";
-// import BlockRoute from "./router/blockRoute";
-// import Loader from "./components/reusable/loader";
-
-// function App() {
-//     useAutoLogin();
-//     const loading = useSelector((state) => state.auth.loading);
-//      if (loading) {
-//     return (
-//       <Loader/>
-//     );
-//   }
-//   return (
-//     <>
-//     <ToastContainer position="top-right" autoClose={2000} />
-   
-
-//       <Routes>
-//         <Route path="/login" element={<BlockRoute><Login/></BlockRoute>}/>
-//         <Route path="/signup" element={<Signup/>}/>
-//          <Route path="/"  element={ <Navigate to={'/home'} replace/>}/> 
-//          <Route path="/verify-otp" element={ <VerifyOTP/>}/>
-//          <Route path="/verify-otp-password" element={<VerifyOtpPassword/>}/>
-//          <Route path="/forgot-password" element={<ForgotPassword/>}/>
-//          <Route path="/change-password" element={<ChangePassword/>}/>
-//          <Route path="/google-success" element={<GoogleSuccess/>}/>
-
-//         <Route path="/home"  element={<Home/>} />
-//         <Route path="/me" element={<ProtectedRoute><Me/></ProtectedRoute>}/>
-        
-//         <Route path="/buggy" element={<Buggy/>}/>
-//         <Route path="*" element={<NotFound/>}/>
-        
-
-//         <Route path="/admin/login" element={<AdminLogin/>}/>
-//         <Route path="/admin/dashboard" element={<AdminProtectedRoute><AdminDashboard/></AdminProtectedRoute>}/>
-//         <Route path="/admin/users" element={<AdminProtectedRoute><UsersList/></AdminProtectedRoute>}/> 
-//         <Route path="/admin/users/:id" element={<AdminProtectedRoute><UserDetails/></AdminProtectedRoute>}/>
-//       </Routes>
-//     </>
-//   )
-// }
-
-// export default App;
-
-
-
 import React from "react";
 import {BrowserRouter as Router, Routes , Route,  Navigate} from 'react-router-dom'
 import Login from "./pages/authentication/Login";
@@ -93,11 +24,15 @@ import { useSelector } from "react-redux";
 import BlockRoute from "./router/blockRoute";
 import Loader from "./components/reusable/loader";
 import CreateCampaign from "./pages/createCampaign";
-import useAdminAutoLogin from "./hooks/useAdminAutoLogin";
+// import useAdminAutoLogin from "./hooks/useAdminAutoLogin";
+import CampaignRequestList from "./pages/Admin/CampaignRequestList";
+import CampaignView from "./pages/Admin/CampaignView";
+import CampaignPage from "./pages/User/campaignPage";
+
 
 function App() {
-    useAutoLogin();
-    useAdminAutoLogin();
+    // useAutoLogin();
+    // useAdminAutoLogin();
     // const initialLoading = useSelector((state) => state.auth.initialLoading); // Changed!
     // const apiLoading = useSelector((state) => state.auth.apiLoading); // Optional: use for UI feedback
    
@@ -132,14 +67,15 @@ function App() {
       <Routes>
         <Route path="/login" element={<BlockRoute><Login/></BlockRoute>}/>
         <Route path="/signup" element={<Signup/>}/>
-         <Route path="/"  element={ <Navigate to={'/home'} replace/>}/> 
+         <Route path="/"  element={<Home/>}/> 
          <Route path="/verify-otp" element={ <VerifyOTP/>}/>
          <Route path="/verify-otp-password" element={<VerifyOtpPassword/>}/>
          <Route path="/forgot-password" element={<ForgotPassword/>}/>
          <Route path="/change-password" element={<ChangePassword/>}/>
          <Route path="/google-success" element={<GoogleSuccess/>}/>
-
-        <Route path="/home"  element={<Home/>} />
+{/* 
+        <Route path="/home"  element={<Home/>} /> */}
+        <Route path="/campaigns" element={<ProtectedRoute><CampaignPage/></ProtectedRoute>}/>
         <Route path="/me" element={<ProtectedRoute><Me/></ProtectedRoute>}/>
         <Route path="/create-campaign" element={<ProtectedRoute><CreateCampaign/></ProtectedRoute>}/>
         
@@ -150,6 +86,8 @@ function App() {
         <Route path="/admin/dashboard" element={<AdminProtectedRoute><AdminDashboard/></AdminProtectedRoute>}/>
         <Route path="/admin/users" element={<AdminProtectedRoute><UsersList/></AdminProtectedRoute>}/> 
         <Route path="/admin/users/:id" element={<AdminProtectedRoute><UserDetails/></AdminProtectedRoute>}/>
+        <Route path="/admin/campaigns-request" element={<AdminProtectedRoute><CampaignRequestList/></AdminProtectedRoute>}/>
+        <Route path="/admin/campaigns-request/:id" element={<AdminProtectedRoute><CampaignView/></AdminProtectedRoute>} />
       </Routes>
     </>
   )

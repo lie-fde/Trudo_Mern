@@ -37,7 +37,7 @@ export default function Login() {
         userEmail: response.data.user.userEmail
       }))
        toast.success("Logged in successfully!")
-       navigate("/home" , {replace:true});
+       navigate("/" , {replace:true});
     
     } catch (err) {
        if (err.response) {

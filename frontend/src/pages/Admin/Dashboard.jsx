@@ -19,12 +19,20 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="flex bg-gray-50 min-h-screen">
+     <div className="bg-gray-50 min-h-screen">
+      {/* FIXED SIDEBAR */}
       <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
-      <div className="flex-1 flex flex-col">
+      {/* MAIN CONTENT WITH SHIFT */}
+      <div
+        className="transition-all duration-300"
+        style={{
+          marginLeft: collapsed ? 80 : 240, // Key fix!
+          paddingTop: 72, // navbar height
+        }}
+      >
         <AdminNavbar collapsed={collapsed} />
-        <div className="p-8 mt-16">
+        <div className="p-8 mt-1">
           <h1 className="text-2xl font-semibold text-gray-800 mb-8">
             Dashboard Overview
           </h1>

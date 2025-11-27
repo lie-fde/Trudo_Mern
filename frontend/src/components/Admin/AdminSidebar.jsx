@@ -45,7 +45,8 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
 
   return (
     <div
-      className={`relative flex flex-col justify-between bg-white h-screen border-r transition-all duration-300 shadow-sm z-30`}
+      // className={`relative flex flex-col justify-between bg-white h-screen border-r transition-all duration-300 shadow-sm z-30`}
+      className="fixed left-0 top-0 h-screen bg-white border-r shadow-lg z-30 transition-all duration-300"
       style={{ width: collapsed ? 80 : 256 }}
     >
       <button
@@ -60,13 +61,14 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
       </button>
 
       <div>
-        <h1
-          className={`text-xl font-semibold px-6 py-4 transition-all ${
-            collapsed ? "opacity-0" : "opacity-100"
-          }`}
-        >
-          Trudo
-        </h1>
+         <div className="flex items-center px-6 py-5 border-b border-gray-200">
+                            <Gift size={24} className="text-teal-600 min-w-8" />
+                            {!collapsed && (
+                                <h1 className={`text-2xl font-extrabold ml-3 text-gray-900 transition-opacity duration-300`}>
+                                    Trudo
+                                </h1>
+                            )}
+                        </div>
 
         <ul className="mt-4 space-y-2 px-2">
           <SidebarItem
@@ -97,7 +99,7 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
             icon={<UserCheck size={20} />}
             label="Campaign Request"
             collapsed={collapsed}
-            path="/admin/requests"
+            path="/admin/campaigns-request"
           />
           <SidebarItem
             icon={<Calendar size={20} />}

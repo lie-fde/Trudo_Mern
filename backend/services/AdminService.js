@@ -16,7 +16,7 @@ const adminLogin = async (adminEmail,password) =>{
     if(!validPassword) throw new Error("Invalid Password")
 
     const adminAccessToken = jwt.sign({id:admin._id},process.env.JWT_SECRET,{
-        expiresIn:'1d'
+        expiresIn:'10s'
     })
      const adminrefreshToken = jwt.sign({id:admin._id},process.env.JWT_REFRESH_SECRET,{
         expiresIn: '2d',
@@ -86,22 +86,19 @@ const unblockUser = async (id) =>{
 const refreshAdminAccessToken = async (adminrefreshToken) => {
   if (!adminrefreshToken) throw new Error("Admin refresh token missing");
 
-  // Verify refresh token
   const decoded = jwt.verify(adminrefreshToken, process.env.JWT_REFRESH_SECRET);
 
   if (!decoded.id) throw new Error("Invalid admin refresh token");
 
-  // Fetch Admin from database
   const admin = await UserRepository.findById(decoded.id);
   if (!admin) throw new Error("Admin not found");
 
   if (!admin.isAdmin) throw new Error("Not authorized");
 
-  // Generate new Access Token
   const adminAccessToken = jwt.sign(
     { id: admin._id },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" }
+    { expiresIn: "10s" }
   );
 
   return {

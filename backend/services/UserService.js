@@ -274,16 +274,13 @@ const getAllUsersPaginated = async (page,limit)=>{
 const refreshAccessToken = async (refreshToken) => {
   if (!refreshToken) throw new Error("Refresh token missing");
 
-  // Verify token
   const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
   if (!decoded.id) throw new Error("Invalid refresh token");
 
-  // Fetch user
   const user = await UserRepository.findById(decoded.id);
   if (!user) throw new Error("User not found");
 
-  // Generate new access token
   const accessToken = jwt.sign(
     { id: user._id },
     process.env.JWT_SECRET,

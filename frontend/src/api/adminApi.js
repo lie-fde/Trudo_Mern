@@ -13,9 +13,7 @@ const adminApi = axios.create({
   withCredentials: true,
 });
 
-// 🔹 REQUEST INTERCEPTOR
 adminApi.interceptors.request.use((config) => {
-  // Start loader only for non-refresh requests
   if (!config.url.includes("refresh-admin")) {
     store.dispatch(startAdminApiLoading());
   }
@@ -29,7 +27,6 @@ adminApi.interceptors.request.use((config) => {
   return config;
 });
 
-// 🔹 RESPONSE INTERCEPTOR
 adminApi.interceptors.response.use(
   (response) => {
     if (!response.config.url.includes("refresh-admin")) {
@@ -41,7 +38,7 @@ adminApi.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (!originalRequest.url.includes("refresh-admin")) {
+    if (!originalRequest.url.includes("/refresh-admin")) {
       store.dispatch(stopAdminApiLoading());
     }
 
@@ -50,12 +47,8 @@ adminApi.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshRes = await axios.get(
-          `${import.meta.env.VITE_API_URL}/auth/admin/refresh-token`,
-          { withCredentials: true }
-        );
+       const refreshRes = await adminApi.get("/auth/admin/refresh-token");
 
-        // Update Redux state
         store.dispatch(
           setAdminCredentials({
             adminAccessToken: refreshRes.data.adminAccessToken,
@@ -64,9 +57,10 @@ adminApi.interceptors.response.use(
           })
         );
 
-        // Retry original request with new access token
+
         originalRequest.headers.Authorization =
           `Bearer ${refreshRes.data.adminAccessToken}`;
+
 
         return adminApi(originalRequest);
 

@@ -6,15 +6,15 @@ const authSlice = createSlice({
         accessToken : null,
         userName : null,
         userEmail : null,
-        initialLoading: true,  // For auto-login only
-        apiLoading: false,     // For API calls
+        initialLoading: true, 
+        apiLoading: false,     
     },
     reducers:{
         setCredentials:(state, action) => {
             state.accessToken = action.payload.accessToken;
             state.userName = action.payload.userName;
             state.userEmail=action.payload.userEmail
-            state.initialLoading = false; // Stop initial loading
+            state.initialLoading = false; 
         },
         logout: (state) => {
             state.accessToken = null;

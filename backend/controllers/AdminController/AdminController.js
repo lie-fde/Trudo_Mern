@@ -1,147 +1,118 @@
-import AdminService from "../../services/AdminService.js"
-import UserService from "../../services/UserService.js"
+import AdminService from "../../services/AdminService.js";
+import UserService from "../../services/UserService.js";
 
-export const adminLogin = async (req,res)=>{
-    try {
+export const adminLogin = async (req, res) => {
+  try {
+    const { adminEmail, password } = req.body;
 
-        const {adminEmail ,password} = req.body
+    const result = await AdminService.adminLogin(adminEmail, password);
 
-        const result = await AdminService.adminLogin(adminEmail,password)
+    const { adminAccessToken, adminrefreshToken, admin } = result;
 
-        const {adminAccessToken,adminrefreshToken,admin}= result
-
-        res.cookie("adminrefreshToken",adminrefreshToken,{
-          httpOnly : true,
-          secure: true,
-          sameSite : "strict",
-          maxAge: 2*24*60*60*1000
-        });
-
-
-        res.status(200).json({
-          message: 'Login Successful', adminAccessToken , admin
-        });
-        
-    } catch (error) {
-
-        res.status(400).json({message:error.message})
-        
-    }
-}
-
-
-export const fetchAllUsers = async ( req,res) =>{
-    try {
-
-        const users = await AdminService.getAllUsers()
-
-        return res.status(200).json({
-            success:true,
-            message:"Users fetched successfully",
-            users
-        })
-        
-    } catch (error) {
-
-        return res.status(500).json({
-            success:false,
-            message:error.message
-        })
-        
-    }
-}
-
-
-export const fetchUser = async (req,res) =>{
-    try {
-
-        const {id} = req.params
-        const user = await AdminService.getUserById(id)
-
-        return res.status(200).json({
-            success:true,
-            user
-        })
-
-        
-    } catch (error) {
-
-        return res.status(500).json({
-            success:false,
-            message:error.message
-        })
-        
-    }
-}
-
-
-export const softDelete = async (req,res) =>{
-    try {
-
-        const {id} = req.params
-        const result = await AdminService.softDeleteUser(id)
-        
-        return res.status(200).json({
-            success:true,
-            message: "User soft deleted successfully",
-            data: result
-        })
-        
-    } catch (error) {
-
-         return res.status(400).json({
-        success: false,
-        message: error.message,
-        
+    res.cookie("adminrefreshToken", adminrefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 2 * 24 * 60 * 60 * 1000,
     });
-}
-}
 
+    res.status(200).json({
+      message: "Login Successful",
+      adminAccessToken,
+      admin,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
-export const block = async (req,res) =>{
-    try {
+export const fetchAllUsers = async (req, res) => {
+  try {
+    const users = await AdminService.getAllUsers();
 
-        const {id} = req.params;
-        const result = await AdminService.blockUser(id)
+    return res.status(200).json({
+      success: true,
+      message: "Users fetched successfully",
+      users,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
-        return res.status(200).json({
-            success: true,
-            message: "User blocked successfully",
-            data: result
-        })
-        
-    } catch (error) {
-        
-        return res.status(400).json({
-        success: false,
-        message: error.message
-      });
-    }
-}
+export const fetchUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await AdminService.getUserById(id);
 
+    return res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
-export const unblock = async (req,res)=>{
-    try {
+export const softDelete = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await AdminService.softDeleteUser(id);
 
-        const {id} = req.params;
-        const result = await AdminService.unblockUser(id)
+    return res.status(200).json({
+      success: true,
+      message: "User soft deleted successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
-        return res.status(200).json({
-        success: true,
-        message: "User unblocked successfully",
-        data: result
-      });
-        
-    } catch (error) {
+export const block = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await AdminService.blockUser(id);
 
-        return res.status(400).json({
-        success: false,
-        message: error.message
-      });
-        
-    }
-}
+    return res.status(200).json({
+      success: true,
+      message: "User blocked successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
+export const unblock = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await AdminService.unblockUser(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "User unblocked successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 export const adminRefreshTokenController = async (req, res) => {
   try {
@@ -150,18 +121,16 @@ export const adminRefreshTokenController = async (req, res) => {
     );
 
     return res.status(200).json(response);
-
   } catch (err) {
     return res.status(401).json({ message: err.message });
   }
 };
 
-
 export const adminLogoutController = (req, res) => {
   res.clearCookie("adminrefreshToken", {
     httpOnly: true,
-    secure: false, 
-    sameSite: "strict"
+    secure: false,
+    sameSite: "strict",
   });
 
   return res.status(200).json({ message: "Admin logged out successfully" });

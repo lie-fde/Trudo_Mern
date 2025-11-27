@@ -21,7 +21,7 @@ export default function AdminNavbar({ collapsed }) {
       }}
     >
       <div className="h-full flex items-center justify-between px-6">
-        <h1 className="text-lg font-semibold text-gray-800">Trudo Admin Panel</h1>
+        <h1 className="text-xl font-bold text-gray-800 tracking-wide">Trudo Admin Panel</h1>
 
         <div className="flex items-center gap-6">
           <button className="relative text-gray-500 hover:text-green-700 transition">

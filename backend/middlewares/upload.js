@@ -16,16 +16,22 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: (req, file) => {
     let folder = "campaigns";
+    let resourceType = "auto";
 
     if (file.fieldname === "orgProof") folder = "organization_proofs";
-    if (file.fieldname === "campaignDocs") folder = "campaign_documents";
+    if (file.fieldname === "campaignDocs")folder = "campaign_documents";
     if (file.fieldname === "campaignImage") folder = "campaign_images";
+
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+    const filename = file.originalname.split('.')[0];
+
 
     return {
       folder,
-      resource_type: "auto",
-      allowed_formats: ["jpg", "jpeg", "png", "pdf"],
-      public_id: `${Date.now()}-${file.originalname}`,
+      resource_type: resourceType,
+      allowed_formats: ["jpg", "jpeg", "png", "pdf"],public_id: `${uniqueSuffix}-${filename}`,
+      // Explicitly tell Cloudinary to treat it as a PDF if the mime matches
+      format: file.mimetype === "application/pdf" ? "pdf" : undefined,
     };
   },
 });

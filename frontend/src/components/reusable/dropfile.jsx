@@ -47,7 +47,6 @@ export default function DropZone({
         </label>
       </div>
 
-      {/* FILE NAME DISPLAY */}
       {file && (
         <p className="mt-2 text-sm text-gray-600">
           <span className="font-medium">Selected:</span> {file.name}

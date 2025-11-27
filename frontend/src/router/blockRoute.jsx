@@ -6,7 +6,7 @@ export default function BlockRoute({ children }) {
 
   if (loading) return null;
 
-  if (accessToken) return <Navigate to="/home" replace />;
+  if (accessToken) return <Navigate to="/" replace />;
 
   return children;
 }
