@@ -6,7 +6,8 @@ import {
   block,
   unblock,
   getCampaignsAdminController, blockCampaignController ,unblockCampaignController,deleteCampaignController,
-  updateCampaignController
+  updateCampaignController,
+  updateAdminProfileController
 } from "../controllers/AdminController/AdminController.js";
 import {
   getPendingCampaigns,
@@ -16,6 +17,8 @@ import {
 import adminAuth from "../middlewares/adminAuth.js";
 import campaignController from "../controllers/UserController/campaignController.js";
 import upload from '../middlewares/upload.js'
+import profileUpload from "../middlewares/profileUpload.js";
+import { getUserProfileController} from "../controllers/UserController/UserController.js";
 
 
 const router = express.Router();
@@ -82,5 +85,10 @@ router.post(
   },
   campaignController.createCampaign
 );
+
+router.get("/profile",adminAuth,getUserProfileController)
+
+router.put("/profile/update", adminAuth, profileUpload.single("avatar"), updateAdminProfileController);
+
 
 export default router;

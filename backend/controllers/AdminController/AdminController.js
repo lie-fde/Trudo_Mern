@@ -1,5 +1,5 @@
 import AdminService from "../../services/AdminService.js";
-import { getCampaignsAdmin , blockCampaignService ,unblockCampaignService,deleteCampaignService, updateCampaignService
+import { getCampaignsAdmin , blockCampaignService ,unblockCampaignService,deleteCampaignService, updateCampaignService,
  } from "../../services/campaignService.js";
 import UserService from "../../services/UserService.js";
 
@@ -241,6 +241,27 @@ export const updateCampaignController = async(req,res) =>{
 
 
 }
+
+export const updateAdminProfileController = async (req, res) => {
+  try {
+    const userId = req.admin?._id; 
+    const avatar = req.file?.path || null;
+    const updatedUser = await AdminService.updateAdminProfileService(
+      userId,
+      req.body,
+      avatar
+    );
+    console.log(updatedUser)
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      data: updatedUser
+    });
+  } catch (err) {
+    console.log(err)
+    return res.status(400).json({ message: err.message });
+  }
+};
 
 
 

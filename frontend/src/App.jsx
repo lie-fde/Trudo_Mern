@@ -24,7 +24,6 @@ import { useSelector } from "react-redux";
 import BlockRoute from "./router/blockRoute";
 import Loader from "./components/reusable/loader";
 import CreateCampaign from "./pages/createCampaign";
-// import useAdminAutoLogin from "./hooks/useAdminAutoLogin";
 import CampaignRequestList from "./pages/Admin/CampaignRequestList";
 import CampaignView from "./pages/Admin/CampaignView";
 import CampaignPage from "./pages/User/campaignPage";
@@ -37,6 +36,7 @@ import Profile from "./pages/User/Profile.jsx";
 import VerifyOTPProfile from "./pages/User/ProfileEmailVerification.jsx";
 import MyCampaignPage from "./pages/User/MyCampaign.jsx";
 import EditCampaignUser from "./pages/User/EditCampaignUser.jsx";
+import AdminProfile from "./pages/Admin/AdminProfile.jsx";
 
 
 function App() {
@@ -106,6 +106,7 @@ function App() {
         <Route path="/admin/campaigns"  element={<AdminProtectedRoute><CampaignsPage/></AdminProtectedRoute>}/>
         <Route path="/admin/create-campaign" element={<AdminProtectedRoute><CreateCampaignAdmin/></AdminProtectedRoute>} />
         <Route path="/admin/campaigns/edit/:id" element={<AdminProtectedRoute><EditCampaignAdmin/></AdminProtectedRoute>}  />
+        <Route path="/admin/profile" element={<AdminProtectedRoute><AdminProfile/></AdminProtectedRoute>}/>
       </Routes>
     </>
   )

@@ -111,4 +111,29 @@ const refreshAdminAccessToken = async (adminrefreshToken) => {
 };
 
 
-export default {adminLogin , getAllUsers , getUserById , softDeleteUser ,blockUser , unblockUser , refreshAdminAccessToken}
+const updateAdminProfileService = async (userId, data,avatar) => {
+
+  const updateData = {};
+
+  // Map frontend → backend fields
+  if (data.userName) updateData.userName = data.userName;
+  if (data.mobileNumber) updateData.mobileNumber = data.mobileNumber;
+ 
+ if (avatar) {
+    updateData.avatar = avatar; // Cloudinary URL
+  }
+
+
+  const updatedUser = await UserRepository.updateUserProfileRepo(
+    userId,
+    updateData
+  );
+
+  if (!updatedUser) throw new Error("User not found");
+
+  return updatedUser;
+};
+
+export default {adminLogin , getAllUsers , getUserById , softDeleteUser ,blockUser , unblockUser , refreshAdminAccessToken,
+    updateAdminProfileService
+}

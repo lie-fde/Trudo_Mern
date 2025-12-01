@@ -202,7 +202,7 @@ export const getMe = async (req,res) =>{
 
 export const getUserProfileController = async (req, res) => {
   try {
-    const  id  = req.user.id;
+    const  id  = (req.user?.id) || (req.admin?.id);
 
     const user = await UserService.getUserProfileService(id);
 
@@ -249,7 +249,7 @@ export const verifyOtpControllerProfile = async (req, res) => {
 
 export const updateUserProfileController = async (req, res) => {
   try {
-    const userId = req.user._id; // From auth middleware
+    const userId = (req.user?._id) || (req.admin?._id); // From auth middleware
     const avatar = req.file?.path || null;
     const updatedUser = await UserService.updateUserProfileService(
       userId,
