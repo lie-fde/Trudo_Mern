@@ -14,7 +14,7 @@ export default async function adminAuth(req, res, next) {
     if (!admin || !admin.isAdmin) {
       return res.status(401).json({ message: "Not authorized (Admin only)" });
     }
-
+    console.log(admin._id)
     req.admin = admin;
     next();
   } catch (err) {

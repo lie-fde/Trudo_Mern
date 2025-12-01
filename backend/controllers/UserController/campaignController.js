@@ -1,5 +1,5 @@
 import  {createCampaignService , getPendingRequests, getCampaignDetailsrepo ,
-  updateCampaignStatusService
+  updateCampaignStatusService, getUserCampaignsService
 } from "../../services/campaignService.js";
 
 const createCampaign = async (req, res) => {
@@ -67,5 +67,25 @@ export const updateCampaignStatus = async (req, res) => {
     });
   } catch (err) {
     return res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+
+export const getUserCampaignsController = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const campaigns = await getUserCampaignsService(userId);
+
+    return res.status(200).json({
+      success: true,
+      data: campaigns,
+    });
+  } catch (err) {
+    console.error("Error fetching user campaigns:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch campaigns",
+    });
   }
 };

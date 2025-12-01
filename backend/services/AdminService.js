@@ -16,7 +16,7 @@ const adminLogin = async (adminEmail,password) =>{
     if(!validPassword) throw new Error("Invalid Password")
 
     const adminAccessToken = jwt.sign({id:admin._id},process.env.JWT_SECRET,{
-        expiresIn:'10s'
+        expiresIn:'10hr'
     })
      const adminrefreshToken = jwt.sign({id:admin._id},process.env.JWT_REFRESH_SECRET,{
         expiresIn: '2d',
@@ -98,7 +98,7 @@ const refreshAdminAccessToken = async (adminrefreshToken) => {
   const adminAccessToken = jwt.sign(
     { id: admin._id },
     process.env.JWT_SECRET,
-    { expiresIn: "10s" }
+    { expiresIn: "10hr" }
   );
 
   return {

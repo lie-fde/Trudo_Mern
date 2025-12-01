@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Mail, Search, Menu, User } from 'lucide-react';
 import Navbar from "../../components/User/Navbar.jsx"
 import { useSelector,useDispatch } from "react-redux";
-import { fetchPublicCampaigns } from "../../store/campaignUserSlice.js";
+import { fetchMycampaign } from "../../store/campaignUserSlice.js";
 import Trudofooter from "../../components/reusable/footer";
 import { useNavigate } from "react-router-dom";
 
@@ -76,7 +76,7 @@ const CampaignCard = ({ campaign }) => {
 };
 
 
-export default function CampaignPage() {
+export default function MyCampaignPage() {
   // Switched to local state for preview purposes since Redux is not available
 
 
@@ -87,28 +87,28 @@ export default function CampaignPage() {
   const [filteredCampaigns, setFilteredCampaigns] = useState([]);
   const [currentPage , setCurrentPage] = useState(1)
 
-  const { campaigns, loading } = useSelector(
+  const { myCampaign, loading } = useSelector(
     (state) => state.campaignPublic
   );
 
   useEffect(() => {
-    dispatch(fetchPublicCampaigns());
+    dispatch(fetchMycampaign());
   }, [dispatch]);
 
   useEffect(() => {
-    if (campaigns) {
-      const results = campaigns.filter((campaign) =>
+    if (myCampaign) {
+      const results = myCampaign.filter((campaign) =>
         campaign.title?.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredCampaigns(results);
     }
-  }, [campaigns, searchTerm]);
+  }, [myCampaign, searchTerm]);
 
 
 
 
   // Logic for displaying current campaigns
-  const displayData = filteredCampaigns.length || searchTerm ? filteredCampaigns : campaigns;
+  const displayData = filteredCampaigns.length || searchTerm ? filteredCampaigns : myCampaign;
   const totalPages = Math.ceil(displayData.length / itemsPerPage);
   
   const indexOfLastItem = currentPage * itemsPerPage;

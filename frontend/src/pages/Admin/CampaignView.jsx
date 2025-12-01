@@ -212,6 +212,13 @@ export default function CampaignView() {
                   <p>Status: {campaign.status}</p>
                 </div>
 
+                <div className="bg-white p-6 rounded-2xl shadow border-t-4 border-purple-500">
+                <p className="font-bold text-lg mb-3">Created By</p>
+                <p className="text-gray-800 text-base">👤 {campaign.User?.userName || "N/A"}</p>
+                <p className="text-gray-800 text-base mt-2">📧 {campaign.User?.userEmail || "N/A"}</p>
+                <p className="text-gray-800 text-base mt-2">📱 {campaign.User?.mobileNumber || "N/A"}</p>
+              </div>
+
                 {/* Docs */}
                 <div className="bg-white p-6 rounded-2xl shadow border-t-4 border-blue-500">
                   <p className="font-bold mb-3">Verification Documents</p>

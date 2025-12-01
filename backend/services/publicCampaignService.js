@@ -18,3 +18,4 @@ export const getSinglePublicCampaign = async (campaignId) => {
 
   return campaign;
 };
+

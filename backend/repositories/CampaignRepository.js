@@ -40,7 +40,8 @@ export const updateStatus = async (id, updateData) => {
  export const findPublicCampaigns = async () => {
   return Campaign.find({
    status: "Approved",      
-    isDeleted: false   
+    isDeleted: false,
+    isBlocked:false,   
   })
     .select("title image targetAmount createdAt") 
     .sort({ createdAt: -1 })
@@ -56,3 +57,36 @@ export const findPublicCampaignById = async (campaignId) => {
     .select("-__v") 
     .lean();
 };
+
+ export const findCampaignsAdmin = async () => {
+  return Campaign.find({
+   status: "Approved",      
+    isDeleted: false ,  
+  })
+    .select("_id title image category status targetAmount isBlocked isDeleted createdAt") 
+    .sort({ createdAt: -1 })
+    .lean();
+};
+
+export const blockCampaignRepository = async (id) =>{
+  return await Campaign.findByIdAndUpdate(id,{isBlocked:true},{new:true})
+}
+
+export const unblockCampaignRepository = async (id)=>{
+  return await Campaign.findByIdAndUpdate(id,{isBlocked:false},{new:true})
+}
+
+export const deleteCampaignRepository = async (id)=>{
+  return await Campaign.findByIdAndUpdate(id,{isDeleted:true},{new:true})
+}
+
+
+export const updateCampaignRepo = async (id,updateData) =>{
+
+  return await Campaign.findByIdAndUpdate(id, updateData,{new:true})
+  
+}
+
+export const getmMyCampaign = async (userId) =>{
+  return await Campaign.find({ User: userId }).populate("User");
+}

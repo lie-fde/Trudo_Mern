@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const addressSchema = new mongoose.Schema({
+  address:{type:String,default:"House Name"},
   street: { type: String, default: "123 Main Street" },
   city: { type: String, default: "Thrissur" },
   state: { type: String, default: "Kerala" },

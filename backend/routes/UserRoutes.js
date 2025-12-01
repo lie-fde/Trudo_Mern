@@ -3,10 +3,17 @@ import { register ,login ,otpVerify , resendOtp ,forgotPassword ,verifyPasswordO
     googleCallbackController,
     fetchUsersforPagination,
     resendOtpPassword , refreshTokenController,getMe,
-    logoutController
+    logoutController,
+    getUserProfileController,
+    verifyOtpControllerProfile,
+    sendOtpControllerProfile,
+    updateUserProfileController
 } from '../controllers/UserController/UserController.js'
+import { getUserCampaignsController } from '../controllers/UserController/campaignController.js'
 import { verifyAccessToken } from '../middlewares/verifytoken.js'
 import passport from 'passport'
+import auth from '../middlewares/auth.js'
+import profileUpload from '../middlewares/profileUpload.js'
 
 const router = express.Router()
 
@@ -37,6 +44,16 @@ router.get("/google",passport.authenticate("google", { scope: ["profile", "email
 router.get("/google/callback",passport.authenticate("google", { session: false, failureRedirect: "/login" }),
 googleCallbackController
 );
+
+router.get("/profile",auth,getUserProfileController)
+
+router.get("/profile/send-otp",auth,sendOtpControllerProfile)
+
+router.post("/profile/verify-otp", auth, verifyOtpControllerProfile)
+
+router.put("/profile/update", auth, profileUpload.single("avatar"), updateUserProfileController);
+
+router.get("/mycampaigns",auth , getUserCampaignsController)
 
 router.get("/me", verifyAccessToken, getMe);
 

@@ -1,4 +1,6 @@
 import AdminService from "../../services/AdminService.js";
+import { getCampaignsAdmin , blockCampaignService ,unblockCampaignService,deleteCampaignService, updateCampaignService
+ } from "../../services/campaignService.js";
 import UserService from "../../services/UserService.js";
 
 export const adminLogin = async (req, res) => {
@@ -135,3 +137,110 @@ export const adminLogoutController = (req, res) => {
 
   return res.status(200).json({ message: "Admin logged out successfully" });
 };
+
+export const getCampaignsAdminController = async (req, res, next) => {
+  try {
+    const campaigns = await getCampaignsAdmin();
+
+    return res.status(200).json({
+      success: true,
+      campaigns,
+    });
+  } catch (error) {
+    next(error); 
+  }
+};
+
+
+export const blockCampaignController = async(req,res) =>{
+
+  try {
+    const { id } = req.params;
+    const result = await blockCampaignService(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Campaign blocked successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+  
+
+}
+
+export const unblockCampaignController = async(req,res) =>{
+
+  try {
+    const { id } = req.params;
+    const result = await unblockCampaignService(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Campaign Unblocked successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+  
+
+}
+
+export const deleteCampaignController = async(req,res) =>{
+
+  try {
+    const { id } = req.params;
+    const result = await deleteCampaignService(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Campaign deleted successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+  
+
+}
+
+
+export const updateCampaignController = async(req,res) =>{
+
+ try {
+      
+     const {id} = req.params
+     const result = await updateCampaignService(id,{...req.body, files: req.files,});
+ 
+    
+     return res.status(201).json({
+       success: true,
+       message: "Campaign updated successfully",
+       data: result,
+     });
+   } catch (err) {
+     console.error("Campaign Create Error:", err.message);
+ 
+     return res.status(500).json({
+       success: false,
+       message: "Failed to update campaign",
+       error: err.message,
+     });
+   }
+
+
+}
+
+
+

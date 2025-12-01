@@ -28,17 +28,24 @@ import CreateCampaign from "./pages/createCampaign";
 import CampaignRequestList from "./pages/Admin/CampaignRequestList";
 import CampaignView from "./pages/Admin/CampaignView";
 import CampaignPage from "./pages/User/campaignPage";
+import CampaignsPage from './pages/Admin/CampaignList.jsx'
+import CreateCampaignAdmin from "./pages/Admin/CreateCampaignAdmin.jsx";
+import CampaignViewUser from "./pages/User/CampaignViewUser.jsx";
+import DonationPage from "./pages/User/DonationAmountPage.jsx";
+import EditCampaignAdmin from "./pages/Admin/EditCampaignRequest.jsx";
+import Profile from "./pages/User/Profile.jsx";
+import VerifyOTPProfile from "./pages/User/ProfileEmailVerification.jsx";
+import MyCampaignPage from "./pages/User/MyCampaign.jsx";
 
 
 function App() {
-    // useAutoLogin();
-    // useAdminAutoLogin();
-    // const initialLoading = useSelector((state) => state.auth.initialLoading); // Changed!
-    // const apiLoading = useSelector((state) => state.auth.apiLoading); // Optional: use for UI feedback
+    
+    const initialLoading = useSelector((state) => state.auth.initialLoading); 
+    // const apiLoading = useSelector((state) => state.auth.apiLoading); 
    
-    // if (initialLoading) {
-    //     return <Loader/>;
-    // }
+    if (initialLoading) {
+        return <Loader/>;
+    }
     
   return (
     <>
@@ -53,7 +60,7 @@ function App() {
         <div className="w-14 h-14 border-4 border-white border-t-pink-500 rounded-full animate-spin"></div>
 
         <h2 className="mt-6 text-xl font-semibold text-gray-800 tracking-wide">
-          Restoring your session...
+          Loading...
         </h2>
 
         <p className="text-sm text-gray-600 mt-2 animate-pulse">
@@ -76,8 +83,14 @@ function App() {
 {/* 
         <Route path="/home"  element={<Home/>} /> */}
         <Route path="/campaigns" element={<ProtectedRoute><CampaignPage/></ProtectedRoute>}/>
+        <Route path="/campaigns/:id" element={<CampaignViewUser/>}/>
+        <Route path="/campaigns/:id/donate" element={<ProtectedRoute><DonationPage/></ProtectedRoute>} />
         <Route path="/me" element={<ProtectedRoute><Me/></ProtectedRoute>}/>
         <Route path="/create-campaign" element={<ProtectedRoute><CreateCampaign/></ProtectedRoute>}/>
+        <Route path="/profile"  element={<ProtectedRoute><Profile/></ProtectedRoute>}   />
+        <Route path="/profile/verify-otp" element={<ProtectedRoute><VerifyOTPProfile/></ProtectedRoute>}/>
+        <Route path="/mycampaigns" element={<ProtectedRoute><MyCampaignPage/></ProtectedRoute>}/>
+        
         
         <Route path="/buggy" element={<Buggy/>}/>
         <Route path="*" element={<NotFound/>}/>
@@ -88,6 +101,9 @@ function App() {
         <Route path="/admin/users/:id" element={<AdminProtectedRoute><UserDetails/></AdminProtectedRoute>}/>
         <Route path="/admin/campaigns-request" element={<AdminProtectedRoute><CampaignRequestList/></AdminProtectedRoute>}/>
         <Route path="/admin/campaigns-request/:id" element={<AdminProtectedRoute><CampaignView/></AdminProtectedRoute>} />
+        <Route path="/admin/campaigns"  element={<AdminProtectedRoute><CampaignsPage/></AdminProtectedRoute>}/>
+        <Route path="/admin/create-campaign" element={<AdminProtectedRoute><CreateCampaignAdmin/></AdminProtectedRoute>} />
+        <Route path="/admin/campaigns/edit/:id" element={<AdminProtectedRoute><EditCampaignAdmin/></AdminProtectedRoute>}  />
       </Routes>
     </>
   )

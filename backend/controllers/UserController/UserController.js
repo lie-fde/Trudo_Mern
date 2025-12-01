@@ -199,3 +199,70 @@ export const getMe = async (req,res) =>{
          return res.status(400).json({ message : error.message})
        }
 }
+
+export const getUserProfileController = async (req, res) => {
+  try {
+    const  id  = req.user.id;
+
+    const user = await UserService.getUserProfileService(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "User profile fetched successfully",
+      data: user
+    });
+
+  } catch (err) {
+    return res.status(404).json({
+      success: false,
+      message: err.message
+    });
+  }
+};
+
+export const sendOtpControllerProfile = async (req, res) => {
+  try {
+    const { email } = req.query;
+     if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+    const result = await UserService.sendOtpServiceProfile(email);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+    console.log(err)
+  }
+};
+
+export const verifyOtpControllerProfile = async (req, res) => {
+  try {
+    console.log("BODY:", req.body);
+    console.log("REQ.USER:", req.user);
+   const { newEmail, otp } = req.body;
+    const userId = req.user._id;
+    const result = await UserService.verifyOtpServiceProfile(userId, newEmail, otp);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+export const updateUserProfileController = async (req, res) => {
+  try {
+    const userId = req.user._id; // From auth middleware
+    const avatar = req.file?.path || null;
+    const updatedUser = await UserService.updateUserProfileService(
+      userId,
+      req.body,
+      avatar
+    );
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      data: updatedUser
+    });
+  } catch (err) {
+    console.log(err)
+    return res.status(400).json({ message: err.message });
+  }
+};
