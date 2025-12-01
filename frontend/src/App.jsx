@@ -36,6 +36,7 @@ import EditCampaignAdmin from "./pages/Admin/EditCampaignRequest.jsx";
 import Profile from "./pages/User/Profile.jsx";
 import VerifyOTPProfile from "./pages/User/ProfileEmailVerification.jsx";
 import MyCampaignPage from "./pages/User/MyCampaign.jsx";
+import EditCampaignUser from "./pages/User/EditCampaignUser.jsx";
 
 
 function App() {
@@ -90,6 +91,7 @@ function App() {
         <Route path="/profile"  element={<ProtectedRoute><Profile/></ProtectedRoute>}   />
         <Route path="/profile/verify-otp" element={<ProtectedRoute><VerifyOTPProfile/></ProtectedRoute>}/>
         <Route path="/mycampaigns" element={<ProtectedRoute><MyCampaignPage/></ProtectedRoute>}/>
+        <Route path="/mycampaigns/edit/:id" element={<ProtectedRoute><EditCampaignUser/></ProtectedRoute>} />
         
         
         <Route path="/buggy" element={<Buggy/>}/>

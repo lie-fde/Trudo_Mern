@@ -9,11 +9,13 @@ import { register ,login ,otpVerify , resendOtp ,forgotPassword ,verifyPasswordO
     sendOtpControllerProfile,
     updateUserProfileController
 } from '../controllers/UserController/UserController.js'
-import { getUserCampaignsController } from '../controllers/UserController/campaignController.js'
+import { getUserCampaignsController , getCampaignById } from '../controllers/UserController/campaignController.js'
+import { updateCampaignController } from '../controllers/AdminController/AdminController.js'
 import { verifyAccessToken } from '../middlewares/verifytoken.js'
 import passport from 'passport'
 import auth from '../middlewares/auth.js'
 import profileUpload from '../middlewares/profileUpload.js'
+import upload from '../middlewares/upload.js'
 
 const router = express.Router()
 
@@ -54,6 +56,26 @@ router.post("/profile/verify-otp", auth, verifyOtpControllerProfile)
 router.put("/profile/update", auth, profileUpload.single("avatar"), updateUserProfileController);
 
 router.get("/mycampaigns",auth , getUserCampaignsController)
+
+router.patch("/campaign/update/:id",auth,
+  (req, res, next) => {
+    upload.fields([
+      { name: "orgProof", maxCount: 1 },
+      { name: "campaignImage", maxCount: 1 },
+      { name: "campaignDocs", maxCount: 1 },
+    ])(req, res, (err) => {
+      if (err) {
+        console.error("MULTER ERROR:", err);
+        return res
+          .status(400)
+          .json({ message: "Upload failed", error: err.message });
+      }
+      next();
+    });
+  },
+  updateCampaignController);
+
+router.get("/campaigns/:id", auth, getCampaignById);
 
 router.get("/me", verifyAccessToken, getMe);
 
