@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { resendOtp, verifyOtp } from '../../services/authService';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { resendOtp, verifyOtp } from "../../services/authService";
 
 export default function VerifyOTP() {
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(60);
   const [message, setMessage] = useState("");
   const [resending, setResending] = useState(false);
@@ -11,11 +11,12 @@ export default function VerifyOTP() {
   const email = localStorage.getItem("tempEmail");
   const navigate = useNavigate();
 
-  useEffect(()=>{
+  useEffect(() => {
     const email = localStorage.getItem("tempEmail");
     if (!email) {
-    navigate("/login")
-  }}, [])
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
     if (timer > 0) {
@@ -25,7 +26,7 @@ export default function VerifyOTP() {
   }, [timer]);
 
   const handleChange = (e, index) => {
-    const value = e.target.value.replace(/\D/g, '');
+    const value = e.target.value.replace(/\D/g, "");
     if (value.length > 1) return;
 
     const newOtp = [...otp];
@@ -38,14 +39,14 @@ export default function VerifyOTP() {
   };
 
   const handleVerify = async () => {
-    const otpGot = otp.join('');
+    const otpGot = otp.join("");
 
     try {
-      const response = await verifyOtp(email,otpGot)
+      const response = await verifyOtp(email, otpGot);
 
       setMessage(response.data.message);
       localStorage.removeItem("tempEmail");
-      navigate('/home');
+      navigate("/");
     } catch (err) {
       if (err.response) {
         setMessage(err.response.data.message);
@@ -56,14 +57,14 @@ export default function VerifyOTP() {
   };
 
   const handleResendOtp = async () => {
-    if (timer > 0) return; 
+    if (timer > 0) return;
     setResending(true);
 
     try {
-      const response = await resendOtp(email)
+      const response = await resendOtp(email);
 
       setMessage(response.data.message);
-      setTimer(60); 
+      setTimer(60);
     } catch (err) {
       setMessage(err.response?.data?.message || "Error resending OTP");
     } finally {
@@ -96,7 +97,7 @@ export default function VerifyOTP() {
         <p className="text-gray-500 text-sm mb-2">
           Resend available in{" "}
           <span className="font-semibold">
-            00:{timer.toString().padStart(2, '0')}
+            00:{timer.toString().padStart(2, "0")}
           </span>
         </p>
 
@@ -105,7 +106,9 @@ export default function VerifyOTP() {
           <span
             onClick={handleResendOtp}
             className={`font-medium cursor-pointer ${
-              timer > 0 ? "text-gray-400 cursor-not-allowed" : "text-pink-600 hover:underline"
+              timer > 0
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-pink-600 hover:underline"
             }`}
           >
             {resending ? "Resending..." : "Resend OTP"}

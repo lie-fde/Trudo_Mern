@@ -1,9 +1,9 @@
-import React, {  useState , useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { adminLogin } from "../../services/authService";
-import { useDispatch , useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { setAdminCredentials } from "../../store/adminAuthSlice";
 
@@ -11,9 +11,13 @@ export default function AdminLogin() {
   const [showPass, setShowPass] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const {register,handleSubmit,formState: { errors },} = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const { adminAccessToken } = useSelector((state) => state.adminAuth);
 
@@ -23,17 +27,18 @@ export default function AdminLogin() {
     }
   }, [adminAccessToken, navigate]);
 
-
   const onSubmit = async (data) => {
     try {
-      const res = await adminLogin(data.email,data.password)
-       dispatch(setAdminCredentials({
-              adminAccessToken: res.data.adminAccessToken,
-              adminName: res.data.admin.adminName,
-              adminEmail: res.data.admin.adminEmail,
-            }))
-      toast.success("Logged in successfully!")
-       navigate("/admin/dashboard", { replace: true });
+      const res = await adminLogin(data.email, data.password);
+      dispatch(
+        setAdminCredentials({
+          adminAccessToken: res.data.adminAccessToken,
+          adminName: res.data.admin.adminName,
+          adminEmail: res.data.admin.adminEmail,
+        })
+      );
+      toast.success("Logged in successfully!");
+      navigate("/admin/dashboard", { replace: true });
     } catch (err) {
       setMessage(err.response?.data?.message || "Login failed");
     }
@@ -47,10 +52,15 @@ export default function AdminLogin() {
 
       <div className="flex flex-1 items-center justify-center">
         <div className="bg-white w-full max-w-sm p-8 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold text-center mb-6">Admin Login</h2>
+          <h2 className="text-2xl font-semibold text-center mb-6">
+            Admin Login
+          </h2>
 
-          <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
+          <form
+            noValidate
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-5"
+          >
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Email
@@ -113,7 +123,6 @@ export default function AdminLogin() {
                 </p>
               )}
             </div>
-
 
             <button
               type="submit"

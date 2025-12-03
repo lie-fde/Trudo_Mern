@@ -7,9 +7,6 @@ import { fetchPublicSingleCampaign } from "../../store/campaignUserSlice.js";
 import Navbar from "../../components/User/Navbar.jsx";
 import Trudofooter from "../../components/reusable/footer.jsx";
 
-// ------------------------------------------------------------------
-// CLEAN MONGO DATA
-// ------------------------------------------------------------------
 const cleanMongoData = (data) => {
   const campaign = {};
   for (const key in data) {
@@ -34,9 +31,6 @@ const cleanMongoData = (data) => {
   return campaign;
 };
 
-// ------------------------------------------------------------------
-// MEDIA CAROUSEL
-// ------------------------------------------------------------------
 const MediaCarousel = ({ mediaList }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -46,9 +40,7 @@ const MediaCarousel = ({ mediaList }) => {
     setCurrentIndex((prev) => (prev === 0 ? mediaList.length - 1 : prev - 1));
 
   const nextMedia = () =>
-    setCurrentIndex((prev) =>
-      prev === mediaList.length - 1 ? 0 : prev + 1
-    );
+    setCurrentIndex((prev) => (prev === mediaList.length - 1 ? 0 : prev + 1));
 
   const currentMedia = mediaList[currentIndex];
 
@@ -91,15 +83,14 @@ const MediaCarousel = ({ mediaList }) => {
   );
 };
 
-// ------------------------------------------------------------------
-// MAIN PAGE (NO SIDEBAR VERSION)
-// ------------------------------------------------------------------
 export default function CampaignViewUser() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { singleCampaign, loading } = useSelector((state) => state.campaignPublic);
+  const { singleCampaign, loading } = useSelector(
+    (state) => state.campaignPublic
+  );
 
   useEffect(() => {
     dispatch(fetchPublicSingleCampaign(id));
@@ -118,18 +109,14 @@ export default function CampaignViewUser() {
 
   return (
     <div className="w-full bg-gray-100 min-h-screen">
-
-      {/* STATIC NAVBAR */}
       <Navbar />
 
-      {/* PAGE CONTENT */}
       <div className="pt-15 pb-16 w-full flex justify-center">
         <div className="w-full max-w-[1100px] px-4">
-
-          {/* Breadcrumb */}
           <div className="flex items-center justify-between mb-8">
             <span className="text-sm text-gray-500">
-              Campaigns › <span className="font-semibold text-gray-800">View</span>
+              Campaigns ›{" "}
+              <span className="font-semibold text-gray-800">View</span>
             </span>
 
             <button
@@ -140,18 +127,13 @@ export default function CampaignViewUser() {
             </button>
           </div>
 
-          {/* Title */}
           <h2 className="text-4xl font-extrabold mb-6 text-gray-900 text-center">
             {campaign.title}
           </h2>
 
-          {/* CAROUSEL */}
           <MediaCarousel mediaList={mediaList} />
 
-          {/* STORY + INFO */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-            {/* Story */}
             <div className="md:col-span-2 bg-white p-8 rounded-2xl shadow">
               <h3 className="text-2xl font-bold mb-4">The Story</h3>
               <p className="text-gray-700 whitespace-pre-line">
@@ -159,10 +141,7 @@ export default function CampaignViewUser() {
               </p>
             </div>
 
-            {/* Right Info */}
             <div className="space-y-6">
-
-              {/* Target */}
               <div className="bg-white p-6 rounded-2xl shadow border-t-4 border-teal-500">
                 <p className="text-xl font-bold mb-2 text-teal-600">
                   Target Amount
@@ -176,7 +155,6 @@ export default function CampaignViewUser() {
                 </p>
               </div>
 
-              {/* Location */}
               <div className="bg-white p-6 rounded-2xl shadow">
                 <p className="font-bold text-lg mb-3">Location & Details</p>
                 <p>📍 Location: {campaign.location}</p>
@@ -184,17 +162,19 @@ export default function CampaignViewUser() {
                 <p>Status: {campaign.status}</p>
               </div>
 
-              {/* -------------------------- */}
-              {/* CREATED BY CARD (NEW)     */}
-              {/* -------------------------- */}
               <div className="bg-white p-6 rounded-2xl shadow border-t-4 border-purple-500">
                 <p className="font-bold text-lg mb-3">Created By</p>
-                <p className="text-gray-800 text-base">👤 {campaign.User?.userName || "N/A"}</p>
-                <p className="text-gray-800 text-base mt-2">📧 {campaign.User?.userEmail || "N/A"}</p>
-                <p className="text-gray-800 text-base mt-2">📱 {campaign.User?.mobileNumber || "N/A"}</p>
+                <p className="text-gray-800 text-base">
+                  👤 {campaign.User?.userName || "N/A"}
+                </p>
+                <p className="text-gray-800 text-base mt-2">
+                  📧 {campaign.User?.userEmail || "N/A"}
+                </p>
+                <p className="text-gray-800 text-base mt-2">
+                  📱 {campaign.User?.mobileNumber || "N/A"}
+                </p>
               </div>
 
-              {/* Verification Docs */}
               <div className="bg-white p-6 rounded-2xl shadow border-t-4 border-blue-500">
                 <p className="font-bold mb-3">Verification Documents</p>
 
@@ -209,7 +189,9 @@ export default function CampaignViewUser() {
                     View Beneficiary Proof
                   </button>
                 ) : (
-                  <p className="text-sm text-red-500">No Beneficiary Document</p>
+                  <p className="text-sm text-red-500">
+                    No Beneficiary Document
+                  </p>
                 )}
 
                 {campaign.organizationIDProof?.length > 0 ? (
@@ -223,15 +205,17 @@ export default function CampaignViewUser() {
                     View Organization Proof
                   </button>
                 ) : (
-                  <p className="text-sm text-red-500 mt-2">No Organization Document</p>
+                  <p className="text-sm text-red-500 mt-2">
+                    No Organization Document
+                  </p>
                 )}
               </div>
 
-              {/* Donation */}
               <div className="bg-white p-6 rounded-2xl shadow border-t-4 border-emerald-500">
                 <p className="font-bold mb-3 text-lg">Support this Cause</p>
                 <p className="text-sm text-gray-600 mb-4">
-                  Your contribution directly helps {campaign.beneficiary || "the beneficiary"}.
+                  Your contribution directly helps{" "}
+                  {campaign.beneficiary || "the beneficiary"}.
                 </p>
 
                 <button
@@ -245,13 +229,10 @@ export default function CampaignViewUser() {
             </div>
           </div>
 
-          {/* DATA REVIEW */}
           <div className="mt-12 bg-white p-8 rounded-2xl shadow border-t-4 border-gray-400">
             <h3 className="text-2xl font-bold mb-6">Campaign Data Review</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-              {/* You can remove this section if no longer needed */}
               {Object.entries(campaign)
                 .filter(([key, value]) => {
                   if (typeof value === "object") return false;
@@ -264,7 +245,7 @@ export default function CampaignViewUser() {
                     "isDeleted",
                     "isBlocked",
                     "_id",
-                    "User"
+                    "User",
                   ].includes(key);
                 })
                 .map(([key, value], index) => (
@@ -279,11 +260,9 @@ export default function CampaignViewUser() {
                 ))}
             </div>
           </div>
-
         </div>
       </div>
-      <Trudofooter/>
-
+      <Trudofooter />
     </div>
   );
 }

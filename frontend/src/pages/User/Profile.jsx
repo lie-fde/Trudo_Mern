@@ -7,7 +7,7 @@ import api from '../../api/api';
 import VerifyOTPProfile from './ProfileEmailVerification';
 
 export default function Profile() {
-  const [currentView, setCurrentView] = useState('profile'); // 'profile' | 'verify'
+  const [currentView, setCurrentView] = useState('profile'); 
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -16,9 +16,6 @@ export default function Profile() {
   const [tempEmail, setTempEmail] = useState("");
 
   const formDataToSend = new FormData();
-  // ============================
-  // FETCH USER PROFILE
-  // ============================
   useEffect(() => {
     async function loadProfile() {
       try {
@@ -52,9 +49,7 @@ export default function Profile() {
     loadProfile();
   }, []);
 
-  // ============================
-  // INPUT HANDLERS
-  // ============================
+ 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -71,11 +66,6 @@ export default function Profile() {
   }
 };
 
-
-
-  // ============================
-  // TRIGGER OTP SEND
-  // ============================
   const sendOtpBeforeVerification = async (email) => {
     try {
       await api.get(`auth/users/profile/send-otp?email=${email}`, {
@@ -88,14 +78,10 @@ export default function Profile() {
     }
   };
 
-  // ============================
-  // EDIT / SAVE HANDLER
-  // ============================
  const handleEditClick = async () => {
   if (isEditing) {
     const emailChanged = formData.email !== originalEmail;
 
-    // ⭐ CASE 1: Email changed → trigger OTP
     if (emailChanged) {
       const email = formData.email;
       setTempEmail(email);
@@ -122,10 +108,10 @@ formDataToSend.append("address", JSON.stringify({
 }));
 
 if (formData.avatar instanceof File) {
-  formDataToSend.append("avatar", formData.avatar); // Upload only if user changed image
+  formDataToSend.append("avatar", formData.avatar); 
 }
 
-    // ⭐ CASE 2: Other fields changed → save directly
+   
     try {
       const res = await api.put(
         "/auth/users/profile/update",
@@ -150,9 +136,7 @@ if (formData.avatar instanceof File) {
 };
 
 
-  // ============================
-  // OTP SUCCESS HANDLER
-  // ============================
+
   const handleVerificationSuccess = () => {
     setOriginalEmail(formData.email);
     setIsEditing(false);
@@ -165,9 +149,7 @@ if (formData.avatar instanceof File) {
     setCurrentView('profile');
   };
 
-  // ============================
-  // SHOW OTP SCREEN
-  // ============================
+
   if (currentView === 'verify') {
     return (
       <VerifyOTPProfile
@@ -177,9 +159,7 @@ if (formData.avatar instanceof File) {
     );
   }
 
-  // ============================
-  // PROFILE UI BELOW (UNCHANGED)
-  // ============================
+
   return (
     <div className="min-h-screen bg-white font-sans text-gray-800">
       <Navbar />

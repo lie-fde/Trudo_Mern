@@ -11,12 +11,17 @@ import { setCredentials } from "../../store/authSlice";
 export default function Login() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
-   const [message, setMessage] = useState("");
-   const navigate = useNavigate()
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
-  const {register,handleSubmit,reset, formState: { errors },} = useForm();
-  
-  const dispatch = useDispatch()
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+
+  const dispatch = useDispatch();
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -26,21 +31,22 @@ export default function Login() {
         password: data.password.trim(),
       };
 
-      const response = await loginUser(cleanData.email,cleanData.password)
-      
-      reset()
-      setMessage(response.data.message)
+      const response = await loginUser(cleanData.email, cleanData.password);
 
-      dispatch(setCredentials({
-        accessToken : response.data.accessToken,
-        userName : response.data.user.userName,
-        userEmail: response.data.user.userEmail
-      }))
-       toast.success("Logged in successfully!")
-       navigate("/" , {replace:true});
-    
+      reset();
+      setMessage(response.data.message);
+
+      dispatch(
+        setCredentials({
+          accessToken: response.data.accessToken,
+          userName: response.data.user.userName,
+          userEmail: response.data.user.userEmail,
+        })
+      );
+      toast.success("Logged in successfully!");
+      navigate("/", { replace: true });
     } catch (err) {
-       if (err.response) {
+      if (err.response) {
         setMessage(err.response.data.message);
       } else {
         setMessage("Error connecting to server");
@@ -61,7 +67,11 @@ export default function Login() {
           </a>
         </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4"
+          noValidate
+        >
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-2">
               Email address
@@ -80,14 +90,17 @@ export default function Login() {
                 },
                 validate: (value) => {
                   const trimmed = value.trim();
-                  if (trimmed === "") return "Email cannot be empty or spaces only";
+                  if (trimmed === "")
+                    return "Email cannot be empty or spaces only";
                   if (/\s/.test(trimmed)) return "Email cannot contain spaces";
                   return true;
                 },
               })}
             />
             {errors.email && (
-              <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -110,8 +123,10 @@ export default function Login() {
                   },
                   validate: (value) => {
                     const trimmed = value.trim();
-                    if (trimmed === "") return "Password cannot be empty or spaces only";
-                    if (/\s/.test(value)) return "Password cannot contain spaces";
+                    if (trimmed === "")
+                      return "Password cannot be empty or spaces only";
+                    if (/\s/.test(value))
+                      return "Password cannot contain spaces";
                     return true;
                   },
                 })}
@@ -131,14 +146,15 @@ export default function Login() {
             )}
           </div>
 
-     
           <div className="flex justify-end">
-            <a href="/forgot-password" className="text-sm text-gray-700 underline">
+            <a
+              href="/forgot-password"
+              className="text-sm text-gray-700 underline"
+            >
               Forget password?
             </a>
           </div>
 
-        
           <div>
             <button
               type="submit"
@@ -154,7 +170,6 @@ export default function Login() {
           </div>
         </form>
 
-  
         <div className="mt-6 flex items-center justify-center gap-4">
           <div className="h-px w-24 bg-gray-200" />
           <span className="text-xs text-gray-500">or</span>
@@ -162,8 +177,6 @@ export default function Login() {
         </div>
 
         <div className="mt-2 grid grid-cols-1 gap-3">
-       
-
           <button
             onClick={() => window.location.replace(googleSign())}
             aria-label="Continue with Google"
@@ -173,11 +186,11 @@ export default function Login() {
             Google
           </button>
         </div>
-      {message && (
-  <p className="mt-4 text-center text-red-600 text-sm font-semibold">
-    {message}
-  </p>
-)}
+        {message && (
+          <p className="mt-4 text-center text-red-600 text-sm font-semibold">
+            {message}
+          </p>
+        )}
       </div>
     </div>
   );

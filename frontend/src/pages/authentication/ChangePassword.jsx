@@ -45,7 +45,7 @@ export default function ChangePassword() {
     setLoading(true);
 
     try {
-      const res = await resetPassword(email,password)
+      const res = await resetPassword(email, password);
 
       setMessage(res.data.message || "Password reset successful!");
       localStorage.removeItem("resetEmail");
