@@ -151,12 +151,14 @@ const login = async (userEmail, password) => {
     }
   );
 
+
   return {
     accessToken,
     refreshToken,
     user: {
       userName: user.userName,
       userEmail: user.userEmail,
+      mobileNumber:user.mobileNumber
     },
   };
 };

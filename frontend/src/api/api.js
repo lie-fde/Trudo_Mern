@@ -46,7 +46,8 @@ api.interceptors.response.use(
                     setCredentials({
                         accessToken: res.data.accessToken,
                         userName: res.data.userName,
-                        userEmail : res.data.userEmail
+                        userEmail : res.data.userEmail,
+                        mobileNumber : res.data.mobileNumber
                     })
                 );
 

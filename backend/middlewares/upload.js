@@ -76,9 +76,6 @@ const fileFilter = (req, file, cb) => {
   cb(null, true);
 };
 
-// ===============================
-// 🔥 FINAL MULTER EXPORT
-// ===============================
 const upload = multer({
   storage,
   limits: { fileSize: FILE_SIZE_LIMIT },

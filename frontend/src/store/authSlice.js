@@ -6,6 +6,7 @@ const authSlice = createSlice({
         accessToken : null,
         userName : null,
         userEmail : null,
+        mobileNumber:null,
         initialLoading: true, 
         apiLoading: false,     
     },
@@ -14,12 +15,14 @@ const authSlice = createSlice({
             state.accessToken = action.payload.accessToken;
             state.userName = action.payload.userName;
             state.userEmail=action.payload.userEmail
+            state.mobileNumber=action.payload.mobileNumber
             state.initialLoading = false; 
         },
         logout: (state) => {
             state.accessToken = null;
             state.userName = null;
             state.userEmail=null
+            state.mobileNumber=null
             state.initialLoading = false;
         },
         setInitialLoadingComplete: (state) => {

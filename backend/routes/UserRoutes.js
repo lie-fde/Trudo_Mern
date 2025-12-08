@@ -16,6 +16,7 @@ import passport from 'passport'
 import auth from '../middlewares/auth.js'
 import profileUpload from '../middlewares/profileUpload.js'
 import upload from '../middlewares/upload.js'
+import { getDonationHistoryController , getDonationStatsController} from '../controllers/donationController.js'
 
 const router = express.Router()
 
@@ -78,5 +79,10 @@ router.patch("/campaign/update/:id",auth,
 router.get("/campaigns/:id", auth, getCampaignById);
 
 router.get("/me", verifyAccessToken, getMe);
+
+router.get("/donations/history", auth, getDonationHistoryController);
+
+router.get("/donations/stats",auth, getDonationStatsController);
+
 
 export default router;

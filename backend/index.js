@@ -13,6 +13,7 @@ import passport from "passport";
 import cookieParser from "cookie-parser";
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
 import cloudinary from './config/cloudinary.js';
+import PaymentRoutes from './routes/PaymentRoutes.js'
 
 connectDB()
 
@@ -30,10 +31,14 @@ app.use(morgan("dev"))
 app.use(errorMiddleware);
 
 
+
+
 app.use('/auth/users',userRoutes)
 app.use('/auth/admin',AdminAuthRoutes)
 app.use('/admin',AdminRoutes)
 app.use("/campaign", CampaignRoutes);
+app.use("/uploads", express.static("uploads"));
+app.use('/payments',PaymentRoutes)
 
 
 app.get('/',(req,res)=>{

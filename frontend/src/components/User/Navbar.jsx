@@ -40,6 +40,8 @@ export default function Navbar() {
           setCredentials({
             accessToken: null,
             userName: null,
+            userEmail:null,
+            mobileNumber:null
           })
         );
 
@@ -70,7 +72,7 @@ export default function Navbar() {
         <button className="hover:text-gray-300 transition" onClick={() => navigate("/campaigns")}>Donate</button>
         <button className="hover:text-gray-300 transition">Events</button>
         <button className="hover:text-gray-300 transition">My Ticket</button>
-        <button className="hover:text-gray-300 transition">My Donation</button>
+        <button className="hover:text-gray-300 transition" onClick={()=>navigate("/my-donations")}>My Donation</button>
         <button className="hover:text-gray-300 transition"onClick={()=>navigate("/mycampaigns")}>My Campaigns</button>
         <button className="hover:text-gray-300 transition">Contact us</button>
       </div>

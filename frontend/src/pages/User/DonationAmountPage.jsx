@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector} from "react-redux";
 import Navbar from "../../components/User/Navbar";
 import Footer from "../../components/reusable/footer";
 import { fetchPublicSingleCampaign } from "../../store/campaignUserSlice";
+import api from "../../api/api";
+import { useNavigate } from "react-router-dom";
 
 export default function DonationPage() {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate()
 
   const { singleCampaign, loading } = useSelector(
     (state) => state.campaignPublic
   );
+
+  const { userEmail ,mobileNumber} = useSelector((state)=> state.auth)
 
   const [amount, setAmount] = useState("");
   const [errors, setErrors] = useState("");
@@ -38,13 +43,58 @@ export default function DonationPage() {
     return "";
   };
 
-  const handleDonate = () => {
+  const handleDonate = async () => {
     const validationError = validateAmount(amount);
     setErrors(validationError);
 
     if (validationError === "") {
       console.log("Proceed to payment page with amount:", amount);
+      console.log(userEmail,mobileNumber,singleCampaign._id)
     }
+
+    const { data } = await api.post("/payments/create-order", {
+      amount,
+      campaignId: singleCampaign._id,
+      email: userEmail,
+      phone: mobileNumber,
+    });
+
+    const { order, key, paymentDBId } = data;
+
+  const options = {
+    key,
+    amount: order.amount,
+    currency: order.currency,
+    order_id: order.id,
+
+    handler: async function (response) {
+      // STEP 2: Verify payment
+      const verify = await api.post("/payments/verify-payment", {
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_signature: response.razorpay_signature,
+        userEmail,
+        mobileNumber,
+        paymentDBId,
+        campaignId: singleCampaign._id
+      });
+
+      console.log("Payment Verified:", verify.data);
+
+       navigate(`/donation/receipt/${verify.data.receiptId}`);
+    },
+
+    prefill: {
+      email: userEmail,
+      contact: mobileNumber,
+    },
+  };
+
+  const rzp = new window.Razorpay(options);
+  rzp.open();
+
+
+
   };
   const tax = 0;
   const totalAmount = Number(amount || 0) + tax;

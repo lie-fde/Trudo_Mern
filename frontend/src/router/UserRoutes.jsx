@@ -20,6 +20,8 @@ import Buggy from "../components/reusable/buggy.jsx"
 import Me from "../pages/me";
 import ProtectedRoute from "./ProtectedRoute";
 import BlockRoute from "./blockRoute";
+import ReceiptPage from "../pages/User/ReceiptPage.jsx";
+import MyDonationPage from "../pages/User/MyDonation.jsx";
 
 
 function UserRoutes(){
@@ -44,6 +46,8 @@ function UserRoutes(){
         <Route path="/profile/verify-otp" element={<ProtectedRoute><VerifyOTPProfile/></ProtectedRoute>}/>
         <Route path="/mycampaigns" element={<ProtectedRoute><MyCampaignPage/></ProtectedRoute>}/>
         <Route path="/mycampaigns/edit/:id" element={<ProtectedRoute><EditCampaignUser/></ProtectedRoute>} />
+        <Route path="/donation/receipt/:receiptId" element={<ProtectedRoute><ReceiptPage/></ProtectedRoute>}/>
+        <Route path="/my-donations" element={<ProtectedRoute><MyDonationPage/></ProtectedRoute>} />
         
         
         <Route path="/buggy" element={<Buggy/>}/>
