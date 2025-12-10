@@ -39,12 +39,12 @@ const StatusBadge = ({ status }) => {
           <XCircle size={14} /> Rejected
         </span>
       );
-    case "disabled":
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
-          <PauseCircle size={14} /> Disabled
-        </span>
-      );
+    // case "disabled":
+    //   return (
+    //     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+    //       <PauseCircle size={14} /> Disabled
+    //     </span>
+    //   );
     default:
       return null;
   }
@@ -53,7 +53,7 @@ const StatusBadge = ({ status }) => {
 const DashboardCampaignCard = ({ campaign }) => {
   const navigate = useNavigate();
 
-  const raised = campaign.raisedAmount || 0;
+  const raised = campaign.raisedAmount || 1;
   const target = campaign.targetAmount || 1;
   const percentage = Math.min(100, Math.round((raised / target) * 100));
 
@@ -79,9 +79,31 @@ const DashboardCampaignCard = ({ campaign }) => {
       <div className="p-6 flex-1 flex flex-col justify-between">
         <div>
           <div className="flex justify-between items-start mb-2">
-            <h3 className="text-xl font-bold text-gray-900 line-clamp-1">
-              {campaign.title}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-xl font-bold text-gray-900 line-clamp-1">
+                {campaign.title}
+              </h3>
+
+              {/* STATUS BADGE */}
+              {campaign.status === "Approved" && (
+                <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 font-medium">
+                  Active
+                </span>
+              )}
+
+              {campaign.status === "Pending" && (
+                <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 font-medium">
+                  Pending
+                </span>
+              )}
+
+              {campaign.status === "Rejected" && (
+                <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700 font-medium">
+                  Rejected
+                </span>
+              )}
+            </div>
+
             <p className="text-xs text-gray-500 whitespace-nowrap">
               {new Date(campaign.createdAt).toLocaleDateString()}
             </p>
@@ -113,8 +135,8 @@ const DashboardCampaignCard = ({ campaign }) => {
               <div
                 className={`h-2.5 rounded-full ${
                   campaign.status === "approved"
-                    ? "bg-orange-500"
-                    : "bg-gray-400"
+                    ? "bg-gray-400"
+                    :  "bg-orange-500"
                 }`}
                 style={{ width: `${percentage}%` }}
               ></div>
@@ -130,8 +152,7 @@ const DashboardCampaignCard = ({ campaign }) => {
             <Eye size={16} /> View
           </button>
 
-          {(campaign.status === "Pending" ||
-            campaign.status === "Rejected") && (
+          {campaign.status === "Pending" && (
             <button
               onClick={() => navigate(`/mycampaigns/edit/${campaign._id}`)}
               className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 border border-blue-200 transition-colors"
@@ -140,7 +161,7 @@ const DashboardCampaignCard = ({ campaign }) => {
             </button>
           )}
 
-          {campaign.status === "Rejected" && (
+          {/* {campaign.status === "Rejected" && (
             <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200">
               <p className="text-red-700 text-sm font-semibold">
                 ❌ Rejected Reason:
@@ -149,7 +170,7 @@ const DashboardCampaignCard = ({ campaign }) => {
                 {campaign.rejectionReason || "No reason was provided."}
               </p>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>
@@ -170,6 +191,8 @@ export default function UserDashboard() {
   }, [dispatch]);
 
   const campaigns = myCampaign || [];
+
+  console.log(campaigns)
 
   const filteredCampaigns = campaigns.filter((campaign) => {
     const matchesSearch = campaign.title
@@ -269,7 +292,7 @@ export default function UserDashboard() {
 
               {/* Status Tabs */}
               <div className="flex p-1 bg-gray-100 rounded-xl overflow-hidden">
-                {["all", "Approved", "Pending", "disabled"].map((tab) => (
+                {["all", "Approved", "Pending", "Rejected"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setStatusFilter(tab)}

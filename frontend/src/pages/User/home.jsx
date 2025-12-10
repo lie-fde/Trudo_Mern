@@ -26,12 +26,23 @@ export default function Home() {
             Empower change with trust & security.
           </p>
 
-          <button
-            onClick={() => navigate("/create-campaign")}
-            className="bg-black text-white px-6 py-3 rounded-md mt-6 hover:bg-gray-800 transition"
-          >
-            Create a Campaign
-          </button>
+        <div className="flex gap-3 mt-6">
+  <button
+    onClick={() => navigate("/create-campaign")}
+    className="bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition"
+  >
+    Raise a Campaign
+  </button>
+
+  <button
+    onClick={() => navigate("/create-event")}
+    className="bg-black text-white px-8 py-3 rounded-md hover:bg-gray-800 transition"
+  >
+    Host an Event
+  </button>
+</div>
+
+
         </div>
 
         <div className="lg:w-1/2 flex justify-center">

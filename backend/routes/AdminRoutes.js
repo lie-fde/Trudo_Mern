@@ -25,8 +25,10 @@ import { getUserProfileController } from "../controllers/UserController/UserCont
 import {
   getAdminDonationReportController,
   exportAdminDonationReportController,
-  getDonationReportStats
+  getDonationReportStats,
 } from "../controllers/AdminDonationController.js";
+import uploadEventImage from "../middlewares/UploadEventImage.js";
+import { createEventController } from "../controllers/EventController.js";
 
 const router = express.Router();
 
@@ -113,7 +115,13 @@ router.get(
   exportAdminDonationReportController
 );
 
+router.get("/donations/report/stats", adminAuth, getDonationReportStats);
 
-router.get("/donations/report/stats", adminAuth,getDonationReportStats);
+router.post(
+  "/events/create",
+  adminAuth,
+  uploadEventImage.single("eventImages"),
+  createEventController
+);
 
 export default router;

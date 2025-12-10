@@ -13,6 +13,8 @@ import EditCampaignAdmin from "../pages/Admin/EditCampaignRequest";
 import AdminProfile from "../pages/Admin/AdminProfile.jsx"
 import NotFound from "../pages/NotFound.jsx";
 import DonationReport from "../pages/Admin/DonationReport.jsx";
+import EventsPage from "../pages/Admin/EventList.jsx";
+import CreateEvent from "../pages/Admin/CreateEvent.jsx";
 
 
 function AdminRoutes () {
@@ -32,6 +34,8 @@ function AdminRoutes () {
         <Route path="/campaigns/edit/:id" element={<AdminProtectedRoute><EditCampaignAdmin/></AdminProtectedRoute>}  />
         <Route path="/profile" element={<AdminProtectedRoute><AdminProfile/></AdminProtectedRoute>}/>
         <Route path="/donation-report" element={<AdminProtectedRoute><DonationReport/></AdminProtectedRoute>} />
+        <Route path="/events" element={<AdminProtectedRoute><EventsPage/></AdminProtectedRoute>} />
+        <Route path="/create-event" element={<AdminProtectedRoute><CreateEvent/></AdminProtectedRoute>}/>
 
         <Route path="*" element={<NotFound/>}/>
 

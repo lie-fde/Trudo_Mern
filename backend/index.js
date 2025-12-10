@@ -12,13 +12,33 @@ import "./config/passport.js";
 import passport from "passport";
 import cookieParser from "cookie-parser";
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
-import cloudinary from './config/cloudinary.js';
+import { createStream} from 'rotating-file-stream';
+import fs from 'fs'
+import path from 'path';
 import PaymentRoutes from './routes/PaymentRoutes.js'
+import EventRoute from './routes/EvenRoute.js'
 
 connectDB()
 
 const app = express()
 const PORT = process.env.PORT || 3000;
+
+const logDirectory = path.join(process.cwd(), "logs");
+if (!fs.existsSync(logDirectory)) fs.mkdirSync(logDirectory);
+
+const accessLogStream = createStream("access.log", {
+  interval: "1d",     // rotate daily
+  path: logDirectory,
+  maxFiles: 7,        // keep logs for 7 days
+  compress: "gzip"    // optional: compress old logs
+});
+
+// Print logs to terminal
+app.use(morgan("dev"));
+
+// Write logs to rotating file
+app.use(morgan("combined", { stream: accessLogStream }));
+
 
 app.use(cookieParser());
 app.use(cors({
@@ -27,7 +47,6 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(passport.initialize());
-app.use(morgan("dev"))
 app.use(errorMiddleware);
 
 
@@ -39,6 +58,7 @@ app.use('/admin',AdminRoutes)
 app.use("/campaign", CampaignRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use('/payments',PaymentRoutes)
+app.use("/events",EventRoute)
 
 
 app.get('/',(req,res)=>{

@@ -1,9 +1,12 @@
 import { findPublicCampaigns , findPublicCampaignById } from "../repositories/CampaignRepository.js";
 
 
-export const getPublicCampaigns = async () => {
-  const campaigns = await findPublicCampaigns();
-  return campaigns;
+// export const getPublicCampaigns = async () => {
+//   const campaigns = await findPublicCampaigns();
+//   return campaigns;
+// };
+export const getPublicCampaigns = async (queryParams) => {
+  return await findPublicCampaigns(queryParams);
 };
 
 

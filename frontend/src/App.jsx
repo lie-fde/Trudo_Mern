@@ -5,33 +5,27 @@ import { useSelector } from "react-redux";
 import Loader from "./components/reusable/loader";
 import UserRoutes from "./router/UserRoutes.jsx";
 import AdminRoutes from "./router/AdminRoutes.jsx";
-import { Routes , Route} from "react-router-dom";
-
-
+import { Routes, Route } from "react-router-dom";
 
 function App() {
-    
-    // const initialLoading = useSelector((state) => state.auth.initialLoading); ; 
-   
-    // if (initialLoading) {
-    //     return <Loader/>;
-    // }
-    
+  // const initialLoading = useSelector((state) => state.auth.initialLoading); ;
+
+  // if (initialLoading) {
+  //     return <Loader/>;
+  // }
+
   return (
     <>
-    <ToastContainer position="top-right" autoClose={2000} />
-          <Routes>
+      <ToastContainer position="top-right" autoClose={2000} />
+      <Routes>
         {/* USER ROUTES */}
         <Route path="/*" element={<UserRoutes />} />
 
         {/* ADMIN ROUTES */}
         <Route path="/admin/*" element={<AdminRoutes />} />
       </Routes>
-
-
-     
     </>
-  )
+  );
 }
 
 export default App;
