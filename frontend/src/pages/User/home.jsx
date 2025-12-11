@@ -1,15 +1,13 @@
 import React from "react";
-import Navbar from "../../components/User/Navbar.jsx"
-import frontImage from '../../assets/Front image .png'
+import Navbar from "../../components/User/Navbar.jsx";
+import frontImage from "../../assets/Front image .png";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
+  const userName = useSelector((state) => state.auth.userName);
 
-
-  const userName = useSelector((state)=> state.auth.userName)
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-[#f8f9fb] flex flex-col">
@@ -23,12 +21,13 @@ export default function Home() {
           </h1>
 
           <p className="text-gray-600 mt-5 text-lg">
-            Welcome back, <span className="font-semibold text-gray-800">{userName}</span> 👋  
+            Welcome back,{" "}
+            <span className="font-semibold text-gray-800">{userName}</span> 👋
             Empower change with trust & security.
           </p>
 
           <button
-            onClick={()=> navigate('/create-campaign')}
+            onClick={() => navigate("/create-campaign")}
             className="bg-black text-white px-6 py-3 rounded-md mt-6 hover:bg-gray-800 transition"
           >
             Create a Campaign
@@ -42,9 +41,7 @@ export default function Home() {
             className="w-full max-w-lg drop-shadow-lg rounded-xl"
           />
         </div>
-
       </div>
-
     </div>
   );
 }

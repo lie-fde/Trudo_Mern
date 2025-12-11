@@ -6,42 +6,50 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { googleSign, signUp } from "../../services/authService";
 
-
 export default function Signup() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-   const navigate = useNavigate()
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) navigate("/home");
+  }, [navigate]);
 
-   useEffect(()=>{
-    const token = localStorage.getItem("token")
-    if(token) navigate('/home')
-   },[navigate])
-
-  const {register,handleSubmit,watch,reset,formState: { errors },} = useForm();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm();
 
   const onSubmit = async (data) => {
     setLoading(true);
     localStorage.setItem("tempEmail", data.email);
-      reset()
-      setLoading(false);
-      navigate('/verify-otp')
-      try {
-                                
-        const response = await signUp(data.fullName, data.email, data.mobile, data.password  )
-       
-        setMessage(response.data.message)
-        console.log(message)        
-      } catch (err) {
-          if (err.response) {
+    reset();
+    setLoading(false);
+    navigate("/verify-otp");
+    try {
+      const response = await signUp(
+        data.fullName,
+        data.email,
+        data.mobile,
+        data.password
+      );
+
+      setMessage(response.data.message);
+      console.log(message);
+    } catch (err) {
+      if (err.response) {
         setMessage(err.response.data.message);
-        console.log(message)
+        console.log(message);
       } else {
         setMessage("Error connecting to server");
       }
-      }
+    }
   };
 
   const password = watch("password");
@@ -52,8 +60,11 @@ export default function Signup() {
       <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl px-10 py-5">
         <h1 className="text-2xl font-semibold text-center mb-3">Sign Up</h1>
 
-        <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-2.5">
-   
+        <form
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-2.5"
+        >
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
               Full Name
@@ -68,7 +79,7 @@ export default function Signup() {
                 required: "Full name is required",
                 pattern: {
                   value: /^[A-Za-z]+(?: [A-Za-z]+)*$/,
-                  message:  "Only letters and single spaces allowed",
+                  message: "Only letters and single spaces allowed",
                 },
                 validate: (value) =>
                   value.trim() !== "" || "Full name cannot be empty",
@@ -80,7 +91,6 @@ export default function Signup() {
               </p>
             )}
           </div>
-
 
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -109,7 +119,6 @@ export default function Signup() {
             )}
           </div>
 
-
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
               Mobile Number
@@ -136,7 +145,6 @@ export default function Signup() {
               </p>
             )}
           </div>
-
 
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -175,7 +183,6 @@ export default function Signup() {
             )}
           </div>
 
-
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
               Confirm Password
@@ -202,11 +209,7 @@ export default function Signup() {
                 onClick={() => setShowConfirmPass((s) => !s)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
               >
-                {showConfirmPass ? (
-                  <FiEyeOff size={16} />
-                ) : (
-                  <FiEye size={16} />
-                )}
+                {showConfirmPass ? <FiEyeOff size={16} /> : <FiEye size={16} />}
               </button>
             </div>
             {errors.confirmPassword && (
@@ -216,14 +219,12 @@ export default function Signup() {
             )}
           </div>
 
-
           <p className="text-center text-xs text-gray-500 pt-1">
             Already have an account?{" "}
             <a href="/login" className="underline text-gray-700">
               Log in
             </a>
           </p>
-
 
           <button
             type="submit"
@@ -237,18 +238,16 @@ export default function Signup() {
             {loading ? "Signing up..." : "Sign Up"}
           </button>
 
-    
           <div className="mt-2 flex items-center justify-center gap-3">
             <div className="h-px w-16 bg-gray-200" />
             <span className="text-xs text-gray-500">Or Register with</span>
             <div className="h-px w-16 bg-gray-200" />
           </div>
 
-
           <div className="mt-1.5">
             <button
               type="button"
-               onClick={() => window.location.replace(googleSign())}
+              onClick={() => window.location.replace(googleSign())}
               className="w-full flex items-center justify-center gap-2 px-2 py-1.5 border rounded-full bg-white hover:shadow-sm"
             >
               <FcGoogle size={16} />

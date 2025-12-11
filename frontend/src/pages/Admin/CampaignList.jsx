@@ -92,10 +92,7 @@ const handleDeleteCampaign = (campaignId) => {
     if (result.isConfirmed) {
       try {
 
-        // API CALL
-        await deleteCampaign(campaignId); // implement this API
-
-        // SUCCESS POPUP
+        await deleteCampaign(campaignId); 
         Swal.fire({
           title: "Deleted!",
           text: "Campaign has been removed successfully.",
@@ -114,24 +111,15 @@ const handleDeleteCampaign = (campaignId) => {
   });
 };
 
-
-//handleCampaignDelete
-
-  // ---------------------------
-  // FRONTEND PROCESSING LOGIC
-  // ---------------------------
-
-  // 1️⃣ SEARCH
   let filtered = campaigns.filter((item) =>
     item.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  // 2️⃣ FILTER BY CATEGORY
+
   if (category) {
     filtered = filtered.filter((item) => item.category === category);
   }
 
-  // 3️⃣ SORT
   if (sort === "amountDesc") {
     filtered = filtered.sort((a, b) => b.targetAmount - a.targetAmount);
   }

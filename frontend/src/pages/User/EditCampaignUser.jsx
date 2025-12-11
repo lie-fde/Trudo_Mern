@@ -15,7 +15,7 @@ export default function EditCampaignUser() {
     trigger,
     setValue,
     watch,
-    formState: { errors }
+    formState: { errors },
   } = useForm({ mode: "onTouched" });
 
   const [step, setStep] = useState(1);
@@ -24,9 +24,6 @@ export default function EditCampaignUser() {
 
   const orgType = watch("orgType");
 
-  // ------------------------------
-  //  FETCH EXISTING CAMPAIGN DATA
-  // ------------------------------
   useEffect(() => {
     async function loadCampaign() {
       try {
@@ -63,9 +60,6 @@ export default function EditCampaignUser() {
     setValue(name, file || null, { shouldValidate: true, shouldTouch: true });
   };
 
-  // ------------------------------
-  //  SUBMIT UPDATED DATA
-  // ------------------------------
   const onFinalSubmit = async (data) => {
     const ok = await trigger();
     if (!ok) {
@@ -77,7 +71,7 @@ export default function EditCampaignUser() {
       text: "Are you sure you want to update this campaign?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, Update"
+      confirmButtonText: "Yes, Update",
     });
 
     if (!result.isConfirmed) return;
@@ -86,7 +80,10 @@ export default function EditCampaignUser() {
 
     const formData = new FormData();
 
-    formData.append("organizationName", data.orgType === "Organization" ? data.orgName : "");
+    formData.append(
+      "organizationName",
+      data.orgType === "Organization" ? data.orgName : ""
+    );
     if (data.orgProof) formData.append("orgProof", data.orgProof);
 
     formData.append("title", data.title);
@@ -99,20 +96,24 @@ export default function EditCampaignUser() {
     formData.append("bankAcc", data.bankAcc);
     formData.append("IFSCCode", data.ifsc);
 
-    // optional updates
-    if (data.campaignImage) formData.append("campaignImage", data.campaignImage);
+    if (data.campaignImage)
+      formData.append("campaignImage", data.campaignImage);
     if (data.campaignDocs) formData.append("campaignDocs", data.campaignDocs);
 
     try {
       await api.patch(`/auth/users/campaign/update/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true
+        withCredentials: true,
       });
 
       Swal.fire("Success", "Campaign updated successfully", "success");
       navigate(`/mycampaigns`);
     } catch (err) {
-      Swal.fire("Error", err.response?.data?.message || "Something went wrong.", "error");
+      Swal.fire(
+        "Error",
+        err.response?.data?.message || "Something went wrong.",
+        "error"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -132,22 +133,27 @@ export default function EditCampaignUser() {
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center">
             <div className="w-10 h-10 border-4 border-gray-300 border-t-purple-600 rounded-full animate-spin"></div>
-            <p className="mt-3 text-gray-700 font-medium">Updating campaign...</p>
+            <p className="mt-3 text-gray-700 font-medium">
+              Updating campaign...
+            </p>
           </div>
         </div>
       )}
 
       <div className="min-h-screen bg-gray-50 py-10 px-4 flex justify-center">
         <div className="w-full max-w-3xl bg-white p-8 rounded-xl shadow">
-          <h1 className="text-4xl font-extrabold text-center mb-8">Edit Campaign</h1>
+          <h1 className="text-4xl font-extrabold text-center mb-8">
+            Edit Campaign
+          </h1>
 
-          {/* EXACT SAME UI as create */}
-          <form noValidate onSubmit={handleSubmit(onFinalSubmit)} className="space-y-6">
-
+          <form
+            noValidate
+            onSubmit={handleSubmit(onFinalSubmit)}
+            className="space-y-6"
+          >
             {/* ---------------- STEP 1 ---------------- */}
             {step === 1 && (
               <>
-                {/* Full name */}
                 <div>
                   <label className="text-sm text-gray-700">Full Name</label>
                   <input
@@ -157,7 +163,6 @@ export default function EditCampaignUser() {
                   />
                 </div>
 
-                {/* Email */}
                 <div>
                   <label className="text-sm text-gray-700">Email</label>
                   <input
@@ -167,7 +172,6 @@ export default function EditCampaignUser() {
                   />
                 </div>
 
-                {/* Phone */}
                 <div>
                   <label className="text-sm text-gray-700">Phone</label>
                   <input
@@ -177,33 +181,47 @@ export default function EditCampaignUser() {
                   />
                 </div>
 
-                {/* Org type */}
                 <div>
-                  <label className="text-sm text-gray-700">Organization / Individual</label>
-                  <select {...register("orgType")} className="w-full mt-1 p-3 border rounded-md">
+                  <label className="text-sm text-gray-700">
+                    Organization / Individual
+                  </label>
+                  <select
+                    {...register("orgType")}
+                    className="w-full mt-1 p-3 border rounded-md"
+                  >
                     <option value="Organization">Organization</option>
                     <option value="Individual">Individual</option>
                   </select>
                 </div>
 
-                {/* Org name */}
                 <div>
-                  <label className="text-sm text-gray-700">Organization Name</label>
-                  <input {...register("orgName")} className="w-full mt-1 p-3 border rounded-md" />
+                  <label className="text-sm text-gray-700">
+                    Organization Name
+                  </label>
+                  <input
+                    {...register("orgName")}
+                    className="w-full mt-1 p-3 border rounded-md"
+                  />
                 </div>
 
-                {/* Bank */}
                 <div>
-                  <label className="text-sm text-gray-700">Bank Account Number</label>
-                  <input {...register("bankAcc")} className="w-full mt-1 p-3 border rounded-md" />
+                  <label className="text-sm text-gray-700">
+                    Bank Account Number
+                  </label>
+                  <input
+                    {...register("bankAcc")}
+                    className="w-full mt-1 p-3 border rounded-md"
+                  />
                 </div>
 
                 <div>
                   <label className="text-sm text-gray-700">IFSC Code</label>
-                  <input {...register("ifsc")} className="w-full mt-1 p-3 border rounded-md" />
+                  <input
+                    {...register("ifsc")}
+                    className="w-full mt-1 p-3 border rounded-md"
+                  />
                 </div>
 
-                {/* Proof - OPTIONAL */}
                 <DropZone
                   label="Organization Proof (optional)"
                   name="orgProof"
@@ -231,13 +249,16 @@ export default function EditCampaignUser() {
             {/* ---------------- STEP 2 ---------------- */}
             {step === 2 && (
               <>
-                {/* Title */}
                 <div>
-                  <label className="text-sm text-gray-700">Campaign Title</label>
-                  <input {...register("title")} className="w-full mt-1 p-3 border rounded-md" />
+                  <label className="text-sm text-gray-700">
+                    Campaign Title
+                  </label>
+                  <input
+                    {...register("title")}
+                    className="w-full mt-1 p-3 border rounded-md"
+                  />
                 </div>
 
-                {/* Beneficiary */}
                 <div>
                   <label className="text-sm text-gray-700">Beneficiary</label>
                   <input
@@ -246,10 +267,12 @@ export default function EditCampaignUser() {
                   />
                 </div>
 
-                {/* Category */}
                 <div>
                   <label className="text-sm text-gray-700">Category</label>
-                  <select {...register("category")} className="w-full mt-1 p-3 border rounded-md">
+                  <select
+                    {...register("category")}
+                    className="w-full mt-1 p-3 border rounded-md"
+                  >
                     <option value="Education">Education</option>
                     <option value="Health">Health</option>
                     <option value="Disaster Relief">Disaster Relief</option>
@@ -257,9 +280,10 @@ export default function EditCampaignUser() {
                   </select>
                 </div>
 
-                {/* Description */}
                 <div>
-                  <label className="text-sm text-gray-700">Detailed Explanation</label>
+                  <label className="text-sm text-gray-700">
+                    Detailed Explanation
+                  </label>
                   <textarea
                     {...register("detail")}
                     rows={5}
@@ -267,7 +291,6 @@ export default function EditCampaignUser() {
                   />
                 </div>
 
-                {/* Location */}
                 <div>
                   <label className="text-sm text-gray-700">Location</label>
                   <input
@@ -276,9 +299,10 @@ export default function EditCampaignUser() {
                   />
                 </div>
 
-                {/* Amount */}
                 <div>
-                  <label className="text-sm text-gray-700">Target Amount (₹)</label>
+                  <label className="text-sm text-gray-700">
+                    Target Amount (₹)
+                  </label>
                   <input
                     type="number"
                     {...register("amount")}
@@ -286,7 +310,6 @@ export default function EditCampaignUser() {
                   />
                 </div>
 
-                {/* Campaign image - OPTIONAL */}
                 <DropZone
                   label="Update Campaign Image (optional)"
                   name="campaignImage"
@@ -299,7 +322,6 @@ export default function EditCampaignUser() {
                   errors={errors}
                 />
 
-                {/* Documents - OPTIONAL */}
                 <DropZone
                   label="Update Campaign Documents (optional)"
                   name="campaignDocs"

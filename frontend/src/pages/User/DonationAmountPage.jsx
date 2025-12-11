@@ -30,7 +30,6 @@ export default function DonationPage() {
 
   const campaign = singleCampaign;
 
-  // ------------- VALIDATION -------------
   const validateAmount = (value) => {
     if (!value) return "Amount is required";
     if (isNaN(value)) return "Amount must be a number";
@@ -45,25 +44,17 @@ export default function DonationPage() {
 
     if (validationError === "") {
       console.log("Proceed to payment page with amount:", amount);
-      // 👇 Add your payment logic here
     }
   };
-
-  // Tax (if any)
   const tax = 0;
   const totalAmount = Number(amount || 0) + tax;
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-
-      {/* NAVBAR */}
       <Navbar />
 
-      {/* CONTENT */}
       <div className="pt-24 flex justify-center items-start flex-grow pb-20">
         <div className="bg-white shadow-xl p-10 rounded-3xl w-[380px] border border-gray-200">
-
-          {/* Campaign Image */}
           <div className="w-full flex justify-center mb-8">
             <img
               src={campaign.image?.[0]}
@@ -72,7 +63,6 @@ export default function DonationPage() {
             />
           </div>
 
-          {/* Donation Amount */}
           <label className="block text-gray-700 font-semibold text-lg mb-2">
             Donating Amount
           </label>
@@ -88,17 +78,15 @@ export default function DonationPage() {
             className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:ring-2 focus:ring-black outline-none"
           />
 
-          {/* Validation Error */}
-          {errors && (
-            <p className="text-red-500 text-sm mt-1">{errors}</p>
-          )}
+          {errors && <p className="text-red-500 text-sm mt-1">{errors}</p>}
 
           <hr className="my-5" />
 
-          {/* Calculation */}
           <div className="flex justify-between text-gray-700 mb-2">
             <span>Donating Amount</span>
-            <span className="font-semibold">₹ {Number(amount || 0).toFixed(2)}</span>
+            <span className="font-semibold">
+              ₹ {Number(amount || 0).toFixed(2)}
+            </span>
           </div>
 
           <div className="flex justify-between text-gray-700 mb-2">
@@ -111,18 +99,14 @@ export default function DonationPage() {
             <span>₹ {totalAmount.toFixed(2)}</span>
           </div>
 
-          {/* Donate Button */}
           <button
             onClick={handleDonate}
             className="mt-6 w-full bg-black text-white py-3 rounded-lg text-lg font-semibold hover:bg-gray-900 transition"
           >
             Donate
           </button>
-
         </div>
       </div>
-
-      {/* FOOTER */}
       <Footer />
     </div>
   );

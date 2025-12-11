@@ -1,22 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { resendOtp, resendOtpPassword, verifyOtpPassword } from '../../services/authService';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  resendOtp,
+  resendOtpPassword,
+  verifyOtpPassword,
+} from "../../services/authService";
 
 export default function VerifyOtpPassword() {
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(60);
   const [message, setMessage] = useState("");
   const [resending, setResending] = useState(false);
 
   const email = localStorage.getItem("resetEmail");
-  
+
   const navigate = useNavigate();
 
-  useEffect(()=>{
+  useEffect(() => {
     const email = localStorage.getItem("resetEmail");
     if (!email) {
-    navigate("/login")
-  }}, [])
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
     if (timer > 0) {
@@ -26,7 +31,7 @@ export default function VerifyOtpPassword() {
   }, [timer]);
 
   const handleChange = (e, index) => {
-    const value = e.target.value.replace(/\D/g, '');
+    const value = e.target.value.replace(/\D/g, "");
     if (value.length > 1) return;
 
     const newOtp = [...otp];
@@ -39,13 +44,13 @@ export default function VerifyOtpPassword() {
   };
 
   const handleVerify = async () => {
-    const otpGot = otp.join('');
+    const otpGot = otp.join("");
 
     try {
-      const response = await verifyOtpPassword(email,otpGot)
+      const response = await verifyOtpPassword(email, otpGot);
 
       setMessage(response.data.message);
-      navigate('/change-password');
+      navigate("/change-password");
     } catch (err) {
       if (err.response) {
         setMessage(err.response.data.message);
@@ -56,14 +61,14 @@ export default function VerifyOtpPassword() {
   };
 
   const handleResendOtp = async () => {
-    if (timer > 0) return; 
+    if (timer > 0) return;
     setResending(true);
 
     try {
-      const response = await resendOtpPassword(email)
+      const response = await resendOtpPassword(email);
 
       setMessage(response.data.message);
-      setTimer(60); 
+      setTimer(60);
     } catch (err) {
       setMessage(err.response?.data?.message || "Error resending OTP");
     } finally {
@@ -96,7 +101,7 @@ export default function VerifyOtpPassword() {
         <p className="text-gray-500 text-sm mb-2">
           Resend available in{" "}
           <span className="font-semibold">
-            00:{timer.toString().padStart(2, '0')}
+            00:{timer.toString().padStart(2, "0")}
           </span>
         </p>
 
@@ -105,7 +110,9 @@ export default function VerifyOtpPassword() {
           <span
             onClick={handleResendOtp}
             className={`font-medium cursor-pointer ${
-              timer > 0 ? "text-gray-400 cursor-not-allowed" : "text-pink-600 hover:underline"
+              timer > 0
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-pink-600 hover:underline"
             }`}
           >
             {resending ? "Resending..." : "Resend OTP"}

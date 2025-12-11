@@ -6,14 +6,12 @@ import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
 import adminApi from "../../api/adminApi";
 
 const ProfilePage = () => {
-  // State to toggle between View and Edit modes (mimicking the two screenshots)
+  
   const [isEditing, setIsEditing] = useState(false);
 
-  // Form State
+
   const [formData, setFormData] = useState({});
   const fileInputRef = useRef(null);
-
-  
 
   useEffect(() => {
     async function loader() {
@@ -42,7 +40,7 @@ const ProfilePage = () => {
     formDataToSend.append("mobileNumber", formData.phone);
 
     if (formData.avatar instanceof File) {
-      formDataToSend.append("avatar", formData.avatar); // Upload only if user changed image
+      formDataToSend.append("avatar", formData.avatar); 
     }
 
     try {
@@ -64,7 +62,7 @@ const ProfilePage = () => {
     if (file) {
       setFormData((prev) => ({
         ...prev,
-        avatar: file, // REAL FILE for upload
+        avatar: file, 
         avatarPreview: URL.createObjectURL(file), // PREVIEW URL
       }));
     }
@@ -231,7 +229,7 @@ const ProfilePage = () => {
                     Update
                   </button>
                 ) : (
-                  /* View Mode Buttons */
+                  
                   <>
                     <button
                       onClick={() => setIsEditing(true)}
@@ -239,7 +237,6 @@ const ProfilePage = () => {
                     >
                       Edit
                     </button>
-                  
                   </>
                 )}
               </div>
