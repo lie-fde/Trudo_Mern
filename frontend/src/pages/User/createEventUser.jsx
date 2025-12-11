@@ -22,6 +22,7 @@ export default function CreateEventPage() {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("description", data.description);
+    formData.append("category", data.category);
     formData.append("venue", data.venue);
     formData.append("eventTime", data.eventTime);
     formData.append("duration", data.duration);

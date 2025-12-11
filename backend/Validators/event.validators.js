@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body , param ,validationResult } from "express-validator";
 
 export const createEventValidators = [
   body("title").trim().notEmpty().withMessage("Title is required"),
@@ -40,4 +40,39 @@ export const createEventValidators = [
     .withMessage("Total tickets is required")
     .isInt({ gt: 0 })
     .withMessage("Total tickets must be > 0"),
+];
+
+
+export const updateEventStatusValidator = [
+  body("status")
+    .notEmpty().withMessage("Status is required")
+    .isIn(["Approved", "Rejected"])
+    .withMessage("Invalid status value"),
+
+  body("rejectionReason")
+    .custom((value, { req }) => {
+      if (req.body.status === "Rejected" && (!value || value.trim() === "")) {
+        throw new Error("Rejection reason is required when rejecting an event");
+      }
+      return true;
+    }),
+];
+
+
+export const getSingleEventValidator = [
+  param("eventId")
+    .isMongoId()
+    .withMessage("Invalid event ID format"),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: errors.array(),
+      });
+    }
+    next();
+  }
 ];

@@ -15,6 +15,8 @@ import NotFound from "../pages/NotFound.jsx";
 import DonationReport from "../pages/Admin/DonationReport.jsx";
 import EventsPage from "../pages/Admin/EventList.jsx";
 import CreateEvent from "../pages/Admin/CreateEvent.jsx";
+import EventRequestList from "../pages/Admin/EventRequestList.jsx";
+import EventView from "../pages/Admin/EventView.jsx";
 
 
 function AdminRoutes () {
@@ -36,8 +38,11 @@ function AdminRoutes () {
         <Route path="/donation-report" element={<AdminProtectedRoute><DonationReport/></AdminProtectedRoute>} />
         <Route path="/events" element={<AdminProtectedRoute><EventsPage/></AdminProtectedRoute>} />
         <Route path="/create-event" element={<AdminProtectedRoute><CreateEvent/></AdminProtectedRoute>}/>
+        <Route path="/event-request" element={<AdminProtectedRoute><EventRequestList/></AdminProtectedRoute>} />
+        <Route path="/event-request/:id" element={<AdminProtectedRoute><EventView/></AdminProtectedRoute>} />
 
         <Route path="*" element={<NotFound/>}/>
+
 
         </Routes>
         </>

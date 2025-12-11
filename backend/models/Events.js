@@ -24,6 +24,13 @@ const EventSchema = new mongoose.Schema(
       default: [],
     },
 
+     category: {
+      type: String,
+      required: true,
+      enum:["Education", "Health", "Technology", "Other"],
+      set: (value) => (value ? value.trim() : value),
+    },
+
     venue: {
       type: String,
       required: true,
@@ -55,6 +62,26 @@ const EventSchema = new mongoose.Schema(
       type: String,
       enum: ["Pending", "Approved", "Rejected", "Cancelled"],
       default: "Pending",
+    },
+
+    rejectionReason: {
+      type: String,
+      default: null, // Empty by default
+    },
+
+        approvalDate: {
+      type: Date,
+      default: null,
+    },
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+
+      isBlocked: {
+      type: Boolean,
+      default: false,
     },
 
     date: {

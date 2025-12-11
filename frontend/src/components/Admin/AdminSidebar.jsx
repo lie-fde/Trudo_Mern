@@ -101,6 +101,12 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
             collapsed={collapsed}
             path="/admin/campaigns-request"
           />
+            <SidebarItem
+            icon={<UserCheck size={20} />}
+            label="Event Request"
+            collapsed={collapsed}
+            path="/admin/event-request"
+          />
           <SidebarItem
             icon={<Calendar size={20} />}
             label="Events"

@@ -22,6 +22,7 @@ export default function EventForm({
         "email",
         "title",
         "description",
+        "category",
         "venue",
         "eventTime",
         "duration",
@@ -54,7 +55,9 @@ export default function EventForm({
     <div className="space-y-6">
       {/* PERSONAL INFO */}
       <div>
-        <label className="text-sm">Full Name *</label>
+        <label className="text-sm">
+          Full Name <span className="text-red-500">*</span>
+        </label>
         <input
           {...register("fullName", {
             required: "Full Name is required",
@@ -69,7 +72,9 @@ export default function EventForm({
       </div>
 
       <div>
-        <label className="text-sm">Email *</label>
+        <label className="text-sm">
+          Email <span className="text-red-500">*</span>
+        </label>
         <input
           type="email"
           {...register("email", {
@@ -87,13 +92,17 @@ export default function EventForm({
       {/* EVENT DETAILS */}
 
       <div>
-        <label className="text-sm">Event Title *</label>
+        <label className="text-sm">
+          Event Title <span className="text-red-500">*</span>
+        </label>
         <input
           {...register("title", {
             required: "Event title is required",
             validate: (v) => v.trim() !== "" || "Event Title cannot be empty",
           })}
-          className="w-full mt-1 p-3 border rounded-md"
+          className={`w-full mt-1 p-3 border rounded-md ${
+            errors.category ? "border-red-500" : "border-gray-300"
+          }`}
         />
         {errors.title && (
           <p className="text-red-500 text-xs">{errors.title.message}</p>
@@ -101,14 +110,18 @@ export default function EventForm({
       </div>
 
       <div>
-        <label className="text-sm">Description *</label>
+        <label className="text-sm">
+          Description <span className="text-red-500">*</span>
+        </label>
         <textarea
           {...register("description", {
             required: "Description is required",
             validate: (v) => v.trim() !== "" || "Description cannot be empty",
           })}
           rows={5}
-          className="w-full mt-1 p-3 border rounded-md"
+          className={`w-full mt-1 p-3 border rounded-md ${
+            errors.category ? "border-red-500" : "border-gray-300"
+          }`}
         />
         {errors.description && (
           <p className="text-red-500 text-xs">{errors.description.message}</p>
@@ -116,13 +129,40 @@ export default function EventForm({
       </div>
 
       <div>
-        <label className="text-sm">Venue *</label>
+        <label className="text-sm text-gray-700 flex items-center gap-1">
+          Category <span className="text-red-500">*</span>
+        </label>
+        <select
+          {...register("category", {
+            required: "Category is required",
+          })}
+          className={`w-full mt-1 p-3 border rounded-md ${
+            errors.category ? "border-red-500" : "border-gray-300"
+          }`}
+        >
+          <option value="">Select Category</option>
+          <option value="Education">Education</option>
+          <option value="Health">Health</option>
+          <option value="Technology">Technology</option>
+          <option value="Other">Other</option>
+        </select>
+        {errors.category && (
+          <p className="text-xs text-red-500 mt-1">{errors.category.message}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="text-sm">
+          Venue <span className="text-red-500">*</span>
+        </label>
         <input
           {...register("venue", {
             required: "Venue is required",
             validate: (v) => v.trim() !== "" || "Venue cannot be empty",
           })}
-          className="w-full mt-1 p-3 border rounded-md"
+          className={`w-full mt-1 p-3 border rounded-md ${
+            errors.category ? "border-red-500" : "border-gray-300"
+          }`}
         />
         {errors.venue && (
           <p className="text-red-500 text-xs">{errors.venue.message}</p>
@@ -130,11 +170,15 @@ export default function EventForm({
       </div>
 
       <div>
-        <label className="text-sm">Event Time *</label>
+        <label className="text-sm">
+          Event Time <span className="text-red-500">*</span>
+        </label>
         <input
           type="time"
           {...register("eventTime", { required: "Event time is required" })}
-          className="w-full mt-1 p-3 border rounded-md"
+          className={`w-full mt-1 p-3 border rounded-md ${
+            errors.category ? "border-red-500" : "border-gray-300"
+          }`}
         />
         {errors.eventTime && (
           <p className="text-red-500 text-xs">{errors.eventTime.message}</p>
@@ -142,11 +186,15 @@ export default function EventForm({
       </div>
 
       <div>
-        <label className="text-sm">Event Date *</label>
+        <label className="text-sm">
+          Event Date <span className="text-red-500">*</span>
+        </label>
         <input
           type="date"
           {...register("date", { required: "Event date is required" })}
-          className="w-full mt-1 p-3 border rounded-md"
+          className={`w-full mt-1 p-3 border rounded-md ${
+            errors.category ? "border-red-500" : "border-gray-300"
+          }`}
         />
         {errors.date && (
           <p className="text-red-500 text-xs">{errors.date.message}</p>
@@ -154,11 +202,15 @@ export default function EventForm({
       </div>
 
       <div>
-        <label className="text-sm">Duration (in hours) *</label>
+        <label className="text-sm">
+          Duration (in hours) <span className="text-red-500">*</span>
+        </label>
         <input
           type="number"
           {...register("duration", { required: "Duration is required" })}
-          className="w-full mt-1 p-3 border rounded-md"
+          className={`w-full mt-1 p-3 border rounded-md ${
+            errors.category ? "border-red-500" : "border-gray-300"
+          }`}
         />
         {errors.duration && (
           <p className="text-red-500 text-xs">{errors.duration.message}</p>
@@ -166,11 +218,15 @@ export default function EventForm({
       </div>
 
       <div>
-        <label className="text-sm">Ticket Price (₹) *</label>
+        <label className="text-sm">
+          Ticket Price (₹) <span className="text-red-500">*</span>
+        </label>
         <input
           type="number"
           {...register("ticketPrice", { required: "Ticket Price is required" })}
-          className="w-full mt-1 p-3 border rounded-md"
+          className={`w-full mt-1 p-3 border rounded-md ${
+            errors.category ? "border-red-500" : "border-gray-300"
+          }`}
         />
         {errors.ticketPrice && (
           <p className="text-red-500 text-xs">{errors.ticketPrice.message}</p>
@@ -178,11 +234,15 @@ export default function EventForm({
       </div>
 
       <div>
-        <label className="text-sm">Total Tickets *</label>
+        <label className="text-sm">
+          Total Tickets <span className="text-red-500">*</span>
+        </label>
         <input
           type="number"
           {...register("totalTickets", { required: "Total tickets required" })}
-          className="w-full mt-1 p-3 border rounded-md"
+          className={`w-full mt-1 p-3 border rounded-md ${
+            errors.category ? "border-red-500" : "border-gray-300"
+          }`}
         />
         {errors.totalTickets && (
           <p className="text-red-500 text-xs">{errors.totalTickets.message}</p>
@@ -236,8 +296,6 @@ export default function EventForm({
         setValue={setValue}
         handleFile={handleFile}
       />
-
-   
 
       {/* SUBMIT BUTTON */}
       <div className="flex justify-end mt-6">
