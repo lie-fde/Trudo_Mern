@@ -40,6 +40,7 @@ function AdminRoutes () {
         <Route path="/create-event" element={<AdminProtectedRoute><CreateEvent/></AdminProtectedRoute>}/>
         <Route path="/event-request" element={<AdminProtectedRoute><EventRequestList/></AdminProtectedRoute>} />
         <Route path="/event-request/:id" element={<AdminProtectedRoute><EventView/></AdminProtectedRoute>} />
+        <Route path="/event/:id" element={<AdminProtectedRoute><EventView/></AdminProtectedRoute>} />
 
         <Route path="*" element={<NotFound/>}/>
 

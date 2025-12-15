@@ -23,6 +23,8 @@ import BlockRoute from "./blockRoute";
 import ReceiptPage from "../pages/User/ReceiptPage.jsx";
 import MyDonationPage from "../pages/User/MyDonation.jsx";
 import CreateEventUser from "../pages/User/createEventUser.jsx";
+import EventPage from "../pages/User/EventPage.jsx";
+import EventViewUserPage from "../pages/User/EventViewUser.jsx";
 
 
 function UserRoutes(){
@@ -50,6 +52,8 @@ function UserRoutes(){
         <Route path="/donation/receipt/:receiptId" element={<ProtectedRoute><ReceiptPage/></ProtectedRoute>}/>
         <Route path="/my-donations" element={<ProtectedRoute><MyDonationPage/></ProtectedRoute>} />
         <Route path="/create-event" element={<ProtectedRoute><CreateEventUser/></ProtectedRoute>}/>
+        <Route path="/events" element={<EventPage/>}/>
+        <Route path="/events/:eventId" element={<ProtectedRoute><EventViewUserPage/></ProtectedRoute>}/>
         
         
         <Route path="/buggy" element={<Buggy/>}/>

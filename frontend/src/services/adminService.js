@@ -17,3 +17,9 @@ export const unblockCampaign =(id)=> adminApi.patch(`/admin/campaign/unblock/${i
 
 export const deleteCampaign = (id) => adminApi.patch(`/admin/campaign/delete/${id}`)
 
+export const blockEvent = (id) => adminApi.patch(`/events/block/${id}`)
+
+export const UnblockEvent = (id) => adminApi.patch(`/events/unblock/${id}`)
+
+export const deleteEvent = (id) => adminApi.patch(`/events/delete/${id}`)
+

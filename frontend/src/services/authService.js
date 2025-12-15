@@ -66,3 +66,7 @@ export const adminLogin =(adminEmail,password) =>{
         adminEmail,password
     })
 }
+
+export const fetchEventsApi = (params) => {
+  return api.get("/events/list", { params });
+};

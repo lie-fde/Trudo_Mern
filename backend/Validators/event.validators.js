@@ -1,4 +1,4 @@
-import { body , param ,validationResult } from "express-validator";
+import { body , param ,validationResult , query} from "express-validator";
 
 export const createEventValidators = [
   body("title").trim().notEmpty().withMessage("Title is required"),
@@ -73,6 +73,14 @@ export const getSingleEventValidator = [
         errors: errors.array(),
       });
     }
+    console.log("Passed")
     next();
   }
+];
+
+export const getEventsUserValidator = [
+  query("page").optional().isInt({ min: 1 }),
+  query("limit").optional().isInt({ min: 1, max: 50 }),
+  query("search").optional().isString().trim(),
+  query("sort").optional().isIn(["newest", "oldest"]),
 ];

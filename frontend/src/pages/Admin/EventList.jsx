@@ -10,149 +10,121 @@ import {
 import AdminNavbar from "../../components/Admin/AdminNavbar";
 import AdminSidebar from "../../components/Admin/AdminSidebar";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCampaigns } from "../../store/campaignSlice";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { blockCampaign , unblockCampaign ,deleteCampaign } from "../../services/adminService";
+import {
+  blockCampaign,
+  unblockCampaign,
+  deleteCampaign,
+  UnblockEvent,
+  blockEvent,
+  deleteEvent,
+} from "../../services/adminService";
+import { fetchAllEvents } from "../../store/eventSlice";
 
 export default function EventsPage() {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  // Frontend State
+  // UI State
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [sort, setSort] = useState("latest");
   const [page, setPage] = useState(1);
 
-  const ITEMS_PER_PAGE = 6;
+  const limit = 5;
 
-  // Fetch campaigns once
+  // Redux State
+  const { events, loading, totalPages, currentPage } = useSelector(
+    (state) => state.event
+  );
+
+  // Fetch Events when filters change
   useEffect(() => {
-    dispatch(fetchAllCampaigns());
-  }, [dispatch]);
-
-  const { campaigns, loading } = useSelector((state) => state.campaign);
-
-  
-  const handleBlockCampaign = (campaignId, isBlocked) => {
-  Swal.fire({
-    title: isBlocked ? "Unlist this campaign?" : "Block this campaign?",
-    text: isBlocked
-      ? "This campaign will no longer be blocked and will be visible again."
-      : "This campaign will be blocked and hidden from users.",
-    icon: isBlocked ? "info" : "warning",
-    showCancelButton: true,
-    confirmButtonColor: isBlocked ? "#16a34a" : "#f59e0b",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: isBlocked 
-      ? "Yes, unlist campaign" 
-      : "Yes, block campaign",
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-
-        // API CALLS
-        if (!isBlocked) {
-          await blockCampaign(campaignId);     // You implement this API
-        } else {
-          await unblockCampaign(campaignId);   // You implement this API
-        }
-
-        // SUCCESS POPUP
-        Swal.fire({
-          title: isBlocked ? "unblocked!" : "Blocked!",
-          text: isBlocked
-            ? "Campaign has been listed successfully."
-            : "Campaign has been blocked successfully.",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-
-        dispatch(fetchAllCampaigns())
-
-      } catch (err) {
-        Swal.fire("Error", "Failed to update campaign status", "error");
-      }
-    }
-  });
-};
-
-const handleDeleteCampaign = (campaignId) => {
-  Swal.fire({
-    title: "Delete this campaign?",
-    text: "Once deleted, you cannot recover this campaign. This action is permanent.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#e11d48", // red
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete it",
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-
-        await deleteCampaign(campaignId); 
-        Swal.fire({
-          title: "Deleted!",
-          text: "Campaign has been removed successfully.",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-
-        // REFRESH LIST
-        dispatch(fetchAllCampaigns());
-
-      } catch (err) {
-        Swal.fire("Error", "Failed to delete campaign", "error");
-      }
-    }
-  });
-};
-
-  let filtered = campaigns.filter((item) =>
-    item.title.toLowerCase().includes(search.toLowerCase())
-  );
-
-
-  if (category) {
-    filtered = filtered.filter((item) => item.category === category);
-  }
-
-  if (sort === "amountDesc") {
-    filtered = filtered.sort((a, b) => b.targetAmount - a.targetAmount);
-  }
-  if (sort === "amountAsc") {
-    filtered = filtered.sort((a, b) => a.targetAmount - b.targetAmount);
-  }
-  if (sort === "latest") {
-    filtered = filtered.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    dispatch(
+      fetchAllEvents({
+        search,
+        page,
+        limit,
+        sort,
+        category,
+      })
     );
-  }
+  }, [search, sort, page, category, dispatch]);
 
-  // 4️⃣ PAGINATION
-  const totalDocs = filtered.length;
-  const totalPages = Math.ceil(totalDocs / ITEMS_PER_PAGE);
 
-  const paginatedCampaigns = filtered.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  );
+  const handleBlockCampaign = (eventId, isBlocked) => {
+    Swal.fire({
+      title: isBlocked ? "Unlist this event?" : "Block this event?",
+      text: isBlocked
+        ? "Event will be visible again."
+        : "Event will be hidden from users.",
+      icon: isBlocked ? "info" : "warning",
+      showCancelButton: true,
+      confirmButtonColor: isBlocked ? "#16a34a" : "#f59e0b",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: isBlocked ? "Unblock" : "Block",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          if (isBlocked) await UnblockEvent(eventId);
+          else await blockEvent(eventId);
 
+          Swal.fire({
+            title: "Success!",
+            text: "Event status updated.",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+
+          dispatch(fetchAllEvents({ search, page, limit, sort, category }));
+        } catch (err) {
+          Swal.fire("Error", "Failed to update event", "error");
+        }
+      }
+    });
+  };
+
+  // ==========================
+  // DELETE LOGIC
+  // ==========================
+  const handleDeleteCampaign = (eventId) => {
+    Swal.fire({
+      title: "Delete this event?",
+      text: "You cannot recover this once deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#e11d48",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteEvent(eventId);
+
+          Swal.fire({
+            title: "Deleted!",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+
+          dispatch(fetchAllEvents({ search, page, limit, sort, category }));
+        } catch (err) {
+          Swal.fire("Error", "Failed to delete event", "error");
+        }
+      }
+    });
+  };
+
+  // ==========================
+  // PAGINATION BUTTON HANDLER
+  // ==========================
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setPage(newPage);
     }
-  };
-
-  const handleDelete = (id) => {
-    console.log("Delete", id);
-  };
-
-  const handleToggleList = (id, currentStatus) => {
-    console.log("Toggle", id, currentStatus);
   };
 
   return (
@@ -169,7 +141,7 @@ const handleDeleteCampaign = (campaignId) => {
         <div className="flex-1 overflow-y-auto p-8">
           <div className="text-sm text-gray-500 mb-6">
             <span>Dashboard</span> <span className="mx-2">&gt;</span>
-            <span className="text-black font-semibold">Campaigns</span>
+            <span className="text-black font-semibold">Events</span>
           </div>
 
           {/* Header + Search */}
@@ -182,7 +154,7 @@ const handleDeleteCampaign = (campaignId) => {
               <div className="relative flex-1 md:flex-none">
                 <input
                   type="text"
-                  placeholder="Search donations..."
+                  placeholder="Search events..."
                   value={search}
                   onChange={(e) => {
                     setSearch(e.target.value);
@@ -194,9 +166,11 @@ const handleDeleteCampaign = (campaignId) => {
               </div>
             </div>
 
-            <button onClick={()=>navigate('/admin/create-event')}
-            className="bg-black text-white px-6 py-2.5 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition-colors shadow-lg">
-              Add New Event <Plus size={18} strokeWidth={3}  />
+            <button
+              onClick={() => navigate("/admin/create-event")}
+              className="bg-black text-white px-6 py-2.5 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition-colors shadow-lg"
+            >
+              Add New Event <Plus size={18} strokeWidth={3} />
             </button>
           </div>
 
@@ -218,8 +192,8 @@ const handleDeleteCampaign = (campaignId) => {
                 <option value="">All</option>
                 <option value="Education">Education</option>
                 <option value="Health">Health</option>
-                <option value="Disaster Relief">Disaster Relief</option>
-                <option value="Others">Others</option>
+                <option value="Technology">Technology</option>
+                <option value="Other">Other</option>
               </select>
             </div>
 
@@ -229,9 +203,9 @@ const handleDeleteCampaign = (campaignId) => {
               <div className="h-4 w-px bg-gray-300 mx-3"></div>
 
               <button
-                onClick={() => setSort("amountDesc")}
+                onClick={() => setSort("priceDesc")}
                 className={`text-sm ${
-                  sort === "amountDesc"
+                  sort === "priceDesc"
                     ? "font-bold text-black"
                     : "text-gray-500 hover:text-black"
                 }`}
@@ -240,9 +214,9 @@ const handleDeleteCampaign = (campaignId) => {
               </button>
 
               <button
-                onClick={() => setSort("amountAsc")}
+                onClick={() => setSort("priceAsc")}
                 className={`text-sm ml-3 ${
-                  sort === "amountAsc"
+                  sort === "priceAsc"
                     ? "font-bold text-black"
                     : "text-gray-500 hover:text-black"
                 }`}
@@ -269,7 +243,7 @@ const handleDeleteCampaign = (campaignId) => {
               <thead className="bg-black text-white">
                 <tr>
                   <th className="py-5 px-6 text-left text-sm">Image</th>
-                  <th className="py-5 px-6 text-left text-sm">Campaign Name</th>
+                  <th className="py-5 px-6 text-left text-sm">Event Name</th>
                   <th className="py-5 px-6 text-left text-sm">Category</th>
                   <th className="py-5 px-6 text-center text-sm">List</th>
                   <th className="py-5 px-6 text-center text-sm">Action</th>
@@ -279,68 +253,68 @@ const handleDeleteCampaign = (campaignId) => {
               <tbody className="divide-y divide-gray-100">
                 {loading ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-12 text-gray-500">
-                      Loading data...
+                    <td colSpan="5" className="py-10 text-center text-gray-500">
+                      Loading...
                     </td>
                   </tr>
-                ) : paginatedCampaigns.length === 0 ? (
+                ) : events.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-12 text-gray-500">
-                      No results found
+                    <td colSpan="5" className="py-10 text-center text-gray-500">
+                      No events found
                     </td>
                   </tr>
                 ) : (
-                  paginatedCampaigns.map((item) => (
+                  events.map((item) => (
                     <tr key={item._id} className="hover:bg-gray-50">
                       <td className="py-4 px-6">
-                        <div className="w-12 h-12 rounded-xl bg-blue-900 flex items-center justify-center overflow-hidden">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-200 flex items-center justify-center">
                           <img
-                            src={
-                              Array.isArray(item.image)
-                                ? item.image[0]
-                                : item.image
-                            }
-                            alt="campaign"
-                            className="w-10 h-10 object-cover"
+                            src={item.images?.[0]}
+                            alt="event"
+                            className="w-full h-full object-cover"
                           />
                         </div>
                       </td>
 
                       <td
-  className="py-4 px-6 font-semibold text-gray-800 underline cursor-pointer hover:text-blue-600 transition"
-  onClick={() => navigate(`/admin/campaigns-request/${item._id}`)}
->
-  {item.title}
-</td>
+                        className="py-4 px-6 font-semibold underline cursor-pointer hover:text-blue-600"
+                        onClick={() =>
+                          navigate(`/admin/event/${item._id}`)
+                        }
+                      >
+                        {item.title}
+                      </td>
 
                       <td className="py-4 px-6 text-gray-600">
                         {item.category}
                       </td>
 
                       <td className="py-4 px-6 text-center">
-
-
                         <button
-                        onClick={() => handleBlockCampaign(item._id, item.isBlocked)}
-                        className={`px-4 py-1 rounded-full text-sm font-medium ${
-                          item.isBlocked
-                            ? "bg-green-600 text-white"
-                            : "bg-red-600 text-white"
-                        }`}
-                      >
-                        {item.isBlocked ? "UNBLOCK" : "BLOCK"}
-                      </button>
-
-
-
+                          onClick={() =>
+                            handleBlockCampaign(item._id, item.isBlocked)
+                          }
+                          className={`px-4 py-1 rounded-full text-sm font-medium ${
+                            item.isBlocked
+                              ? "bg-green-600 text-white"
+                              : "bg-red-600 text-white"
+                          }`}
+                        >
+                          {item.isBlocked ? "UNBLOCK" : "BLOCK"}
+                        </button>
                       </td>
 
-                      <td className="py-4 px-6">
+                      <td className="py-4 px-6 text-center">
                         <div className="flex justify-center gap-3">
-                          <button onClick={()=>navigate(`/admin/campaigns/edit/${item._id}`)}
-                          className="p-2 border rounded-lg hover:bg-gray-100 text-gray-600">
+                          <button
+                            onClick={() =>
+                              navigate(`/admin/events/edit/${item._id}`)
+                            }
+                            className="p-2 border rounded-lg hover:bg-gray-100 text-gray-600"
+                          >
                             <Edit size={16} />
                           </button>
+
                           <button
                             onClick={() => handleDeleteCampaign(item._id)}
                             className="p-2 border border-red-200 rounded-lg hover:bg-red-50 text-red-500"
@@ -359,15 +333,8 @@ const handleDeleteCampaign = (campaignId) => {
           {/* Pagination */}
           <div className="flex justify-between items-center mt-8 text-sm text-gray-500">
             <p>
-              Showing{" "}
-              <span className="text-black">
-                {(page - 1) * ITEMS_PER_PAGE + 1}
-              </span>{" "}
-              -{" "}
-              <span className="text-black">
-                {Math.min(page * ITEMS_PER_PAGE, totalDocs)}
-              </span>{" "}
-              of <span className="text-black">{totalDocs}</span>
+              Page <span className="text-black">{currentPage}</span> of{" "}
+              <span className="text-black">{totalPages}</span>
             </p>
 
             <div className="flex items-center gap-2">

@@ -13,11 +13,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCampaigns } from "../../store/campaignSlice";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { blockCampaign , unblockCampaign ,deleteCampaign } from "../../services/adminService";
+import {
+  blockCampaign,
+  unblockCampaign,
+  deleteCampaign,
+} from "../../services/adminService";
 
 export default function CampaignsPage() {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // Frontend State
   const [search, setSearch] = useState("");
@@ -34,87 +38,81 @@ export default function CampaignsPage() {
 
   const { campaigns, loading } = useSelector((state) => state.campaign);
 
-  
   const handleBlockCampaign = (campaignId, isBlocked) => {
-  Swal.fire({
-    title: isBlocked ? "Unlist this campaign?" : "Block this campaign?",
-    text: isBlocked
-      ? "This campaign will no longer be blocked and will be visible again."
-      : "This campaign will be blocked and hidden from users.",
-    icon: isBlocked ? "info" : "warning",
-    showCancelButton: true,
-    confirmButtonColor: isBlocked ? "#16a34a" : "#f59e0b",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: isBlocked 
-      ? "Yes, unlist campaign" 
-      : "Yes, block campaign",
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
+    Swal.fire({
+      title: isBlocked ? "Unlist this campaign?" : "Block this campaign?",
+      text: isBlocked
+        ? "This campaign will no longer be blocked and will be visible again."
+        : "This campaign will be blocked and hidden from users.",
+      icon: isBlocked ? "info" : "warning",
+      showCancelButton: true,
+      confirmButtonColor: isBlocked ? "#16a34a" : "#f59e0b",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: isBlocked
+        ? "Yes, unlist campaign"
+        : "Yes, block campaign",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // API CALLS
+          if (!isBlocked) {
+            await blockCampaign(campaignId); // You implement this API
+          } else {
+            await unblockCampaign(campaignId); // You implement this API
+          }
 
-        // API CALLS
-        if (!isBlocked) {
-          await blockCampaign(campaignId);     // You implement this API
-        } else {
-          await unblockCampaign(campaignId);   // You implement this API
+          // SUCCESS POPUP
+          Swal.fire({
+            title: isBlocked ? "unblocked!" : "Blocked!",
+            text: isBlocked
+              ? "Campaign has been listed successfully."
+              : "Campaign has been blocked successfully.",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+
+          dispatch(fetchAllCampaigns());
+        } catch (err) {
+          Swal.fire("Error", "Failed to update campaign status", "error");
         }
-
-        // SUCCESS POPUP
-        Swal.fire({
-          title: isBlocked ? "unblocked!" : "Blocked!",
-          text: isBlocked
-            ? "Campaign has been listed successfully."
-            : "Campaign has been blocked successfully.",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-
-        dispatch(fetchAllCampaigns())
-
-      } catch (err) {
-        Swal.fire("Error", "Failed to update campaign status", "error");
       }
-    }
-  });
-};
+    });
+  };
 
-const handleDeleteCampaign = (campaignId) => {
-  Swal.fire({
-    title: "Delete this campaign?",
-    text: "Once deleted, you cannot recover this campaign. This action is permanent.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#e11d48", // red
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete it",
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
+  const handleDeleteCampaign = (campaignId) => {
+    Swal.fire({
+      title: "Delete this campaign?",
+      text: "Once deleted, you cannot recover this campaign. This action is permanent.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#e11d48", // red
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteCampaign(campaignId);
+          Swal.fire({
+            title: "Deleted!",
+            text: "Campaign has been removed successfully.",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          });
 
-        await deleteCampaign(campaignId); 
-        Swal.fire({
-          title: "Deleted!",
-          text: "Campaign has been removed successfully.",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-
-        // REFRESH LIST
-        dispatch(fetchAllCampaigns());
-
-      } catch (err) {
-        Swal.fire("Error", "Failed to delete campaign", "error");
+          // REFRESH LIST
+          dispatch(fetchAllCampaigns());
+        } catch (err) {
+          Swal.fire("Error", "Failed to delete campaign", "error");
+        }
       }
-    }
-  });
-};
+    });
+  };
 
   let filtered = campaigns.filter((item) =>
     item.title.toLowerCase().includes(search.toLowerCase())
   );
-
 
   if (category) {
     filtered = filtered.filter((item) => item.category === category);
@@ -194,9 +192,11 @@ const handleDeleteCampaign = (campaignId) => {
               </div>
             </div>
 
-            <button onClick={()=>navigate('/admin/create-campaign')}
-            className="bg-black text-white px-6 py-2.5 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition-colors shadow-lg">
-              Add New Campaign <Plus size={18} strokeWidth={3}  />
+            <button
+              onClick={() => navigate("/admin/create-campaign")}
+              className="bg-black text-white px-6 py-2.5 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition-colors shadow-lg"
+            >
+              Add New Campaign <Plus size={18} strokeWidth={3} />
             </button>
           </div>
 
@@ -307,38 +307,41 @@ const handleDeleteCampaign = (campaignId) => {
                       </td>
 
                       <td
-  className="py-4 px-6 font-semibold text-gray-800 underline cursor-pointer hover:text-blue-600 transition"
-  onClick={() => navigate(`/admin/campaigns-request/${item._id}`)}
->
-  {item.title}
-</td>
+                        className="py-4 px-6 font-semibold text-gray-800 underline cursor-pointer hover:text-blue-600 transition"
+                        onClick={() =>
+                          navigate(`/admin/campaigns-request/${item._id}`)
+                        }
+                      >
+                        {item.title}
+                      </td>
 
                       <td className="py-4 px-6 text-gray-600">
                         {item.category}
                       </td>
 
                       <td className="py-4 px-6 text-center">
-
-
                         <button
-                        onClick={() => handleBlockCampaign(item._id, item.isBlocked)}
-                        className={`px-4 py-1 rounded-full text-sm font-medium ${
-                          item.isBlocked
-                            ? "bg-green-600 text-white"
-                            : "bg-red-600 text-white"
-                        }`}
-                      >
-                        {item.isBlocked ? "UNBLOCK" : "BLOCK"}
-                      </button>
-
-
-
+                          onClick={() =>
+                            handleBlockCampaign(item._id, item.isBlocked)
+                          }
+                          className={`px-4 py-1 rounded-full text-sm font-medium ${
+                            item.isBlocked
+                              ? "bg-green-600 text-white"
+                              : "bg-red-600 text-white"
+                          }`}
+                        >
+                          {item.isBlocked ? "UNBLOCK" : "BLOCK"}
+                        </button>
                       </td>
 
                       <td className="py-4 px-6">
                         <div className="flex justify-center gap-3">
-                          <button onClick={()=>navigate(`/admin/campaigns/edit/${item._id}`)}
-                          className="p-2 border rounded-lg hover:bg-gray-100 text-gray-600">
+                          <button
+                            onClick={() =>
+                              navigate(`/admin/campaigns/edit/${item._id}`)
+                            }
+                            className="p-2 border rounded-lg hover:bg-gray-100 text-gray-600"
+                          >
                             <Edit size={16} />
                           </button>
                           <button

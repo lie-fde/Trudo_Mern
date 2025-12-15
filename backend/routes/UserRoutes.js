@@ -17,9 +17,21 @@ import auth from '../middlewares/auth.js'
 import profileUpload from '../middlewares/profileUpload.js'
 import upload from '../middlewares/upload.js'
 import { getDonationHistoryController , getDonationStatsController} from '../controllers/donationController.js'
+import { getSingleEventController } from '../controllers/EventController.js'
+import { getSingleEventValidator } from '../Validators/event.validators.js'
+import rateLimit from 'express-rate-limit'
 
 
 const router = express.Router()
+
+const eventCreateLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100,
+  message: {
+    success: false,
+    message: "Too many event creation attempts. Please try again later.",
+  },
+});
 
 
 router.post("/signup",register)
@@ -86,5 +98,6 @@ router.get("/donations/history", auth, getDonationHistoryController);
 
 router.get("/donations/stats",auth, getDonationStatsController);
 
+router.get("/events/:eventId", auth , eventCreateLimiter,getSingleEventValidator, getSingleEventController)
 
 export default router;
