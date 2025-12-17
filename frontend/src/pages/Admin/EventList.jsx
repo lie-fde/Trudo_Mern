@@ -52,7 +52,6 @@ export default function EventsPage() {
     );
   }, [search, sort, page, category, dispatch]);
 
-
   const handleBlockCampaign = (eventId, isBlocked) => {
     Swal.fire({
       title: isBlocked ? "Unlist this event?" : "Block this event?",
@@ -86,9 +85,6 @@ export default function EventsPage() {
     });
   };
 
-  // ==========================
-  // DELETE LOGIC
-  // ==========================
   const handleDeleteCampaign = (eventId) => {
     Swal.fire({
       title: "Delete this event?",
@@ -278,9 +274,7 @@ export default function EventsPage() {
 
                       <td
                         className="py-4 px-6 font-semibold underline cursor-pointer hover:text-blue-600"
-                        onClick={() =>
-                          navigate(`/admin/event/${item._id}`)
-                        }
+                        onClick={() => navigate(`/admin/event/${item._id}`)}
                       >
                         {item.title}
                       </td>

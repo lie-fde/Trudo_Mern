@@ -42,30 +42,29 @@ export default function VerifyOTPProfile({ onVerified, onCancel }) {
   };
 
   const handleVerify = async () => {
-  const otpGot = otp.join("");
+    const otpGot = otp.join("");
 
-  try {
-    const response = await api.post(
-      "/auth/users/profile/verify-otp",
-      {
-        newEmail: localStorage.getItem("tempEmail"),
-        otp: otpGot
-      },
-      { withCredentials: true }
-    );
+    try {
+      const response = await api.post(
+        "/auth/users/profile/verify-otp",
+        {
+          newEmail: localStorage.getItem("tempEmail"),
+          otp: otpGot,
+        },
+        { withCredentials: true }
+      );
 
-    setMessage(response.data.message);
+      setMessage(response.data.message);
 
-    localStorage.removeItem("tempEmail");
+      localStorage.removeItem("tempEmail");
 
-    if (onVerified) onVerified();
+      if (onVerified) onVerified();
 
-    navigate("/profile", { replace: true });
-
-  } catch (err) {
-    setMessage(err.response?.data?.message || "Server error");
-  }
-};
+      navigate("/profile", { replace: true });
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Server error");
+    }
+  };
 
   // RESEND OTP
   const handleResendOtp = async () => {

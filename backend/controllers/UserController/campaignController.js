@@ -1,13 +1,15 @@
-import  {createCampaignService , getPendingRequests, getCampaignDetailsrepo ,
-  updateCampaignStatusService, getUserCampaignsService
+import {
+  createCampaignService,
+  getPendingRequests,
+  getCampaignDetailsrepo,
+  updateCampaignStatusService,
+  getUserCampaignsService,
 } from "../../services/campaignService.js";
 
 const createCampaign = async (req, res) => {
   try {
-   
     const result = await createCampaignService(req);
 
-   
     return res.status(201).json({
       success: true,
       message: "Campaign created successfully",
@@ -24,13 +26,12 @@ const createCampaign = async (req, res) => {
   }
 };
 
-export default {createCampaign,};
+export default { createCampaign };
 
 export const getPendingCampaigns = async (req, res) => {
   try {
     const campaigns = await getPendingRequests();
     return res.status(200).json({ success: true, campaigns });
-
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
@@ -40,7 +41,6 @@ export const getCampaignById = async (req, res) => {
   try {
     const campaign = await getCampaignDetailsrepo(req.params.id);
     return res.status(200).json({ success: true, campaign });
-
   } catch (err) {
     return res.status(404).json({ success: false, message: err.message });
   }
@@ -48,10 +48,10 @@ export const getCampaignById = async (req, res) => {
 
 export const updateCampaignStatus = async (req, res) => {
   try {
-    const { status , rejectionReason} = req.body;
+    const { status, rejectionReason } = req.body;
     let updateData = { status };
 
-    if (status === 'Rejected' && rejectionReason) {
+    if (status === "Rejected" && rejectionReason) {
       updateData.rejectionReason = rejectionReason;
     }
 
@@ -69,7 +69,6 @@ export const updateCampaignStatus = async (req, res) => {
     return res.status(400).json({ success: false, message: err.message });
   }
 };
-
 
 export const getUserCampaignsController = async (req, res) => {
   try {

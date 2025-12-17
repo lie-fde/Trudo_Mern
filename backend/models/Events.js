@@ -20,14 +20,14 @@ const EventSchema = new mongoose.Schema(
     },
 
     images: {
-      type: [String], // array of image URLs
+      type: [String],
       default: [],
     },
 
-     category: {
+    category: {
       type: String,
       required: true,
-      enum:["Education", "Health", "Technology", "Other"],
+      enum: ["Education", "Health", "Technology", "Other"],
       set: (value) => (value ? value.trim() : value),
     },
 
@@ -42,7 +42,7 @@ const EventSchema = new mongoose.Schema(
     },
 
     duration: {
-      type: Number, // in minutes or hours
+      type: Number,
       required: true,
     },
 
@@ -66,10 +66,10 @@ const EventSchema = new mongoose.Schema(
 
     rejectionReason: {
       type: String,
-      default: null, // Empty by default
+      default: null,
     },
 
-        approvalDate: {
+    approvalDate: {
       type: Date,
       default: null,
     },
@@ -79,7 +79,7 @@ const EventSchema = new mongoose.Schema(
       default: false,
     },
 
-      isBlocked: {
+    isBlocked: {
       type: Boolean,
       default: false,
     },
@@ -90,7 +90,7 @@ const EventSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // adds createdAt & updatedAt automatically
+    timestamps: true,
   }
 );
 

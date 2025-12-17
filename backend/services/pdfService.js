@@ -29,7 +29,7 @@ export const generateReceiptPDF = (receiptData) => {
 
     doc.end();
 
-      writeStream.on("finish", async () => {
+    writeStream.on("finish", async () => {
       try {
         // 1️⃣ Upload PDF to Cloudinary
         const uploadResult = await cloudinary.uploader.upload(filePath, {

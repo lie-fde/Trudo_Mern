@@ -1,17 +1,25 @@
-import { createEventRepo , findPendingEventsRepo , updateEventStatusRepo ,findEventByIdRepo , findAll , count,
-    blockEventRepository,unblockEventRepository, deleteEventRepository,
-    getEventsUserRepo
+import {
+  createEventRepo,
+  findPendingEventsRepo,
+  updateEventStatusRepo,
+  findEventByIdRepo,
+  findAll,
+  count,
+  blockEventRepository,
+  unblockEventRepository,
+  deleteEventRepository,
+  getEventsUserRepo,
+  updateEventRepo,
 } from "../repositories/EventRepo.js";
-import User from  "../repositories/UserRepository.js"
+import User from "../repositories/UserRepository.js";
 
 export const createEventService = async (id, body, file) => {
-
   if (!file) {
     throw new Error("Event image is required");
   }
 
-// 1. Create Date objects
- console.log(body.date)
+  // 1. Create Date objects
+  console.log(body.date);
   const inputDate = new Date(body.date);
   const today = new Date();
 
@@ -21,41 +29,82 @@ export const createEventService = async (id, body, file) => {
 
   // 3. Check if input date is Today or Earlier
   if (inputDate.getTime() <= today.getTime()) {
-  throw {
-    statusCode: 400,
-    message: "Events must be scheduled for a future date (cannot be today or in the past)"
-  };
-}
-
+    throw {
+      statusCode: 400,
+      message:
+        "Events must be scheduled for a future date (cannot be today or in the past)",
+    };
+  }
 
   // Multer-Cloudinary: file.path already contains Cloudinary URL
   const cloudinaryImageUrl = file.path;
-
-
 
   const eventData = {
     User: id,
     title: body.title,
     description: body.description,
-    category : body.category,
+    category: body.category,
     venue: body.venue,
     eventTime: body.eventTime,
     duration: body.duration,
     ticketPrice: body.ticketPrice,
     totalTickets: body.totalTickets,
     date: body.date,
-    images: [cloudinaryImageUrl], 
+    images: [cloudinaryImageUrl],
   };
 
   return await createEventRepo(eventData);
 };
 
+export const updateEventService = async (eventId, req) => {
+  const event = await findEventByIdRepo(eventId);
+  if (!event) throw new Error("Event not found");
+
+  const inputDate = new Date(req.body.date);
+  const today = new Date();
+
+  // 2. Reset time to midnight (00:00:00) for both to compare ONLY the date
+  inputDate.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  // 3. Check if input date is Today or Earlier
+  if (inputDate.getTime() < today.getTime()) {
+    throw {
+      statusCode: 400,
+      message:
+        "Events must be scheduled for a future date (cannot be today or in the past)",
+    };
+  }
+
+  const updateData = {
+    title: req.body.title,
+    description: req.body.description,
+    category: req.body.category,
+    venue: req.body.venue,
+    eventTime: req.body.eventTime,
+    duration: req.body.duration,
+    ticketPrice: req.body.ticketPrice,
+    totalTickets: req.body.totalTickets,
+    date: req.body.date,
+  };
+
+  // 🔥 Only update images if new image uploaded
+  if (req.file) {
+    updateData.images = [req.file.path];
+  }
+
+  return await updateEventRepo(eventId, updateData);
+};
 
 export const getPendingEventsService = async () => {
   return await findPendingEventsRepo();
 };
 
-export const updateEventStatusService = async (eventId, status, rejectionReason) => {
+export const updateEventStatusService = async (
+  eventId,
+  status,
+  rejectionReason
+) => {
   const updateData = {
     status,
     rejectionReason: rejectionReason || null,
@@ -83,13 +132,12 @@ export const getSingleEventService = async (eventId) => {
   };
 };
 
-
 export const getAllEventsService = async (query) => {
   const page = Number(query.page) || 1;
   const limit = Number(query.limit) || 10;
 
-  let filter = { isDeleted: false , status:"Approved"}; // default filter
-  let sort = { createdAt: -1 };      // default sort (latest)
+  let filter = { isDeleted: false, status: "Approved" }; // default filter
+  let sort = { createdAt: -1 }; // default sort (latest)
 
   // ---- SEARCH ----
   if (query.search) {
@@ -120,7 +168,6 @@ export const getAllEventsService = async (query) => {
   };
 };
 
-
 export const blockEventService = async (eventId) => {
   const event = await findEventByIdRepo(eventId);
 
@@ -148,16 +195,15 @@ export const deleteEventService = async (eventId) => {
   return await deleteEventRepository(eventId);
 };
 
-
 export const getEventsUserService = async (query, id) => {
   const page = Number(query.page) || 1;
   const limit = Number(query.limit) || 8;
   const search = query.search || "";
   const sort = query.sort || "newest"; // newest | oldest
 
-  const user = await User.findById(id,"address.city")
+  const user = await User.findById(id, "address.city");
   const userCity = user?.address?.city || null;
-  const userName = user.userName
+  const userName = user.userName;
 
   return await getEventsUserRepo({
     page,
@@ -165,7 +211,6 @@ export const getEventsUserService = async (query, id) => {
     search,
     sort,
     userCity,
-    userName
+    userName,
   });
 };
-

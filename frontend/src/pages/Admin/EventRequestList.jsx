@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPendingEvents,updateEventStatus } from "../../store/eventRequestSlice.js";
+import {
+  fetchPendingEvents,
+  updateEventStatus,
+} from "../../store/eventRequestSlice.js";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
 import AdminNavbar from "../../components/Admin/AdminNavbar.jsx";
-
 
 export default function EventRequestList() {
   const dispatch = useDispatch();
@@ -19,8 +21,6 @@ export default function EventRequestList() {
   useEffect(() => {
     dispatch(fetchPendingEvents());
   }, [dispatch]);
-
-    
 
   const handleReject = (eventId, userName) => {
     Swal.fire({
@@ -163,12 +163,11 @@ export default function EventRequestList() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => handleApprove(c._id, c.User?.userName)}
-            
                     className="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition"
                   >
                     Approve
                   </button>
-                  
+
                   <button
                     onClick={() => handleReject(c._id, c.User?.userName)}
                     className="bg-red-600 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 transition"
@@ -179,9 +178,7 @@ export default function EventRequestList() {
 
                 <div className="flex items-center">
                   <button
-                    onClick={() =>
-                      navigate(`/admin/event-request/${c._id}`)
-                    }
+                    onClick={() => navigate(`/admin/event-request/${c._id}`)}
                     className="p-2 hover:bg-gray-200 rounded-full"
                   >
                     <svg

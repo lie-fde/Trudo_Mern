@@ -32,12 +32,7 @@ const eventCreateLimiter = rateLimit({
   },
 });
 
-router.get(
-  "/list", 
-  auth,
-  getEventsUserController
-);
-
+router.get("/list", auth, getEventsUserController);
 
 router.post(
   "/create",
@@ -69,9 +64,6 @@ router.get(
 
 router.get("/", adminAuth, eventCreateLimiter, getAllEvents);
 
-
-
-
 router.patch(
   "/block/:eventId",
   adminAuth,
@@ -95,7 +87,5 @@ router.patch(
   getSingleEventValidator,
   deleteEventController
 );
-
-
 
 export default router;

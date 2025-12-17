@@ -166,11 +166,6 @@ export const DonationRepository = {
   },
 };
 
-/**
- * -------------------------------
- * ADMIN DONATION REPORT (PAGINATED)
- * -------------------------------
- */
 export const getAdminDonations = async ({
   skip,
   limit,
@@ -284,11 +279,6 @@ export const getAdminDonations = async ({
   return { data, total };
 };
 
-/**
- * -------------------------------
- * ADMIN EXPORT REPORT (NO PAGINATION)
- * -------------------------------
- */
 export const exportAdminDonations = async ({
   search,
   campaignTitle,

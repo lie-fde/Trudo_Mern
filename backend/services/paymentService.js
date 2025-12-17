@@ -29,19 +29,19 @@ export const getReceiptService = async (receiptId) => {
     date: donation.createdAt,
   };
 
-  if(donation.receiptUrl){
+  if (donation.receiptUrl) {
     return {
-        ...receiptData,
-        pdfUrl:donation.receiptUrl
-    }
+      ...receiptData,
+      pdfUrl: donation.receiptUrl,
+    };
   }
 
   // 4. Generate PDF
   const cloudinaryReceiptUrl = await generateReceiptPDF(receiptData);
 
-  donation.receiptUrl =cloudinaryReceiptUrl;
+  donation.receiptUrl = cloudinaryReceiptUrl;
 
-  await donation.save()
+  await donation.save();
 
   return {
     ...receiptData,

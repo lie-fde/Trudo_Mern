@@ -7,9 +7,6 @@ import { fetchSingleEvent } from "../../store/eventSlice.js";
 import AdminNavbar from "../../components/Admin/AdminNavbar.jsx";
 import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
 
-// ---------------------------------------------------------
-// CLEAN MONGO DATA
-// ---------------------------------------------------------
 const cleanMongoData = (data) => {
   const event = {};
   for (const key in data) {
@@ -29,9 +26,6 @@ const cleanMongoData = (data) => {
   return event;
 };
 
-// ---------------------------------------------------------
-// MEDIA CAROUSEL
-// ---------------------------------------------------------
 const MediaCarousel = ({ mediaList }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -41,9 +35,7 @@ const MediaCarousel = ({ mediaList }) => {
     setCurrentIndex((prev) => (prev === 0 ? mediaList.length - 1 : prev - 1));
 
   const nextMedia = () =>
-    setCurrentIndex((prev) =>
-      prev === mediaList.length - 1 ? 0 : prev + 1
-    );
+    setCurrentIndex((prev) => (prev === mediaList.length - 1 ? 0 : prev + 1));
 
   const currentMedia = mediaList[currentIndex];
 
@@ -86,9 +78,6 @@ const MediaCarousel = ({ mediaList }) => {
   );
 };
 
-// ---------------------------------------------------------
-// MAIN PAGE
-// ---------------------------------------------------------
 export default function EventView() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -105,7 +94,7 @@ export default function EventView() {
     return <p className="p-10 text-center text-lg">Loading Event...</p>;
   }
 
-  console.log(singleEvent)
+  console.log(singleEvent);
 
   const event = cleanMongoData(singleEvent);
 
@@ -208,9 +197,7 @@ export default function EventView() {
                 {/* Status */}
                 <div className="bg-white p-6 rounded-2xl shadow border-t-4 border-blue-500">
                   <p className="font-bold text-lg">Status</p>
-                  <p className="text-gray-900 text-base mt-2">
-                    {event.status}
-                  </p>
+                  <p className="text-gray-900 text-base mt-2">{event.status}</p>
 
                   {event.rejectionReason && (
                     <p className="mt-2 text-red-500 text-sm">
@@ -220,8 +207,7 @@ export default function EventView() {
 
                   {event.approvalDate && (
                     <p className="mt-2 text-green-600 text-sm">
-                      Approved On:{" "}
-                      {new Date(event.approvalDate).toDateString()}
+                      Approved On: {new Date(event.approvalDate).toDateString()}
                     </p>
                   )}
                 </div>
@@ -241,10 +227,8 @@ export default function EventView() {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
-
       </div>
     </div>
   );

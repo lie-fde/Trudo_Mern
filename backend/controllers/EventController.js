@@ -1,11 +1,20 @@
-import { createEventService  , getPendingEventsService, updateEventStatusService ,getSingleEventService, getAllEventsService, blockEventService, unblockEventService, deleteEventService, getEventsUserService
+import {
+  createEventService,
+  getPendingEventsService,
+  updateEventStatusService,
+  getSingleEventService,
+  getAllEventsService,
+  blockEventService,
+  unblockEventService,
+  deleteEventService,
+  getEventsUserService,
+  updateEventService,
 } from "../services/EventService.js";
 import { validationResult } from "express-validator";
 
 export const createEventController = async (req, res) => {
   try {
-
-   const errors = validationResult(req);
+    const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
       return res.status(422).json({
@@ -14,18 +23,16 @@ export const createEventController = async (req, res) => {
       });
     }
 
-
-    const id= req.admin?._id || req.user?._id; // from adminAuth
-     // Cloudinary image already uploaded
+    const id = req.admin?._id || req.user?._id;
 
     if (!req.file || req.file.length === 0) {
-  return res.status(400).json({
-    success: false,
-    message: "At least one event image is required",
-  });
-}
+      return res.status(400).json({
+        success: false,
+        message: "At least one event image is required",
+      });
+    }
 
-const file = req.file;
+    const file = req.file;
 
     const event = await createEventService(id, req.body, file);
 
@@ -42,11 +49,10 @@ const file = req.file;
   }
 };
 
-
 export const getPendingEventsController = async (req, res, next) => {
   try {
     const events = await getPendingEventsService();
-    console.log(events)
+    console.log(events);
     return res.status(200).json({
       success: true,
       events,
@@ -58,7 +64,6 @@ export const getPendingEventsController = async (req, res, next) => {
 
 export const updateEventStatusController = async (req, res, next) => {
   try {
-    // validate request body using express-validator
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({
@@ -93,8 +98,6 @@ export const updateEventStatusController = async (req, res, next) => {
   }
 };
 
-
-
 export const getSingleEventController = async (req, res) => {
   try {
     const { eventId } = req.params;
@@ -115,12 +118,10 @@ export const getSingleEventController = async (req, res) => {
   }
 };
 
-
 export const getAllEvents = async (req, res) => {
   try {
     const data = await getAllEventsService(req.query);
     console.log("CATEGORY RECEIVED:", req.query.category);
-
 
     return res.status(200).json({
       success: true,
@@ -135,10 +136,7 @@ export const getAllEvents = async (req, res) => {
   }
 };
 
-
-
-export const blockEventController = async(req,res) =>{
-
+export const blockEventController = async (req, res) => {
   try {
     const { eventId } = req.params;
     const result = await blockEventService(eventId);
@@ -154,12 +152,9 @@ export const blockEventController = async(req,res) =>{
       message: error.message,
     });
   }
-  
+};
 
-}
-
-export const unblockEventController = async(req,res) =>{
-
+export const unblockEventController = async (req, res) => {
   try {
     const { eventId } = req.params;
     const result = await unblockEventService(eventId);
@@ -175,12 +170,9 @@ export const unblockEventController = async(req,res) =>{
       message: error.message,
     });
   }
-  
+};
 
-}
-
-export const deleteEventController = async(req,res) =>{
-
+export const deleteEventController = async (req, res) => {
   try {
     const { eventId } = req.params;
     const result = await deleteEventService(eventId);
@@ -196,13 +188,11 @@ export const deleteEventController = async(req,res) =>{
       message: error.message,
     });
   }
-  
-
-}
+};
 
 export const getEventsUserController = async (req, res) => {
   try {
-    const id = req.user._id
+    const id = req.user._id;
     const data = await getEventsUserService(req.query, id);
 
     return res.status(200).json({
@@ -217,8 +207,32 @@ export const getEventsUserController = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res
-      .status(500)
-      .json({ success: false, message: "Server Error" });
+    return res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+export const updateEventController = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
+    const eventId = req.params.id;
+
+    const updatedEvent = await updateEventService(eventId, req);
+
+    return res.status(200).json({
+      success: true,
+      message: "Event updated successfully",
+      event: updatedEvent,
+    });
+  } catch (err) {
+    return res.status(err.statusCode || 500).json({
+      success: false,
+      message: err.message || "Server Error",
+    });
   }
 };

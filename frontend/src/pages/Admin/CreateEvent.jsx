@@ -89,6 +89,7 @@ export default function CreateEventPage() {
               errors={errors}
               watch={watch}
               setValue={setValue}
+              editing={false}
             />
           </form>
         </div>

@@ -1,4 +1,8 @@
-import { getAdminDonations ,exportAdminDonations ,DonationReportStatsRepo} from "../repositories/DonationRepository.js";
+import {
+  getAdminDonations,
+  exportAdminDonations,
+  DonationReportStatsRepo,
+} from "../repositories/DonationRepository.js";
 
 export const getAdminDonationReportService = async ({
   page,
@@ -41,7 +45,6 @@ export const exportAdminDonationReportService = async ({
   });
 };
 
-
 export const DonationReportStatsService = async () => {
   try {
     const stats = await DonationReportStatsRepo();
@@ -51,4 +54,3 @@ export const DonationReportStatsService = async () => {
     throw new Error("Failed to fetch donation report stats");
   }
 };
-

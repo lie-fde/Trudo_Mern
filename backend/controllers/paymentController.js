@@ -5,7 +5,6 @@ import crypto from "crypto";
 import { getReceiptService } from "../services/paymentService.js";
 import UserRepository from "../repositories/UserRepository.js";
 
-
 export const createOrder = async (req, res) => {
   try {
     const { amount, email, phone } = req.body;
@@ -33,14 +32,11 @@ export const createOrder = async (req, res) => {
       key: process.env.RAZORPAY_KEY_ID,
       paymentDBId: newPayment._id,
     });
-
   } catch (err) {
     console.error("Error creating order:", err);
     res.status(500).json({ success: false, message: "Failed to create order" });
   }
 };
-
-
 
 export const verifyPayment = async (req, res) => {
   try {
@@ -51,11 +47,10 @@ export const verifyPayment = async (req, res) => {
       paymentDBId,
       campaignId,
       userEmail,
-      mobileNumber
+      mobileNumber,
     } = req.body;
 
-    const userId = req.user?._id
-
+    const userId = req.user?._id;
 
     const sign = razorpay_order_id + "|" + razorpay_payment_id;
 
@@ -65,7 +60,9 @@ export const verifyPayment = async (req, res) => {
       .digest("hex");
 
     if (expectedSign !== razorpay_signature) {
-      return res.status(400).json({ success: false, message: "Invalid signature" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid signature" });
     }
 
     const payment = await Payment.findByIdAndUpdate(
@@ -74,8 +71,8 @@ export const verifyPayment = async (req, res) => {
         razorpayPaymentId: razorpay_payment_id,
         razorpaySignature: razorpay_signature,
         paymentStatus: "success",
-        email:userEmail,
-        mobileNumber
+        email: userEmail,
+        mobileNumber,
       },
       { new: true }
     );
@@ -89,24 +86,22 @@ export const verifyPayment = async (req, res) => {
       receiptId,
     });
 
-    const user = UserRepository.findById(userId)
-    const userName = user.userName
-    console.log(userName,userEmail)
+    const user = UserRepository.findById(userId);
+    const userName = user.userName;
+    console.log(userName, userEmail);
 
     return res.json({
       success: true,
       donation,
       receiptId,
       userEmail,
-      userName
+      userName,
     });
-
   } catch (err) {
     console.error("Verification failed:", err);
     res.status(500).json({ success: false });
   }
 };
-
 
 export const getReceipt = async (req, res) => {
   try {

@@ -17,6 +17,7 @@ import EventsPage from "../pages/Admin/EventList.jsx";
 import CreateEvent from "../pages/Admin/CreateEvent.jsx";
 import EventRequestList from "../pages/Admin/EventRequestList.jsx";
 import EventView from "../pages/Admin/EventView.jsx";
+import EditEventPage from "../pages/Admin/EditEvent.jsx";
 
 
 function AdminRoutes () {
@@ -41,6 +42,7 @@ function AdminRoutes () {
         <Route path="/event-request" element={<AdminProtectedRoute><EventRequestList/></AdminProtectedRoute>} />
         <Route path="/event-request/:id" element={<AdminProtectedRoute><EventView/></AdminProtectedRoute>} />
         <Route path="/event/:id" element={<AdminProtectedRoute><EventView/></AdminProtectedRoute>} />
+        <Route path="/events/edit/:id" element={<AdminProtectedRoute><EditEventPage/></AdminProtectedRoute>}/>
 
         <Route path="*" element={<NotFound/>}/>
 

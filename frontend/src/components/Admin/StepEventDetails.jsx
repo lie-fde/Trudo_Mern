@@ -1,19 +1,27 @@
 import React from "react";
 import DropZone from "../reusable/dropfile.jsx";
 
-export default function StepEventDetails({ register, errors, watch, setValue, backStep }) {
-  const handleFile = (name, file) => setValue(name, file, { shouldValidate: true });
+export default function StepEventDetails({
+  register,
+  errors,
+  watch,
+  setValue,
+  backStep,
+}) {
+  const handleFile = (name, file) =>
+    setValue(name, file, { shouldValidate: true });
 
   return (
     <div className="space-y-6">
-
       <div>
         <label className="text-sm">Event Title *</label>
         <input
           {...register("title", { required: "Event title is required" })}
           className="w-full mt-1 p-3 border rounded-md"
         />
-        {errors.title && <p className="text-red-500 text-xs">{errors.title.message}</p>}
+        {errors.title && (
+          <p className="text-red-500 text-xs">{errors.title.message}</p>
+        )}
       </div>
 
       <div>
@@ -23,7 +31,9 @@ export default function StepEventDetails({ register, errors, watch, setValue, ba
           rows={5}
           className="w-full mt-1 p-3 border rounded-md"
         />
-        {errors.description && <p className="text-red-500 text-xs">{errors.description.message}</p>}
+        {errors.description && (
+          <p className="text-red-500 text-xs">{errors.description.message}</p>
+        )}
       </div>
 
       <div>
@@ -32,7 +42,9 @@ export default function StepEventDetails({ register, errors, watch, setValue, ba
           {...register("venue", { required: "Venue is required" })}
           className="w-full mt-1 p-3 border rounded-md"
         />
-        {errors.venue && <p className="text-red-500 text-xs">{errors.venue.message}</p>}
+        {errors.venue && (
+          <p className="text-red-500 text-xs">{errors.venue.message}</p>
+        )}
       </div>
 
       <div>
@@ -93,11 +105,18 @@ export default function StepEventDetails({ register, errors, watch, setValue, ba
       />
 
       <div className="flex justify-between mt-6">
-        <button type="button" onClick={backStep} className="px-6 py-2 border rounded-lg">
+        <button
+          type="button"
+          onClick={backStep}
+          className="px-6 py-2 border rounded-lg"
+        >
           Back
         </button>
 
-        <button type="submit" className="px-6 py-2 bg-green-600 text-white rounded-lg">
+        <button
+          type="submit"
+          className="px-6 py-2 bg-green-600 text-white rounded-lg"
+        >
           Create Event
         </button>
       </div>

@@ -5,10 +5,9 @@ import Navbar from "../../components/User/Navbar";
 import Footer from "../../components/reusable/footer";
 
 export default function ReceiptPage() {
-  const { receiptId } = useParams(); 
+  const { receiptId } = useParams();
   const [receipt, setReceipt] = useState(null);
   const [loading, setLoading] = useState(true);
-  
 
   const navigate = useNavigate();
 
@@ -48,7 +47,6 @@ export default function ReceiptPage() {
       <Navbar />
 
       <div className="min-h-screen flex flex-col items-center pt-24 bg-gray-50 pb-20">
-
         {/* Success Icon */}
         <div className="bg-green-500 text-white rounded-full p-4 shadow-lg mb-6">
           <svg
@@ -59,7 +57,11 @@ export default function ReceiptPage() {
             stroke="currentColor"
             strokeWidth="2"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 13l4 4L19 7"
+            />
           </svg>
         </div>
 
@@ -68,7 +70,8 @@ export default function ReceiptPage() {
         </h1>
 
         <p className="text-gray-600 mb-10 text-center px-4">
-          Your contribution helps support the campaign and makes a positive impact.
+          Your contribution helps support the campaign and makes a positive
+          impact.
         </p>
 
         {/* Receipt Card */}
@@ -78,13 +81,27 @@ export default function ReceiptPage() {
           </h2>
 
           <div className="space-y-3 text-gray-800">
-            <p><strong>Receipt ID:</strong> {receipt.receiptId}</p>
-            <p><strong>Donor:</strong> {receipt.userName}</p>
-            <p><strong>Email:</strong> {receipt.userEmail}</p>
-            <p><strong>Campaign:</strong> {receipt.campaignName}</p>
-            <p><strong>Amount:</strong> ₹{receipt.amount}</p>
-            <p><strong>Payment ID:</strong> {receipt.paymentId}</p>
-            <p><strong>Date:</strong> {new Date(receipt.date).toLocaleString()}</p>
+            <p>
+              <strong>Receipt ID:</strong> {receipt.receiptId}
+            </p>
+            <p>
+              <strong>Donor:</strong> {receipt.userName}
+            </p>
+            <p>
+              <strong>Email:</strong> {receipt.userEmail}
+            </p>
+            <p>
+              <strong>Campaign:</strong> {receipt.campaignName}
+            </p>
+            <p>
+              <strong>Amount:</strong> ₹{receipt.amount}
+            </p>
+            <p>
+              <strong>Payment ID:</strong> {receipt.paymentId}
+            </p>
+            <p>
+              <strong>Date:</strong> {new Date(receipt.date).toLocaleString()}
+            </p>
           </div>
 
           {/* Download PDF */}
@@ -103,7 +120,6 @@ export default function ReceiptPage() {
             Go to Home
           </button>
         </div>
-
       </div>
 
       <Footer />

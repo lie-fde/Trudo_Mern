@@ -4,14 +4,6 @@ import {
   DonationReportStatsService,
 } from "../services/adminDonationService.js";
 
-/**
- * GET /admin/donations/report
- * Query:
- *  page, limit, search, campaign, from, to
- *  - search: campaign title OR user name OR user email
- *  - campaign: campaign title substring (dropdown)
- *  - from, to: YYYY-MM-DD (to defaults to today if missing)
- */
 export const getAdminDonationReportController = async (req, res) => {
   try {
     const page = Number(req.query.page) || 1;
@@ -23,11 +15,10 @@ export const getAdminDonationReportController = async (req, res) => {
     let from = req.query.from ? new Date(req.query.from) : null;
     let to = req.query.to ? new Date(req.query.to) : null;
 
-    // If "to" not supplied, default to now (end of day)
     if (!to) {
       to = new Date();
     }
-    // Normalize to end of day
+
     if (to) {
       to.setHours(23, 59, 59, 999);
     }
@@ -76,13 +67,12 @@ export const exportAdminDonationReportController = async (req, res) => {
       to,
     });
 
-    // Build CSV
     let csv =
       "Campaign ID,Campaign Name,User Email,User Name,Date,Amount,Receipt ID,Payment ID\n";
 
     csv += rows
       .map((row) => {
-        const dateStr = new Date(row.date).toISOString().slice(0, 10); // YYYY-MM-DD
+        const dateStr = new Date(row.date).toISOString().slice(0, 10);
         return [
           row.campaignId,
           `"${row.campaignName?.replace(/"/g, '""') || ""}"`,

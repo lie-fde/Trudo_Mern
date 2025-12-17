@@ -5,8 +5,6 @@ export default async function adminAuth(req, res, next) {
   try {
     const token = req.headers.authorization?.split(" ")[1];
 
-
-
     if (!token) return res.status(401).json({ message: "No token provided" });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -16,7 +14,7 @@ export default async function adminAuth(req, res, next) {
     if (!admin || !admin.isAdmin) {
       return res.status(401).json({ message: "Not authorized (Admin only)" });
     }
-    console.log(admin._id)
+    console.log(admin._id);
     req.admin = admin;
     next();
   } catch (err) {

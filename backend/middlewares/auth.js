@@ -19,7 +19,7 @@ export default async function auth(req, res, next) {
       return res.status(401).json({ message: "User not found" });
     }
 
-    req.user = user; // ← Use actual user object
+    req.user = user; 
     console.log("✅ USER FOUND:", user._id);
 
     next();

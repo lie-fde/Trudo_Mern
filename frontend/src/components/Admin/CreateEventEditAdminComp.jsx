@@ -12,7 +12,6 @@ export default function EditEventForm({
   const [removedImages, setRemovedImages] = useState([]);
   const [newImagePreview, setNewImagePreview] = useState(null);
 
-  // Prefill fields for editing
   useEffect(() => {
     if (eventData) {
       const fields = [
@@ -69,7 +68,9 @@ export default function EditEventForm({
           {...register("title", { required: "Event title is required" })}
           className="w-full mt-1 p-3 border rounded-md"
         />
-        {errors.title && <p className="text-red-500 text-xs">{errors.title.message}</p>}
+        {errors.title && (
+          <p className="text-red-500 text-xs">{errors.title.message}</p>
+        )}
       </div>
 
       {/* ----------------- DESCRIPTION ----------------- */}
@@ -80,10 +81,11 @@ export default function EditEventForm({
           {...register("description", { required: "Description is required" })}
           className="w-full mt-1 p-3 border rounded-md"
         />
-        {errors.description && <p className="text-red-500 text-xs">{errors.description.message}</p>}
+        {errors.description && (
+          <p className="text-red-500 text-xs">{errors.description.message}</p>
+        )}
       </div>
 
-      {/* ----------------- CATEGORY ----------------- */}
       <div>
         <label className="text-sm">Category *</label>
         <select
@@ -96,7 +98,9 @@ export default function EditEventForm({
           <option value="Technology">Technology</option>
           <option value="Other">Other</option>
         </select>
-        {errors.category && <p className="text-xs text-red-500">{errors.category.message}</p>}
+        {errors.category && (
+          <p className="text-xs text-red-500">{errors.category.message}</p>
+        )}
       </div>
 
       {/* ----------------- VENUE ----------------- */}
@@ -106,7 +110,9 @@ export default function EditEventForm({
           {...register("venue", { required: "Venue is required" })}
           className="w-full mt-1 p-3 border rounded-md"
         />
-        {errors.venue && <p className="text-red-500 text-xs">{errors.venue.message}</p>}
+        {errors.venue && (
+          <p className="text-red-500 text-xs">{errors.venue.message}</p>
+        )}
       </div>
 
       {/* ----------------- TIME ----------------- */}
@@ -117,7 +123,9 @@ export default function EditEventForm({
           {...register("eventTime", { required: "Event time is required" })}
           className="w-full mt-1 p-3 border rounded-md"
         />
-        {errors.eventTime && <p className="text-red-500 text-xs">{errors.eventTime.message}</p>}
+        {errors.eventTime && (
+          <p className="text-red-500 text-xs">{errors.eventTime.message}</p>
+        )}
       </div>
 
       {/* ----------------- DATE ----------------- */}
@@ -128,7 +136,9 @@ export default function EditEventForm({
           {...register("date", { required: "Event date is required" })}
           className="w-full mt-1 p-3 border rounded-md"
         />
-        {errors.date && <p className="text-red-500 text-xs">{errors.date.message}</p>}
+        {errors.date && (
+          <p className="text-red-500 text-xs">{errors.date.message}</p>
+        )}
       </div>
 
       {/* ----------------- DURATION ----------------- */}
@@ -139,10 +149,11 @@ export default function EditEventForm({
           {...register("duration", { required: "Duration is required" })}
           className="w-full mt-1 p-3 border rounded-md"
         />
-        {errors.duration && <p className="text-red-500 text-xs">{errors.duration.message}</p>}
+        {errors.duration && (
+          <p className="text-red-500 text-xs">{errors.duration.message}</p>
+        )}
       </div>
 
-      {/* ----------------- TICKET PRICE ----------------- */}
       <div>
         <label className="text-sm">Ticket Price (₹) *</label>
         <input
@@ -150,28 +161,35 @@ export default function EditEventForm({
           {...register("ticketPrice", { required: "Ticket price is required" })}
           className="w-full mt-1 p-3 border rounded-md"
         />
-        {errors.ticketPrice && <p className="text-red-500 text-xs">{errors.ticketPrice.message}</p>}
+        {errors.ticketPrice && (
+          <p className="text-red-500 text-xs">{errors.ticketPrice.message}</p>
+        )}
       </div>
 
-      {/* ----------------- TOTAL TICKETS ----------------- */}
       <div>
         <label className="text-sm">Total Tickets *</label>
         <input
           type="number"
-          {...register("totalTickets", { required: "Total tickets are required" })}
+          {...register("totalTickets", {
+            required: "Total tickets are required",
+          })}
           className="w-full mt-1 p-3 border rounded-md"
         />
-        {errors.totalTickets && <p className="text-red-500 text-xs">{errors.totalTickets.message}</p>}
+        {errors.totalTickets && (
+          <p className="text-red-500 text-xs">{errors.totalTickets.message}</p>
+        )}
       </div>
 
-      {/* ----------------- EXISTING IMAGES ----------------- */}
       {existingImages.length > 0 && (
         <div>
           <p className="text-sm font-semibold mb-2">Existing Images</p>
           <div className="flex flex-wrap gap-3">
             {existingImages.map((img, i) => (
               <div key={i} className="relative">
-                <img src={img} className="h-24 w-24 object-cover border rounded" />
+                <img
+                  src={img}
+                  className="h-24 w-24 object-cover border rounded"
+                />
                 <button
                   type="button"
                   onClick={() => removeExistingImage(img)}
@@ -201,12 +219,19 @@ export default function EditEventForm({
       {newImagePreview && (
         <div>
           <p className="text-sm font-semibold">New Image Preview:</p>
-          <img src={newImagePreview} className="h-32 w-32 object-cover rounded border" />
+          <img
+            src={newImagePreview}
+            className="h-32 w-32 object-cover rounded border"
+          />
         </div>
       )}
 
       {/* Hidden removed images */}
-      <input type="hidden" {...register("removedImages")} value={removedImages} />
+      <input
+        type="hidden"
+        {...register("removedImages")}
+        value={removedImages}
+      />
 
       {/* ----------------- UPDATE BUTTON ----------------- */}
       <div className="flex justify-end mt-6">

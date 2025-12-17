@@ -28,7 +28,11 @@ import {
   getDonationReportStats,
 } from "../controllers/AdminDonationController.js";
 import uploadEventImage from "../middlewares/UploadEventImage.js";
-import { createEventController } from "../controllers/EventController.js";
+import {
+  createEventController,
+  updateEventController,
+} from "../controllers/EventController.js";
+import { updateEventValidator } from "../Validators/event.validators.js";
 
 const router = express.Router();
 
@@ -124,7 +128,12 @@ router.post(
   createEventController
 );
 
-
-
+router.put(
+  "/events/edit/:id",
+  adminAuth,
+  uploadEventImage.single("eventImages"),
+  updateEventValidator,
+  updateEventController
+);
 
 export default router;

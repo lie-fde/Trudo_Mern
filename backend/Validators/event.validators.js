@@ -1,21 +1,13 @@
-import { body , param ,validationResult , query} from "express-validator";
+import { body, param, validationResult, query } from "express-validator";
 
 export const createEventValidators = [
   body("title").trim().notEmpty().withMessage("Title is required"),
 
-  body("description")
-    .trim()
-    .notEmpty()
-    .withMessage("Description is required"),
+  body("description").trim().notEmpty().withMessage("Description is required"),
 
-  body("venue")
-    .trim()
-    .notEmpty()
-    .withMessage("Venue is required"),
+  body("venue").trim().notEmpty().withMessage("Venue is required"),
 
-  body("eventTime")
-    .notEmpty()
-    .withMessage("Event time is required"),
+  body("eventTime").notEmpty().withMessage("Event time is required"),
 
   body("date")
     .notEmpty()
@@ -42,27 +34,23 @@ export const createEventValidators = [
     .withMessage("Total tickets must be > 0"),
 ];
 
-
 export const updateEventStatusValidator = [
   body("status")
-    .notEmpty().withMessage("Status is required")
+    .notEmpty()
+    .withMessage("Status is required")
     .isIn(["Approved", "Rejected"])
     .withMessage("Invalid status value"),
 
-  body("rejectionReason")
-    .custom((value, { req }) => {
-      if (req.body.status === "Rejected" && (!value || value.trim() === "")) {
-        throw new Error("Rejection reason is required when rejecting an event");
-      }
-      return true;
-    }),
+  body("rejectionReason").custom((value, { req }) => {
+    if (req.body.status === "Rejected" && (!value || value.trim() === "")) {
+      throw new Error("Rejection reason is required when rejecting an event");
+    }
+    return true;
+  }),
 ];
 
-
 export const getSingleEventValidator = [
-  param("eventId")
-    .isMongoId()
-    .withMessage("Invalid event ID format"),
+  param("eventId").isMongoId().withMessage("Invalid event ID format"),
 
   (req, res, next) => {
     const errors = validationResult(req);
@@ -73,9 +61,9 @@ export const getSingleEventValidator = [
         errors: errors.array(),
       });
     }
-    console.log("Passed")
+    console.log("Passed");
     next();
-  }
+  },
 ];
 
 export const getEventsUserValidator = [
@@ -83,4 +71,17 @@ export const getEventsUserValidator = [
   query("limit").optional().isInt({ min: 1, max: 50 }),
   query("search").optional().isString().trim(),
   query("sort").optional().isIn(["newest", "oldest"]),
+];
+
+export const updateEventValidator = [
+  param("id").isMongoId().withMessage("Invalid event ID"),
+
+  body("title").optional().notEmpty(),
+  body("description").optional().notEmpty(),
+  body("venue").optional().notEmpty(),
+  body("eventTime").optional().notEmpty(),
+  body("duration").optional().isNumeric(),
+  body("ticketPrice").optional().isNumeric(),
+  body("totalTickets").optional().isNumeric(),
+  body("date").optional().isISO8601(),
 ];

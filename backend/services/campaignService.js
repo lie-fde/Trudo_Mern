@@ -146,9 +146,9 @@ export const updateCampaignService = async (id, data) => {
 export const getUserCampaignsService = async (userId) => {
   const campaigns = await getmMyCampaign(userId);
 
- if (!campaigns) {
-    return []; 
-}
+  if (!campaigns) {
+    return [];
+  }
 
   return campaigns;
 };

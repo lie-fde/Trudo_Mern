@@ -54,8 +54,6 @@ const updateUserProfileRepo = async (userId, updateData) => {
   );
 };
 
-
-
 export default {
   create,
   findByEmail,
@@ -70,5 +68,5 @@ export default {
   getUserProfileRepo,
   updateUserEmailRepo,
   updateUserProfileRepo,
-  findByIdEvent
+  findByIdEvent,
 };

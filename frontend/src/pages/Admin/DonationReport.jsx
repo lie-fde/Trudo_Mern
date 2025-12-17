@@ -196,15 +196,6 @@ const DonationReport = () => {
                   className="w-full pl-10 pr-4 py-2.5 bg-gray-100 rounded-lg text-sm focus:ring-2 focus:ring-gray-200"
                 />
               </div>
-
-              {/* Campaign Dropdown */}
-              {/* <FilterDropdown
-                campaignFilter={campaignFilter}
-                setCampaignFilter={(value) => {
-                  setCampaignFilter(value);
-                  setPage(1);
-                }}
-              /> */}
             </div>
 
             {/* DATE FILTER */}

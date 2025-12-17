@@ -1,28 +1,42 @@
-import express from 'express'
-import { register ,login ,otpVerify , resendOtp ,forgotPassword ,verifyPasswordOtp ,resetPassword ,
-    googleCallbackController,
-    fetchUsersforPagination,
-    resendOtpPassword , refreshTokenController,getMe,
-    logoutController,
-    getUserProfileController,
-    verifyOtpControllerProfile,
-    sendOtpControllerProfile,
-    updateUserProfileController
-} from '../controllers/UserController/UserController.js'
-import { getUserCampaignsController , getCampaignById } from '../controllers/UserController/campaignController.js'
-import { updateCampaignController } from '../controllers/AdminController/AdminController.js'
-import { verifyAccessToken } from '../middlewares/verifytoken.js'
-import passport from 'passport'
-import auth from '../middlewares/auth.js'
-import profileUpload from '../middlewares/profileUpload.js'
-import upload from '../middlewares/upload.js'
-import { getDonationHistoryController , getDonationStatsController} from '../controllers/donationController.js'
-import { getSingleEventController } from '../controllers/EventController.js'
-import { getSingleEventValidator } from '../Validators/event.validators.js'
-import rateLimit from 'express-rate-limit'
+import express from "express";
+import {
+  register,
+  login,
+  otpVerify,
+  resendOtp,
+  forgotPassword,
+  verifyPasswordOtp,
+  resetPassword,
+  googleCallbackController,
+  fetchUsersforPagination,
+  resendOtpPassword,
+  refreshTokenController,
+  getMe,
+  logoutController,
+  getUserProfileController,
+  verifyOtpControllerProfile,
+  sendOtpControllerProfile,
+  updateUserProfileController,
+} from "../controllers/UserController/UserController.js";
+import {
+  getUserCampaignsController,
+  getCampaignById,
+} from "../controllers/UserController/campaignController.js";
+import { updateCampaignController } from "../controllers/AdminController/AdminController.js";
+import { verifyAccessToken } from "../middlewares/verifytoken.js";
+import passport from "passport";
+import auth from "../middlewares/auth.js";
+import profileUpload from "../middlewares/profileUpload.js";
+import upload from "../middlewares/upload.js";
+import {
+  getDonationHistoryController,
+  getDonationStatsController,
+} from "../controllers/donationController.js";
+import { getSingleEventController } from "../controllers/EventController.js";
+import { getSingleEventValidator } from "../Validators/event.validators.js";
+import rateLimit from "express-rate-limit";
 
-
-const router = express.Router()
+const router = express.Router();
 
 const eventCreateLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 minutes
@@ -33,46 +47,60 @@ const eventCreateLimiter = rateLimit({
   },
 });
 
+router.post("/signup", register);
 
-router.post("/signup",register)
+router.post("/login", login);
 
-router.post("/login",login)
+router.post("/verify-otp", otpVerify);
 
-router.post("/verify-otp",otpVerify)
-
-router.post("/resend-otp",resendOtp)
+router.post("/resend-otp", resendOtp);
 
 router.get("/refresh-token", refreshTokenController);
 
-router.post("/logout",logoutController)
+router.post("/logout", logoutController);
 
-router.post("/resend-otp-password",resendOtpPassword)
+router.post("/resend-otp-password", resendOtpPassword);
 
-router.post("/change-password",resetPassword)
+router.post("/change-password", resetPassword);
 
-router.post("/paginated",fetchUsersforPagination)
+router.post("/paginated", fetchUsersforPagination);
 
-router.post("/forgot-password",forgotPassword)
+router.post("/forgot-password", forgotPassword);
 
-router.post('/verify-password-otp', verifyPasswordOtp);
+router.post("/verify-password-otp", verifyPasswordOtp);
 
-router.get("/google",passport.authenticate("google", { scope: ["profile", "email"] }));
-
-router.get("/google/callback",passport.authenticate("google", { session: false, failureRedirect: "/login" }),
-googleCallbackController
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-router.get("/profile",auth,getUserProfileController)
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: "/login",
+  }),
+  googleCallbackController
+);
 
-router.get("/profile/send-otp",auth,sendOtpControllerProfile)
+router.get("/profile", auth, getUserProfileController);
 
-router.post("/profile/verify-otp", auth, verifyOtpControllerProfile)
+router.get("/profile/send-otp", auth, sendOtpControllerProfile);
 
-router.put("/profile/update", auth, profileUpload.single("avatar"), updateUserProfileController);
+router.post("/profile/verify-otp", auth, verifyOtpControllerProfile);
 
-router.get("/mycampaigns",auth , getUserCampaignsController)
+router.put(
+  "/profile/update",
+  auth,
+  profileUpload.single("avatar"),
+  updateUserProfileController
+);
 
-router.patch("/campaign/update/:id",auth,
+router.get("/mycampaigns", auth, getUserCampaignsController);
+
+router.patch(
+  "/campaign/update/:id",
+  auth,
   (req, res, next) => {
     upload.fields([
       { name: "orgProof", maxCount: 1 },
@@ -88,7 +116,8 @@ router.patch("/campaign/update/:id",auth,
       next();
     });
   },
-  updateCampaignController);
+  updateCampaignController
+);
 
 router.get("/campaigns/:id", auth, getCampaignById);
 
@@ -96,8 +125,14 @@ router.get("/me", verifyAccessToken, getMe);
 
 router.get("/donations/history", auth, getDonationHistoryController);
 
-router.get("/donations/stats",auth, getDonationStatsController);
+router.get("/donations/stats", auth, getDonationStatsController);
 
-router.get("/events/:eventId", auth , eventCreateLimiter,getSingleEventValidator, getSingleEventController)
+router.get(
+  "/events/:eventId",
+  auth,
+  eventCreateLimiter,
+  getSingleEventValidator,
+  getSingleEventController
+);
 
 export default router;
