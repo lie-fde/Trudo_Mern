@@ -3,3 +3,7 @@ backend/node_modules
 backend/.env
 
 backend/logs/access.log
+
+backend/logs/
+*.log
+*.txt
