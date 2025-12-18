@@ -6,6 +6,8 @@ const findByEmail = async (userEmail) => await User.findOne({ userEmail });
 
 const findById = async (id) => await User.findById(id);
 
+const findByIdEvent = async (userId) => await User.findById(userId);
+
 const updatePassword = async (email, hashedPassword) => {
   return await User.updateOne(
     { userEmail: email },
@@ -52,8 +54,6 @@ const updateUserProfileRepo = async (userId, updateData) => {
   );
 };
 
-
-
 export default {
   create,
   findByEmail,
@@ -67,5 +67,6 @@ export default {
   countUsers,
   getUserProfileRepo,
   updateUserEmailRepo,
-  updateUserProfileRepo
+  updateUserProfileRepo,
+  findByIdEvent,
 };

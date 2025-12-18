@@ -1,47 +1,56 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import {LayoutDashboard,Gift,Users,Calendar,FileText,LogOut,ChevronLeft,ChevronRight,ClipboardList,UserCheck,} from "lucide-react";
+import {
+  LayoutDashboard,
+  Gift,
+  Users,
+  Calendar,
+  FileText,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  UserCheck,
+} from "lucide-react";
 import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
 import { setAdminCredentials } from "../../store/adminAuthSlice";
 import adminApi from "../../api/adminApi";
 
-
-
 const AdminSidebar = ({ collapsed, setCollapsed }) => {
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
-   const handleLogout = () => {
-  Swal.fire({
-    title: "Logout?",
-    text: "Are you sure you want to logout from the admin panel?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, logout"
-  }).then(async(result) => {
-    if (result.isConfirmed) {
-      
-      await adminApi.post('/auth/admin/logout')
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const handleLogout = () => {
+    Swal.fire({
+      title: "Logout?",
+      text: "Are you sure you want to logout from the admin panel?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, logout",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await adminApi.post("/auth/admin/logout");
 
-      dispatch(setAdminCredentials({
-         adminAccessToken: null,
-         adminName: null,
-        adminEmail: null,
-      }))
+        dispatch(
+          setAdminCredentials({
+            adminAccessToken: null,
+            adminName: null,
+            adminEmail: null,
+          })
+        );
 
-       Swal.fire({
-        icon: "success",
-        title: "Logged Out",
-        text: "You have been successfully logged out!",
-        timer: 1500,
-        showConfirmButton: false
-      });
-
-    }
-  });
-};
+        Swal.fire({
+          icon: "success",
+          title: "Logged Out",
+          text: "You have been successfully logged out!",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
+    });
+  };
 
   return (
     <div
@@ -61,14 +70,16 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
       </button>
 
       <div>
-         <div className="flex items-center px-6 py-5 border-b border-gray-200">
-                            <Gift size={24} className="text-teal-600 min-w-8" />
-                            {!collapsed && (
-                                <h1 className={`text-2xl font-extrabold ml-3 text-gray-900 transition-opacity duration-300`}>
-                                    Trudo
-                                </h1>
-                            )}
-                        </div>
+        <div className="flex items-center px-6 py-5 border-b border-gray-200">
+          <Gift size={24} className="text-teal-600 min-w-8" />
+          {!collapsed && (
+            <h1
+              className={`text-2xl font-extrabold ml-3 text-gray-900 transition-opacity duration-300`}
+            >
+              Trudo
+            </h1>
+          )}
+        </div>
 
         <ul className="mt-4 space-y-2 px-2">
           <SidebarItem
@@ -102,6 +113,12 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
             path="/admin/campaigns-request"
           />
           <SidebarItem
+            icon={<UserCheck size={20} />}
+            label="Event Request"
+            collapsed={collapsed}
+            path="/admin/event-request"
+          />
+          <SidebarItem
             icon={<Calendar size={20} />}
             label="Events"
             collapsed={collapsed}
@@ -118,7 +135,7 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
 
       <div className="p-4">
         <button
-          onClick={()=> handleLogout()}
+          onClick={() => handleLogout()}
           className={`${
             collapsed ? "w-10" : "w-full"
           } flex items-center justify-center bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition`}
@@ -131,14 +148,16 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
   );
 };
 
-const SidebarItem = ({ icon, label, collapsed, active  , path}) => {
+const SidebarItem = ({ icon, label, collapsed, active, path }) => {
   return (
     <NavLink
       to={path}
-    className={({ isActive }) =>
+      className={({ isActive }) =>
         `flex items-center gap-3 p-3 rounded-md cursor-pointer transition 
         hover:bg-green-50 hover:text-green-700
-        ${isActive ? "bg-green-100 text-green-700 font-medium" : "text-gray-700"}
+        ${
+          isActive ? "bg-green-100 text-green-700 font-medium" : "text-gray-700"
+        }
         `
       }
     >

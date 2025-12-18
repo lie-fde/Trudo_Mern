@@ -157,6 +157,7 @@ const login = async (userEmail, password) => {
     user: {
       userName: user.userName,
       userEmail: user.userEmail,
+      mobileNumber: user.mobileNumber,
     },
   };
 };
@@ -342,15 +343,14 @@ const verifyOtpServiceProfile = async (userId, newEmail, otp) => {
   };
 };
 
-
-const updateUserProfileService = async (userId, data,avatar) => {
+const updateUserProfileService = async (userId, data, avatar) => {
   if (data.email) {
     throw new Error("Email cannot be updated without OTP verification");
   }
 
   const updateData = {};
 
-   if (data.address && typeof data.address === "string") {
+  if (data.address && typeof data.address === "string") {
     data.address = JSON.parse(data.address);
   }
 
@@ -362,18 +362,17 @@ const updateUserProfileService = async (userId, data,avatar) => {
 
   // Address handling (your schema uses nested object)
   updateData.address = {
-      address: data.address.address || "",
-      street: data.address.street || "",
-      city: data.address.city || "",
-      state: data.address.state || "",
-      pincode: data.address.pincode || "",
-      country: data.address.country || "India"
+    address: data.address.address || "",
+    street: data.address.street || "",
+    city: data.address.city || "",
+    state: data.address.state || "",
+    pincode: data.address.pincode || "",
+    country: data.address.country || "India",
   };
- 
- if (avatar) {
+
+  if (avatar) {
     updateData.avatar = avatar; // Cloudinary URL
   }
-
 
   const updatedUser = await UserRepository.updateUserProfileRepo(
     userId,
@@ -384,9 +383,6 @@ const updateUserProfileService = async (userId, data,avatar) => {
 
   return updatedUser;
 };
-
-
-
 
 export default {
   signup,
@@ -404,5 +400,5 @@ export default {
   getUserProfileService,
   sendOtpServiceProfile,
   verifyOtpServiceProfile,
-  updateUserProfileService
+  updateUserProfileService,
 };

@@ -1,19 +1,32 @@
-
-import { getPublicCampaigns ,getSinglePublicCampaign } from "../../services/publicCampaignService.js";
+import {
+  getPublicCampaigns,
+  getSinglePublicCampaign,
+} from "../../services/publicCampaignService.js";
 
 export const getCampaigns = async (req, res, next) => {
   try {
-    const campaigns = await getPublicCampaigns();
+    const {
+      page = 1,
+      limit = 6,
+      search = "",
+      sort = "created_desc",
+    } = req.query;
+
+    const data = await getPublicCampaigns({
+      page: Number(page),
+      limit: Number(limit),
+      search,
+      sort,
+    });
 
     return res.status(200).json({
       success: true,
-      campaigns,
+      ...data,
     });
   } catch (error) {
-    next(error); 
+    next(error);
   }
 };
-
 
 export const getSingleCampaign = async (req, res, next) => {
   try {

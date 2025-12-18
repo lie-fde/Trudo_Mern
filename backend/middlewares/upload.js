@@ -2,7 +2,6 @@ import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../config/cloudinary.js";
 
-// === MAX FILE SIZE: 5MB ===
 const FILE_SIZE_LIMIT = 5 * 1024 * 1024;
 
 // Allowed file types
@@ -13,17 +12,12 @@ const allowedMimeTypes = [
   "application/pdf",
 ];
 
-// ===============================
-// 🔥 CLEAN FILENAME SANITIZER
-// ===============================
 function sanitizeFilename(originalname) {
   // Remove extension (only last extension)
   let name = originalname.replace(/\.[^/.]+$/, "");
 
-
   // Replace spaces with underscore
   name = name.replace(/\s+/g, "_");
-
 
   // Remove all symbols except A-Z, a-z, 0-9, _, -
   name = name.replace(/[^a-zA-Z0-9_-]/g, "");
@@ -31,9 +25,6 @@ function sanitizeFilename(originalname) {
   return name;
 }
 
-// ===============================
-// 🔥 CLOUDINARY STORAGE ENGINE
-// ===============================
 const storage = new CloudinaryStorage({
   cloudinary,
   params: (req, file) => {
@@ -54,21 +45,16 @@ const storage = new CloudinaryStorage({
     return {
       folder,
       public_id:
-      file.mimetype === "application/pdf"
-        ? `${uniqueSuffix}-${cleanedName}.pdf`
-        : `${uniqueSuffix}-${cleanedName}`,
-
+        file.mimetype === "application/pdf"
+          ? `${uniqueSuffix}-${cleanedName}.pdf`
+          : `${uniqueSuffix}-${cleanedName}`,
 
       resource_type: file.mimetype === "application/pdf" ? "raw" : "image",
       allowed_formats: ["jpg", "jpeg", "png", "pdf"],
-
     };
   },
 });
 
-// ===============================
-// 🔥 FILE FILTER
-// ===============================
 const fileFilter = (req, file, cb) => {
   if (!allowedMimeTypes.includes(file.mimetype)) {
     return cb(new Error("Unsupported file format"), false);
@@ -76,9 +62,6 @@ const fileFilter = (req, file, cb) => {
   cb(null, true);
 };
 
-// ===============================
-// 🔥 FINAL MULTER EXPORT
-// ===============================
 const upload = multer({
   storage,
   limits: { fileSize: FILE_SIZE_LIMIT },
@@ -86,4 +69,3 @@ const upload = multer({
 });
 
 export default upload;
-

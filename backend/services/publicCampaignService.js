@@ -1,16 +1,16 @@
-import { findPublicCampaigns , findPublicCampaignById } from "../repositories/CampaignRepository.js";
+import {
+  findPublicCampaigns,
+  findPublicCampaignById,
+} from "../repositories/CampaignRepository.js";
 
-
-export const getPublicCampaigns = async () => {
-  const campaigns = await findPublicCampaigns();
-  return campaigns;
+export const getPublicCampaigns = async (queryParams) => {
+  return await findPublicCampaigns(queryParams);
 };
-
 
 export const getSinglePublicCampaign = async (campaignId) => {
   const campaign = await findPublicCampaignById(campaignId);
 
-   if (!campaign) {
+  if (!campaign) {
     const error = new Error("Campaign not found");
     error.statusCode = 404;
     throw error;
@@ -18,4 +18,3 @@ export const getSinglePublicCampaign = async (campaignId) => {
 
   return campaign;
 };
-

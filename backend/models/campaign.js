@@ -1,9 +1,7 @@
 import mongoose from "mongoose";
 
-
 const campaignSchema = new mongoose.Schema(
   {
-    
     User: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -15,7 +13,7 @@ const campaignSchema = new mongoose.Schema(
       default: null,
     },
     organizationIDProof: {
-      type: [String], 
+      type: [String],
       default: null,
     },
 
@@ -30,7 +28,7 @@ const campaignSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum:["Education", "Health", "Disaster Relief", "Other"],
+      enum: ["Education", "Health", "Disaster Relief", "Other"],
       set: (value) => (value ? value.trim() : value),
     },
     location: {
@@ -42,12 +40,12 @@ const campaignSchema = new mongoose.Schema(
       required: true,
     },
     beneficiaryDocuments: {
-      type: [String], 
+      type: [String],
       required: true,
     },
-    beneficiary:{
-      type:String,
-      required:true
+    beneficiary: {
+      type: String,
+      required: true,
     },
 
     bankDetails: {
@@ -66,10 +64,10 @@ const campaignSchema = new mongoose.Schema(
       default: "Pending",
     },
 
-    rejectionReason: { 
-    type: String, 
-    default: null // Empty by default
-  },
+    rejectionReason: {
+      type: String,
+      default: null, // Empty by default
+    },
 
     approvalDate: {
       type: Date,
@@ -81,7 +79,7 @@ const campaignSchema = new mongoose.Schema(
       default: false,
     },
 
-      isBlocked: {
+    isBlocked: {
       type: Boolean,
       default: false,
     },

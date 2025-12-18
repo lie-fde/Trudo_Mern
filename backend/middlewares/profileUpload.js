@@ -2,15 +2,10 @@ import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../config/cloudinary.js";
 
-// === MAX FILE SIZE: 5MB ===
 const FILE_SIZE_LIMIT = 5 * 1024 * 1024;
 
-// Allowed file types
 const allowedMimeTypes = ["image/jpeg", "image/png", "image/jpg"];
 
-// ===============================
-// 🔥 CLEAN FILENAME SANITIZER
-// ===============================
 function sanitizeFilename(originalname) {
   // Remove extension
   let name = originalname.replace(/\.[^/.]+$/, "");
@@ -24,9 +19,6 @@ function sanitizeFilename(originalname) {
   return name;
 }
 
-// ===============================
-// 🔥 CLOUDINARY STORAGE ENGINE
-// ===============================
 const storage = new CloudinaryStorage({
   cloudinary,
   params: (req, file) => {
@@ -43,9 +35,6 @@ const storage = new CloudinaryStorage({
   },
 });
 
-// ===============================
-// 🔥 FILE FILTER
-// ===============================
 const fileFilter = (req, file, cb) => {
   if (!allowedMimeTypes.includes(file.mimetype)) {
     return cb(new Error("Only JPG, PNG images allowed"), false);
@@ -53,9 +42,6 @@ const fileFilter = (req, file, cb) => {
   cb(null, true);
 };
 
-// ===============================
-// 🔥 FINAL MULTER EXPORT
-// ===============================
 const profileUpload = multer({
   storage,
   limits: { fileSize: FILE_SIZE_LIMIT },

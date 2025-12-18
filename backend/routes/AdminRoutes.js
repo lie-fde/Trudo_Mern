@@ -5,9 +5,12 @@ import {
   softDelete,
   block,
   unblock,
-  getCampaignsAdminController, blockCampaignController ,unblockCampaignController,deleteCampaignController,
+  getCampaignsAdminController,
+  blockCampaignController,
+  unblockCampaignController,
+  deleteCampaignController,
   updateCampaignController,
-  updateAdminProfileController
+  updateAdminProfileController,
 } from "../controllers/AdminController/AdminController.js";
 import {
   getPendingCampaigns,
@@ -16,38 +19,50 @@ import {
 } from "../controllers/UserController/campaignController.js";
 import adminAuth from "../middlewares/adminAuth.js";
 import campaignController from "../controllers/UserController/campaignController.js";
-import upload from '../middlewares/upload.js'
+import upload from "../middlewares/upload.js";
 import profileUpload from "../middlewares/profileUpload.js";
-import { getUserProfileController} from "../controllers/UserController/UserController.js";
-
+import { getUserProfileController } from "../controllers/UserController/UserController.js";
+import {
+  getAdminDonationReportController,
+  exportAdminDonationReportController,
+  getDonationReportStats,
+} from "../controllers/AdminDonationController.js";
+import uploadEventImage from "../middlewares/UploadEventImage.js";
+import {
+  createEventController,
+  updateEventController,
+} from "../controllers/EventController.js";
+import { updateEventValidator } from "../Validators/event.validators.js";
 
 const router = express.Router();
 
-router.get("/users", adminAuth,fetchAllUsers);
+router.get("/users", adminAuth, fetchAllUsers);
 
-router.get("/users/:id", adminAuth,fetchUser);
+router.get("/users/:id", adminAuth, fetchUser);
 
-router.patch("/users/delete/:id",adminAuth, softDelete);
+router.patch("/users/delete/:id", adminAuth, softDelete);
 
-router.patch("/users/block/:id", adminAuth,block);
+router.patch("/users/block/:id", adminAuth, block);
 
-router.patch("/users/unblock/:id",adminAuth, unblock);
+router.patch("/users/unblock/:id", adminAuth, unblock);
 
 router.get("/campaigns/pending", adminAuth, getPendingCampaigns);
 
 router.get("/campaigns/:id", adminAuth, getCampaignById);
 
-router.get("/campaigns",adminAuth,getCampaignsAdminController)
+router.get("/campaigns", adminAuth, getCampaignsAdminController);
 
 router.patch("/campaigns/:id/status", adminAuth, updateCampaignStatus);
 
-router.patch("/campaign/block/:id",adminAuth,blockCampaignController);
+router.patch("/campaign/block/:id", adminAuth, blockCampaignController);
 
-router.patch("/campaign/unblock/:id",adminAuth,unblockCampaignController);
+router.patch("/campaign/unblock/:id", adminAuth, unblockCampaignController);
 
-router.patch("/campaign/delete/:id",adminAuth,deleteCampaignController);
+router.patch("/campaign/delete/:id", adminAuth, deleteCampaignController);
 
-router.patch("/campaign/update/:id",adminAuth,
+router.patch(
+  "/campaign/update/:id",
+  adminAuth,
   (req, res, next) => {
     upload.fields([
       { name: "orgProof", maxCount: 1 },
@@ -63,7 +78,8 @@ router.patch("/campaign/update/:id",adminAuth,
       next();
     });
   },
-  updateCampaignController);
+  updateCampaignController
+);
 
 router.post(
   "/campaigns/create",
@@ -86,9 +102,38 @@ router.post(
   campaignController.createCampaign
 );
 
-router.get("/profile",adminAuth,getUserProfileController)
+router.get("/profile", adminAuth, getUserProfileController);
 
-router.put("/profile/update", adminAuth, profileUpload.single("avatar"), updateAdminProfileController);
+router.put(
+  "/profile/update",
+  adminAuth,
+  profileUpload.single("avatar"),
+  updateAdminProfileController
+);
 
+router.get("/donations/report", adminAuth, getAdminDonationReportController);
+
+router.get(
+  "/donations/report/export",
+  adminAuth,
+  exportAdminDonationReportController
+);
+
+router.get("/donations/report/stats", adminAuth, getDonationReportStats);
+
+router.post(
+  "/events/create",
+  adminAuth,
+  uploadEventImage.single("eventImages"),
+  createEventController
+);
+
+router.put(
+  "/events/edit/:id",
+  adminAuth,
+  uploadEventImage.single("eventImages"),
+  updateEventValidator,
+  updateEventController
+);
 
 export default router;

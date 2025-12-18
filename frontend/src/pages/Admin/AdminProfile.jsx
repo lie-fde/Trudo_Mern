@@ -6,9 +6,7 @@ import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
 import adminApi from "../../api/adminApi";
 
 const ProfilePage = () => {
-  
   const [isEditing, setIsEditing] = useState(false);
-
 
   const [formData, setFormData] = useState({});
   const fileInputRef = useRef(null);
@@ -40,7 +38,7 @@ const ProfilePage = () => {
     formDataToSend.append("mobileNumber", formData.phone);
 
     if (formData.avatar instanceof File) {
-      formDataToSend.append("avatar", formData.avatar); 
+      formDataToSend.append("avatar", formData.avatar);
     }
 
     try {
@@ -62,7 +60,7 @@ const ProfilePage = () => {
     if (file) {
       setFormData((prev) => ({
         ...prev,
-        avatar: file, 
+        avatar: file,
         avatarPreview: URL.createObjectURL(file), // PREVIEW URL
       }));
     }
@@ -229,7 +227,6 @@ const ProfilePage = () => {
                     Update
                   </button>
                 ) : (
-                  
                   <>
                     <button
                       onClick={() => setIsEditing(true)}

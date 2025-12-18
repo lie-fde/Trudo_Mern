@@ -1,9 +1,8 @@
 import OtpRepository from "../repositories/OtpRepository.js";
-import nodemailer from 'nodemailer'
-import dotenv from 'dotenv'
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
 
-dotenv.config()
-
+dotenv.config();
 
 export const verifyGenericOtp = async (email, otp) => {
   const otpRecord = await OtpRepository.findByEmailAndOtp(email, otp);
@@ -16,8 +15,8 @@ export const verifyGenericOtp = async (email, otp) => {
   return true;
 };
 
-
-export const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+export const generateOtp = () =>
+  Math.floor(100000 + Math.random() * 900000).toString();
 
 // NodeMailer Transport
 export const transporter = nodemailer.createTransport({

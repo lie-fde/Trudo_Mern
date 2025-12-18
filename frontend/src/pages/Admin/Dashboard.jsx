@@ -1,25 +1,39 @@
 import React, { useState } from "react";
 import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
 import AdminNavbar from "../../components/Admin/AdminNavbar.jsx";
-import {Users,HandCoins,IndianRupee,CalendarDays,} from "lucide-react";
+import { Users, HandCoins, IndianRupee, CalendarDays } from "lucide-react";
 import { useSelector } from "react-redux";
 
 export default function AdminDashboard() {
   const [collapsed, setCollapsed] = useState(false);
-  const userName = useSelector((state)=> state.adminAuth.adminName)
-  const userEmail = useSelector((state)=> state.adminAuth.adminEmail)
-  console.log(userName)
-   console.log(userEmail)
+  const userName = useSelector((state) => state.adminAuth.adminName);
+  const userEmail = useSelector((state) => state.adminAuth.adminEmail);
 
   const cards = [
-    { label: "Total Users", value: "5,423", icon: <Users size={28} className="text-green-700" /> },
-    { label: "Total Donations", value: "1,893", icon: <HandCoins size={28} className="text-green-700" /> },
-    { label: "Total Amount", value: "₹65,805", icon: <IndianRupee size={28} className="text-green-700" /> },
-    { label: "Total Events", value: "189", icon: <CalendarDays size={28} className="text-green-700" /> },
+    {
+      label: "Total Users",
+      value: "5,423",
+      icon: <Users size={28} className="text-green-700" />,
+    },
+    {
+      label: "Total Donations",
+      value: "1,893",
+      icon: <HandCoins size={28} className="text-green-700" />,
+    },
+    {
+      label: "Total Amount",
+      value: "₹65,805",
+      icon: <IndianRupee size={28} className="text-green-700" />,
+    },
+    {
+      label: "Total Events",
+      value: "189",
+      icon: <CalendarDays size={28} className="text-green-700" />,
+    },
   ];
 
   return (
-     <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen">
       {/* FIXED SIDEBAR */}
       <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
@@ -46,12 +60,13 @@ export default function AdminDashboard() {
                 <div className="p-3 bg-green-100 rounded-full">{card.icon}</div>
                 <div>
                   <p className="text-sm text-gray-600">{card.label}</p>
-                  <h2 className="text-xl font-bold text-gray-800">{card.value}</h2>
+                  <h2 className="text-xl font-bold text-gray-800">
+                    {card.value}
+                  </h2>
                 </div>
               </div>
             ))}
           </div>
-          
         </div>
       </div>
     </div>

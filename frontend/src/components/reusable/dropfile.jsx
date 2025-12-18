@@ -34,7 +34,7 @@ export default function DropZone({
       >
         <div className="text-4xl mb-2">☁️</div>
         <p className="text-gray-600 text-sm">Choose a file or drag & drop it here</p>
-        <p className="text-xs text-gray-400">JPEG, PNG, PDF, MP4 allowed</p>
+        <p className="text-xs text-gray-400">JPEG, PNG, PDF allowed</p>
 
         <label className="mt-3 cursor-pointer px-4 py-2 border rounded-lg text-sm hover:bg-gray-50">
           Browse File
@@ -59,3 +59,5 @@ export default function DropZone({
     </div>
   );
 }
+
+
