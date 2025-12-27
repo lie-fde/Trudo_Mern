@@ -158,6 +158,7 @@ const login = async (userEmail, password) => {
       userName: user.userName,
       userEmail: user.userEmail,
       mobileNumber: user.mobileNumber,
+      isBlocked : user.isBlocked
     },
   };
 };
@@ -224,12 +225,12 @@ const googleLoginService = async (googleUser) => {
     });
   }
 
-  const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+  const accessToken = jwt.sign({ id: user._id , role : "user"}, process.env.JWT_SECRET, {
     expiresIn: "1hr",
   });
 
   const refreshToken = jwt.sign(
-    { id: user._id },
+    { id: user._id , role : "user"},
     process.env.JWT_REFRESH_SECRET,
     {
       expiresIn: "2d",
@@ -384,6 +385,24 @@ const updateUserProfileService = async (userId, data, avatar) => {
   return updatedUser;
 };
 
+
+ const changePasswordService = async (
+  userId,
+  currentPassword,
+  newPassword
+) => {
+  const id=userId
+  const user = await UserRepository.findById(id);
+  if (!user) throw new Error("User not found");
+
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) throw new Error("Current password is incorrect");
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  await UserRepository.updateUserPassword(id, hashedPassword);
+};
+
 export default {
   signup,
   login,
@@ -401,4 +420,5 @@ export default {
   sendOtpServiceProfile,
   verifyOtpServiceProfile,
   updateUserProfileService,
+  changePasswordService
 };

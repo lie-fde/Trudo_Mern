@@ -20,10 +20,28 @@ export default function DonationPage() {
 
   const [amount, setAmount] = useState("");
   const [errors, setErrors] = useState("");
+  const [raisedAmount, setRaisedAmount] = useState(0);
 
   useEffect(() => {
     dispatch(fetchPublicSingleCampaign(id));
   }, [id, dispatch]);
+
+   useEffect(() => {
+    const fetchRaisedAmount = async () => {
+      try {
+        const campaignId = id;
+        const res = await api.get(`/campaign/raisedAmount/${campaignId}`);
+
+        setRaisedAmount(res.data.raisedAmount);
+      } catch (error) {
+        console.error("Failed to fetch raised amount", error);
+      }
+    };
+
+    if (id) {
+      fetchRaisedAmount();
+    }
+  }, [id]);
 
   if (loading || !singleCampaign) {
     return (
@@ -34,12 +52,14 @@ export default function DonationPage() {
   }
 
   const campaign = singleCampaign;
-
+  
   const validateAmount = (value) => {
+    const availableAmount = campaign.targetAmount - raisedAmount
     if (!value) return "Amount is required";
     if (isNaN(value)) return "Amount must be a number";
     if (value < 100) return "Minimum donation is ₹100";
     if (value > 500000) return "Maximum donation is ₹5,00,000";
+    if (value > availableAmount) return `Donation exceeds . Maximum ₹${availableAmount} can be donated`
     return "";
   };
 
@@ -47,10 +67,9 @@ export default function DonationPage() {
     const validationError = validateAmount(amount);
     setErrors(validationError);
 
-    if (validationError === "") {
-      console.log("Proceed to payment page with amount:", amount);
-      console.log(userEmail,mobileNumber,singleCampaign._id)
-    }
+      if (validationError) {
+    return;
+  }
 
     const { data } = await api.post("/payments/create-order", {
       amount,

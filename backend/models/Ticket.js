@@ -23,14 +23,14 @@ const TicketSchema = new mongoose.Schema({
 
   qrCode: {
     type: String,
-    required: true,
+    default:null
   },
 
-  status: {
-    type: String,
-    enum: ["Active", "Cancelled", "Expired"],
-    default: "Active",
-  },
+ status: {
+  type: String,
+  enum: ["Locked", "Active", "Cancelled", "Expired"],
+  default: "Locked",
+},
 
   paymentId: {
     type: String,

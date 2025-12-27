@@ -14,6 +14,13 @@ export default async function auth(req, res, next) {
 
     const user = await UserRepository.findById(decoded.id);
 
+    if(user.isBlocked){
+       return res.status(403).json({
+        message: "Your account has been blocked by admin",
+        code: "USER_BLOCKED"
+      });
+    }
+
     if (!user) {
       console.log("❌ User not found for decoded token!");
       return res.status(401).json({ message: "User not found" });

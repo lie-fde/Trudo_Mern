@@ -46,7 +46,7 @@ export default function VerifyOTP() {
 
       setMessage(response.data.message);
       localStorage.removeItem("tempEmail");
-      navigate("/");
+      navigate("/login");
     } catch (err) {
       if (err.response) {
         setMessage(err.response.data.message);

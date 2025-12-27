@@ -17,6 +17,7 @@ import {
   verifyOtpControllerProfile,
   sendOtpControllerProfile,
   updateUserProfileController,
+  changePassword
 } from "../controllers/UserController/UserController.js";
 import {
   getUserCampaignsController,
@@ -35,6 +36,9 @@ import {
 import { getSingleEventController } from "../controllers/EventController.js";
 import { getSingleEventValidator } from "../Validators/event.validators.js";
 import rateLimit from "express-rate-limit";
+import { lockTicketController } from "../controllers/TicketController.js";
+import { createOrderController, verifyPaymentEvent } from "../controllers/paymentController.js";
+import { changePasswordValidator } from "../Validators/Profile.validators.js";
 
 const router = express.Router();
 
@@ -134,5 +138,14 @@ router.get(
   getSingleEventValidator,
   getSingleEventController
 );
+
+router.post("/ticket/lock", auth , lockTicketController)
+
+router.post("/payment/create-order" , auth , createOrderController)
+
+router.post("/payment/verify", auth ,verifyPaymentEvent )
+
+router.put("/changePassword-UserProfile" , auth ,  changePasswordValidator,
+  changePassword)
 
 export default router;

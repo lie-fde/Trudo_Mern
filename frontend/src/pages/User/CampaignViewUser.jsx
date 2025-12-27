@@ -6,6 +6,8 @@ import { fetchPublicSingleCampaign } from "../../store/campaignUserSlice.js";
 
 import Navbar from "../../components/User/Navbar.jsx";
 import Trudofooter from "../../components/reusable/footer.jsx";
+import api from "../../api/api.js";
+import Swal from "sweetalert2";
 
 const cleanMongoData = (data) => {
   const campaign = {};
@@ -87,6 +89,7 @@ export default function CampaignViewUser() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [raisedAmount, setRaisedAmount] = useState(0);
 
   const { singleCampaign, loading } = useSelector(
     (state) => state.campaignPublic
@@ -95,6 +98,23 @@ export default function CampaignViewUser() {
   useEffect(() => {
     dispatch(fetchPublicSingleCampaign(id));
   }, [id, dispatch]);
+
+  useEffect(() => {
+    const fetchRaisedAmount = async () => {
+      try {
+        const campaignId = id;
+        const res = await api.get(`/campaign/raisedAmount/${campaignId}`);
+
+        setRaisedAmount(res.data.raisedAmount);
+      } catch (error) {
+        console.error("Failed to fetch raised amount", error);
+      }
+    };
+
+    if (id) {
+      fetchRaisedAmount();
+    }
+  }, [id]);
 
   if (loading || !singleCampaign) {
     return <p className="p-10 text-center text-lg">Loading campaign...</p>;
@@ -106,6 +126,18 @@ export default function CampaignViewUser() {
     url,
     type: "Campaign Image",
   }));
+
+  const handleClick = () => {
+    if (raisedAmount >= campaign.targetAmount) {
+      Swal.fire({
+        icon: "error",
+        title: "Donation Failed",
+        text: "Campaign amount is already full",
+      });
+    } else {
+      navigate(`/campaigns/${campaign._id}/donate`);
+    }
+  };
 
   return (
     <div className="w-full bg-gray-100 min-h-screen">
@@ -219,7 +251,7 @@ export default function CampaignViewUser() {
                 </p>
 
                 <button
-                  onClick={() => navigate(`/campaigns/${campaign._id}/donate`)}
+                  onClick={() => handleClick()}
                   className="flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white w-full py-3 rounded-lg font-bold text-lg shadow-md transition-all transform hover:scale-[1.02]"
                 >
                   <Heart size={20} className="mr-2 fill-current" />

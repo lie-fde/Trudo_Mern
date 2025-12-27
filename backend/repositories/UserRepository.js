@@ -54,6 +54,10 @@ const updateUserProfileRepo = async (userId, updateData) => {
   );
 };
 
+ const updateUserPassword = (id, password) => {
+  return User.findByIdAndUpdate(id, { password });
+};
+
 export default {
   create,
   findByEmail,
@@ -69,4 +73,5 @@ export default {
   updateUserEmailRepo,
   updateUserProfileRepo,
   findByIdEvent,
+  updateUserPassword
 };

@@ -10,6 +10,7 @@ import {
   deleteCampaignRepository,
   updateCampaignRepo,
   getmMyCampaign,
+  calculateRaisedAmountRepo,
 } from "../repositories/CampaignRepository.js";
 
 export const createCampaignService = async (req) => {
@@ -151,4 +152,21 @@ export const getUserCampaignsService = async (userId) => {
   }
 
   return campaigns;
+};
+
+
+export const checkCampaignFullService = async (campaignId) => {
+  const campaign = await findCampaignById(campaignId)
+
+  if (!campaign) {
+    throw new Error("Campaign not found");
+  }
+
+  const raisedAmount = await calculateRaisedAmountRepo(campaignId)
+
+  // if (raisedAmount >= campaign.targetAmount) {
+  //   throw new Error("Campaign amount is already full");
+  // }
+
+  return raisedAmount
 };

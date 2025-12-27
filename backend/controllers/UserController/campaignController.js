@@ -4,6 +4,7 @@ import {
   getCampaignDetailsrepo,
   updateCampaignStatusService,
   getUserCampaignsService,
+  checkCampaignFullService
 } from "../../services/campaignService.js";
 
 const createCampaign = async (req, res) => {
@@ -86,5 +87,31 @@ export const getUserCampaignsController = async (req, res) => {
       success: false,
       message: "Failed to fetch campaigns",
     });
+  }
+};
+
+
+
+export const checkCampaignFullController = async (req, res) => {
+  try {
+    const { campaignId } = req.params;
+
+    if (!campaignId) throw new Error("No campaign ID") ;
+
+    const raisedAmount = await checkCampaignFullService(campaignId);
+
+    return res.status(200).json({
+      success:true,
+      raisedAmount,
+      message:"Raised amount calculated successfully"
+    })
+
+
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({
+      success:false,
+      message:error.message
+    })
   }
 };

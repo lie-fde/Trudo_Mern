@@ -11,6 +11,7 @@ import {
   getEventsUserRepo,
   updateEventRepo,
 } from "../repositories/EventRepo.js";
+import { getEventWithRemainingTicketsRepo } from "../repositories/TicketRepo.js";
 import User from "../repositories/UserRepository.js";
 
 export const createEventService = async (id, body, file) => {
@@ -124,6 +125,10 @@ export const getSingleEventService = async (eventId) => {
       message: "Event not found",
     };
   }
+
+  const remainingTickets = await getEventWithRemainingTicketsRepo(eventId)
+
+  if(remainingTickets) event.remainingTickets= remainingTickets
 
   return {
     success: true,

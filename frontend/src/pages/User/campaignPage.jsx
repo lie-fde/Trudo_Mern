@@ -248,6 +248,13 @@ const CampaignCard = ({ campaign }) => {
                 ₹ {campaign.targetAmount?.toLocaleString()}
               </p>
             </div>
+              <div>
+              <p className="text-xs text-gray-400 mb-0.5">Raised</p>
+              <p className="font-bold text-gray-900 text-sm">
+                ₹ {campaign.raisedAmount?.toLocaleString()}
+              </p>
+            </div>
+
 
             <div className="text-right">
               <p className="text-xs text-gray-400 mb-0.5">Created</p>
