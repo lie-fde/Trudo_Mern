@@ -284,7 +284,7 @@ export default function EventViewUserPage() {
       });
 
       Swal.fire("Success", "Ticket booked successfully", "success")
-        .then(() => navigate("/my-tickets"));
+        .then(() => navigate("/mytickets"));
     },
   };
 

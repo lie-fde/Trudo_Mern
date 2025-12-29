@@ -33,6 +33,7 @@ import {
   updateEventController,
 } from "../controllers/EventController.js";
 import { updateEventValidator } from "../Validators/event.validators.js";
+import { exportAdminEventReportController, getAdminEventReportController, getEventReportStats } from "../controllers/TicketController.js";
 
 const router = express.Router();
 
@@ -113,13 +114,19 @@ router.put(
 
 router.get("/donations/report", adminAuth, getAdminDonationReportController);
 
+router.get("/event/report", adminAuth , getAdminEventReportController)
+
 router.get(
   "/donations/report/export",
   adminAuth,
   exportAdminDonationReportController
 );
 
+router.get("/events/report/export", adminAuth , exportAdminEventReportController)
+
 router.get("/donations/report/stats", adminAuth, getDonationReportStats);
+
+router.get("/events/report/stats", adminAuth , getEventReportStats)
 
 router.post(
   "/events/create",

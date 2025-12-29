@@ -8,7 +8,8 @@ import {
   createOrderService,
 } from "../services/paymentService.js";
 import UserRepository from "../repositories/UserRepository.js";
-import QRCode from "qrcode"
+import QRCode from "qrcode";
+import { generateAndUploadQR } from "../middlewares/qrCodeUpload.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -190,7 +191,7 @@ export const createOrderController = async (req, res) => {
 //   return ticket;
 // };
 
-export const verifyPaymentEvent = async (req,res) => {
+export const verifyPaymentEvent = async (req, res) => {
   try {
     const {
       ticketId,
@@ -257,21 +258,34 @@ export const verifyPaymentEvent = async (req,res) => {
     }
 
     // 🔐 Generate QR (URL-based)
-    const qrUrl = `${process.env.FRONTEND_URL}/ticket/${ticket._id}`;
-    console.log("📎 QR URL:", qrUrl);
+    // const qrUrl = `${process.env.FRONTEND_URL}/ticket/${ticket._id}`;
+    // console.log("📎 QR URL:", qrUrl);
 
-    const qrCode = await QRCode.toDataURL(qrUrl);
+    // const qrCode = await QRCode.toDataURL(qrUrl);
+
+    // ticket.status = "Active";
+    // ticket.qrCode = qrCode;
+    // ticket.paymentId = razorpay_payment_id;
+    // ticket.bookingLockExpires = null;
+
+    // await ticket.save();
+
+    const qrText = `${process.env.FRONTEND_URL}/ticket/${ticket._id}`;
+    const qrUrl = await generateAndUploadQR(qrText, ticket._id);
 
     ticket.status = "Active";
-    ticket.qrCode = qrCode;
+    ticket.qrCode = qrUrl;
     ticket.paymentId = razorpay_payment_id;
     ticket.bookingLockExpires = null;
+    ticket.expiresAt = new Date(
+      ticket.eventId.date.getTime() + ticket.eventId.duration * 60 * 60 * 1000
+    );
 
     await ticket.save();
 
     console.log("✅ TICKET ACTIVATED:", ticket._id);
 
-      return res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Payment verified and ticket activated",
       ticketId: ticket._id,

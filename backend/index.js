@@ -17,6 +17,7 @@ import fs from 'fs'
 import path from 'path';
 import PaymentRoutes from './routes/PaymentRoutes.js'
 import EventRoute from './routes/EvenRoute.js'
+import './cron/ticketExpiry.cron.js'
 
 connectDB()
 
