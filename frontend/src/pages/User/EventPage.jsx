@@ -140,24 +140,7 @@ const EventPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
 
-//   const loadEvents = async (sortValue = sort) => {
-//     try {
-//       setLoading(true);
-//       //   const res = await fetchEventsApi({
-//       //     page,
-//       //     limit: 8,
-//       //     search,
-//       //     sort: sortValue,
-//       //   });
 
-//       const res = await api.get("/events/list", {
-//         params: {
-//           page,
-//           limit: 8,
-//           search,
-//           sort: sortValue,
-//         },
-//       });
 
   const loadEvents = async () => {
     try {
@@ -181,15 +164,7 @@ const EventPage = () => {
     }
   };
 
-//       setEvents(res.data.events);
-//       setTotalPages(res.data.pagination.totalPages);
-//       setSort(sortValue);
-//     } catch (err) {
-//       console.error(err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+;
 
    useEffect(() => {
     const delay = setTimeout(() => {
@@ -238,76 +213,3 @@ const EventPage = () => {
 };
 
 export default EventPage;
-
-// import { useDispatch , useSelector } from "react-redux";
-// import { fetchPublicEvents } from "../../store/eventUserSlice";
-
-// const EventPage = () => {
-//   const dispatch = useDispatch();
-
-//   const {
-//     events,
-//     loading,
-//     pagination: { page, totalPages },
-//   } = useSelector((state) => state.eventPublic);
-
-//   const [search, setSearch] = useState("");
-//   const [sort, setSort] = useState("newest");
-
-//   useEffect(() => {
-//     dispatch(
-//       fetchPublicEvents({
-//         page,
-//         limit: 8,
-//         search,
-//         sort,
-//       })
-//     );
-//   }, [dispatch, page, search, sort]);
-
-//   return (
-//     <div className="min-h-screen bg-white text-gray-900">
-//       <Navbar />
-
-//       <main className="max-w-7xl mx-auto px-4 pb-20">
-//         <SearchBar
-//           search={search}
-//           setSearch={setSearch}
-//           onSearch={(value) => {
-//             setSort(value || sort);
-//           }}
-//         />
-
-//         {loading ? (
-//           <p className="text-center mt-10">Loading events...</p>
-//         ) : (
-//           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-//             {events.map((event) => (
-//               <EventCard key={event._id} event={event} />
-//             ))}
-//           </div>
-//         )}
-
-//         <Pagination
-//           page={page}
-//           totalPages={totalPages}
-//           setPage={(p) =>
-//             dispatch(
-//               fetchPublicEvents({
-//                 page: p,
-//                 limit: 8,
-//                 search,
-//                 sort,
-//               })
-//             )
-//           }
-//         />
-//       </main>
-
-//       <CTABanner />
-//       <Trudofooter />
-//     </div>
-//   );
-// };
-
-// export default EventPage

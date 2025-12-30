@@ -34,6 +34,7 @@ import {
 } from "../controllers/EventController.js";
 import { updateEventValidator } from "../Validators/event.validators.js";
 import { exportAdminEventReportController, getAdminEventReportController, getEventReportStats } from "../controllers/TicketController.js";
+import { getMonthlyDonationGraph } from "../controllers/DonationGraphController.js";
 
 const router = express.Router();
 
@@ -121,6 +122,8 @@ router.get(
   adminAuth,
   exportAdminDonationReportController
 );
+
+router.get("/donations/graph",adminAuth, getMonthlyDonationGraph);
 
 router.get("/events/report/export", adminAuth , exportAdminEventReportController)
 

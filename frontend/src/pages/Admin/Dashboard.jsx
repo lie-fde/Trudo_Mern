@@ -1,36 +1,107 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
 import AdminNavbar from "../../components/Admin/AdminNavbar.jsx";
 import { Users, HandCoins, IndianRupee, CalendarDays } from "lucide-react";
 import { useSelector } from "react-redux";
+import { DonationBarChart } from "../../components/Admin/Dashboad.jsx";
+import adminApi from "../../api/adminApi.js";
 
 export default function AdminDashboard() {
   const [collapsed, setCollapsed] = useState(false);
   const userName = useSelector((state) => state.adminAuth.adminName);
   const userEmail = useSelector((state) => state.adminAuth.adminEmail);
+  const [donationData, setDonationData] = useState([]);
+
+     const [stats, setStats] = useState({
+       TotalUsers: 0,
+       TotalCampaigns: 0,
+       totalDonations: 0,
+       ActiveCampaigns: 0,
+       TotalEvents:0
+     });
+
+     const [TotalEvents , setTotalEvents] = useState(0);
+
+
+
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const res = await adminApi.get("/admin/donations/report/stats");
+        if (res.data.success) {
+          setStats({
+            TotalUsers: res.data.data.TotalUsers,
+            TotalCampaigns: res.data.data.TotalCampaigns,
+            totalDonations: res.data.data.totalDonations,
+            ActiveCampaigns: res.data.data.ActiveCampaigns,
+          });
+        }
+      } catch (err) {
+        console.error("Stats load error:", err);
+      }
+    }
+
+    loadStats();
+  }, []);
+
+
+    useEffect(() => {
+    async function loadStats() {
+      try {
+        const res = await adminApi.get("/admin/events/report/stats");
+        if (res.data.success) {
+          setTotalEvents( res.data.data.TotalEvents);
+        }
+      } catch (err) {
+        console.error("Stats load error:", err);
+      }
+    }
+
+    loadStats();
+  }, []);
+
 
   const cards = [
     {
       label: "Total Users",
-      value: "5,423",
+      value: stats.TotalUsers,
       icon: <Users size={28} className="text-green-700" />,
     },
     {
-      label: "Total Donations",
-      value: "1,893",
+      label: "Total Campaigns",
+      value: stats.TotalCampaigns,
       icon: <HandCoins size={28} className="text-green-700" />,
     },
     {
       label: "Total Amount",
-      value: "₹65,805",
+      value: stats.totalDonations,
       icon: <IndianRupee size={28} className="text-green-700" />,
     },
     {
       label: "Total Events",
-      value: "189",
+      value: TotalEvents,
       icon: <CalendarDays size={28} className="text-green-700" />,
     },
   ];
+
+
+
+
+
+  useEffect(() => {
+  const fetchDonationGraph = async () => {
+    try {
+      const res = await adminApi.get("/admin/donations/graph");
+      if (res.data.success) {
+        setDonationData(res.data.data);
+      }
+    } catch (err) {
+      console.error("Donation graph load failed", err);
+    }
+  };
+
+  fetchDonationGraph();
+}, []);
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -67,6 +138,11 @@ export default function AdminDashboard() {
               </div>
             ))}
           </div>
+
+         <div className="mt-10">
+            <DonationBarChart data={donationData} />
+          </div>
+
         </div>
       </div>
     </div>
