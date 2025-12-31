@@ -143,6 +143,10 @@ export const getAdminEventReport = async ({
     andConditions.push({ createdAt });
   }
 
+  andConditions.push({
+  status: { $ne: "Locked" },
+});
+
   const pipeline = [
     ...(andConditions.length ? [{ $match: { $and: andConditions } }] : []),
 

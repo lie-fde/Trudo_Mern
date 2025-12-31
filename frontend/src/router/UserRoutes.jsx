@@ -28,6 +28,7 @@ import EventViewUserPage from "../pages/User/EventViewUser.jsx";
 import ChangePasswordProfile from "../pages/User/ChangePassword.jsx";
 import MyTickets from "../pages/User/Mytickets.jsx";
 import VerifyTicket from "../pages/User/VerifyTicketPage.jsx";
+import Contact from "../pages/User/ContactPage.jsx";
 
 
 function UserRoutes(){
@@ -60,6 +61,7 @@ function UserRoutes(){
         <Route path="/changePassword" element={<ProtectedRoute><ChangePasswordProfile/></ProtectedRoute>} />
         <Route path="/mytickets" element={<ProtectedRoute><MyTickets/></ProtectedRoute>} />
         <Route path="/ticket/:ticketId" element={<VerifyTicket/>}/>
+        <Route path="/contact" element={<Contact/>}/>
         
         
         <Route path="/buggy" element={<Buggy/>}/>

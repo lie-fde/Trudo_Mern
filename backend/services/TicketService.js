@@ -158,7 +158,7 @@ export const getAdminEventReportService = async ({
   });
 
   return {
-    events: data,          // 👈 frontend will consume this
+    events: data,          
     total,
     page,
     pages: Math.ceil(total / limit),

@@ -10,6 +10,7 @@ import {
 import UserRepository from "../repositories/UserRepository.js";
 import QRCode from "qrcode";
 import { generateAndUploadQR } from "../middlewares/qrCodeUpload.js";
+import sendTicketEmail from "../utils/sendTicketEmail.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -143,54 +144,6 @@ export const createOrderController = async (req, res) => {
   }
 };
 
-// export const verifyPaymentEvent = async ({
-//   ticketId,
-//   razorpay_order_id,
-//   razorpay_payment_id,
-//   razorpay_signature,
-// }) => {
-//   const body = razorpay_order_id + "|" + razorpay_payment_id;
-
-//   const expectedSignature = crypto
-//     .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-//     .update(body)
-//     .digest("hex");
-
-//   if (expectedSignature !== razorpay_signature) {
-//     throw { status: 400, message: "Invalid payment signature" };
-//   }
-
-//   // Update payment
-//   await Payment.findOneAndUpdate(
-//     { razorpayOrderId: razorpay_order_id },
-//     {
-//       razorpayPaymentId: razorpay_payment_id,
-//       razorpaySignature: razorpay_signature,
-//       paymentStatus: "success",
-//     }
-//   );
-
-//   // Activate ticket
-//   const ticket = await Tickets.findById(ticketId).populate("eventId");
-
-//   if (!ticket || ticket.status !== "Locked") {
-//     throw { status: 400, message: "Invalid ticket state" };
-//   }
-
-//   // 🔐 Generate QR (URL-based)
-//   const qrUrl = `${process.env.FRONTEND_URL}/ticket/${ticket._id}`;
-//   const qrCode = await QRCode.toDataURL(qrUrl);
-
-//   ticket.status = "Active";
-//   ticket.qrCode = qrCode;
-//   ticket.paymentId = razorpay_payment_id;
-//   ticket.bookingLockExpires = null;
-
-//   await ticket.save();
-
-//   return ticket;
-// };
-
 export const verifyPaymentEvent = async (req, res) => {
   try {
     const {
@@ -204,6 +157,9 @@ export const verifyPaymentEvent = async (req, res) => {
     console.log("razorpay_order_id:", razorpay_order_id);
     console.log("razorpay_payment_id:", razorpay_payment_id);
     console.log("razorpay_signature:", razorpay_signature);
+
+    const userName = req.user?.userName;
+    const userEmail = req.user?.userEmail;
 
     console.log(
       "🔑 RAZORPAY_KEY_SECRET exists:",
@@ -257,19 +213,6 @@ export const verifyPaymentEvent = async (req, res) => {
       throw { status: 400, message: "Invalid ticket state" };
     }
 
-    // 🔐 Generate QR (URL-based)
-    // const qrUrl = `${process.env.FRONTEND_URL}/ticket/${ticket._id}`;
-    // console.log("📎 QR URL:", qrUrl);
-
-    // const qrCode = await QRCode.toDataURL(qrUrl);
-
-    // ticket.status = "Active";
-    // ticket.qrCode = qrCode;
-    // ticket.paymentId = razorpay_payment_id;
-    // ticket.bookingLockExpires = null;
-
-    // await ticket.save();
-
     const qrText = `${process.env.FRONTEND_URL}/ticket/${ticket._id}`;
     const qrUrl = await generateAndUploadQR(qrText, ticket._id);
 
@@ -284,6 +227,17 @@ export const verifyPaymentEvent = async (req, res) => {
     await ticket.save();
 
     console.log("✅ TICKET ACTIVATED:", ticket._id);
+
+    await sendTicketEmail({
+      email: userEmail,
+      userName: userName,
+      eventName: ticket.eventId.title,
+      eventDate: ticket.eventId.date.toDateString(),
+      location: ticket.eventId.venue,
+      ticketId: ticket._id.toString(),
+      cloudinaryImageUrl: ticket.eventId.images[0],
+      qrCodeImageUrl: ticket.qrCode
+    });
 
     return res.status(200).json({
       success: true,
