@@ -164,9 +164,5 @@ export const checkCampaignFullService = async (campaignId) => {
 
   const raisedAmount = await calculateRaisedAmountRepo(campaignId)
 
-  // if (raisedAmount >= campaign.targetAmount) {
-  //   throw new Error("Campaign amount is already full");
-  // }
-
   return raisedAmount
 };

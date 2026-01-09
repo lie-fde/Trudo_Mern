@@ -115,6 +115,7 @@ export default function CampaignViewUser() {
       fetchRaisedAmount();
     }
   }, [id]);
+  
 
   if (loading || !singleCampaign) {
     return <p className="p-10 text-center text-lg">Loading campaign...</p>;

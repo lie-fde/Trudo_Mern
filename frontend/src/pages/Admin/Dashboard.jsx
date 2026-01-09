@@ -11,6 +11,9 @@ export default function AdminDashboard() {
   const userName = useSelector((state) => state.adminAuth.adminName);
   const userEmail = useSelector((state) => state.adminAuth.adminEmail);
   const [donationData, setDonationData] = useState([]);
+  const [yearlyData, setYearlyData] = useState([]);
+  const [activeTab, setActiveTab] = useState('Monthly');
+
 
      const [stats, setStats] = useState({
        TotalUsers: 0,
@@ -22,7 +25,7 @@ export default function AdminDashboard() {
 
      const [TotalEvents , setTotalEvents] = useState(0);
 
-
+   
 
   useEffect(() => {
     async function loadStats() {
@@ -103,6 +106,52 @@ export default function AdminDashboard() {
   fetchDonationGraph();
 }, []);
 
+useEffect(() => {
+  const fetchYearlyDonationGraph = async () => {
+    try {
+      const res = await adminApi.get("/admin/donations/graph/yearly");
+      if (res.data.success) {
+        setYearlyData(res.data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch yearly donation graph", error);
+    }
+  };
+
+  fetchYearlyDonationGraph();
+}, []);
+
+const paddedYearlyData = () => {
+  if (!yearlyData.length) return [];
+
+  const realData = yearlyData;
+  const lastYear = realData[realData.length - 1].year;
+
+  const result = [];
+
+  for (let i = 11; i >= 0; i--) {
+    const year = lastYear - i;
+
+    const found = realData.find((d) => d.year === year);
+
+    result.push(
+      found || {
+        year,
+        amount: 0,
+        count: 0,
+      }
+    );
+  }
+
+  return result;
+};
+
+   const chartData =
+  activeTab === "Monthly"
+    ? donationData
+    : paddedYearlyData();
+
+
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* FIXED SIDEBAR */}
@@ -140,7 +189,7 @@ export default function AdminDashboard() {
           </div>
 
          <div className="mt-10">
-            <DonationBarChart data={donationData} />
+            <DonationBarChart data={chartData} setActiveTab={setActiveTab} activeTab={activeTab}/>
           </div>
 
         </div>

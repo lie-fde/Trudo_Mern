@@ -6,6 +6,7 @@ import { fetchSingleCampaign } from "../../store/campaignSlice.js";
 
 import AdminNavbar from "../../components/Admin/AdminNavbar.jsx";
 import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
+import adminApi from "../../api/adminApi.js";
 
 // ------------------------------------------------------------------
 // CLEAN MONGO DATA
@@ -46,9 +47,7 @@ const MediaCarousel = ({ mediaList }) => {
     setCurrentIndex((prev) => (prev === 0 ? mediaList.length - 1 : prev - 1));
 
   const nextMedia = () =>
-    setCurrentIndex((prev) =>
-      prev === mediaList.length - 1 ? 0 : prev + 1
-    );
+    setCurrentIndex((prev) => (prev === mediaList.length - 1 ? 0 : prev + 1));
 
   const currentMedia = mediaList[currentIndex];
 
@@ -99,12 +98,30 @@ export default function CampaignView() {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const dispatch = useDispatch();
+  const [raisedAmount, setRaisedAmount] = useState(0);
 
   const { singleCampaign, loading } = useSelector((state) => state.campaign);
 
   useEffect(() => {
     dispatch(fetchSingleCampaign(id));
   }, [id, dispatch]);
+
+  useEffect(() => {
+  if (!id) return;
+
+  const fetchRaisedAmount = async () => {
+    try {
+      const res = await adminApi.get(`/campaign/raisedAmountAdmin/${id}`);
+      setRaisedAmount(res.data.raisedAmount || 0);
+    } catch (error) {
+      console.error("Failed to fetch raised amount", error);
+      setRaisedAmount(0);
+    }
+  };
+
+  fetchRaisedAmount();
+}, [id]);
+
 
   if (loading || !singleCampaign) {
     return <p className="p-10 text-center text-lg">Loading campaign...</p>;
@@ -126,7 +143,7 @@ export default function CampaignView() {
         "image",
         "beneficiaryDocuments",
         "__v",
-        "isDeleted"
+        "isDeleted",
       ].includes(key);
     })
     .map(([key, value]) => {
@@ -150,7 +167,6 @@ export default function CampaignView() {
         {/* MAIN PAGE CENTERED CONTAINER */}
         <div className="py-10 flex justify-center">
           <div className="w-full max-w-[1000px] px-4">
-
             {/* Breadcrumb */}
             <div className="flex items-center justify-between mb-8">
               <span className="text-sm text-gray-500">
@@ -178,7 +194,6 @@ export default function CampaignView() {
 
             {/* STORY + INFO */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-
               {/* Story */}
               <div className="md:col-span-2 bg-white p-8 rounded-2xl shadow">
                 <h3 className="text-2xl font-bold mb-4">The Story</h3>
@@ -189,7 +204,6 @@ export default function CampaignView() {
 
               {/* Right Info */}
               <div className="space-y-6">
-
                 {/* Target */}
                 <div className="bg-white p-6 rounded-2xl shadow border-t-4 border-teal-500">
                   <p className="text-xl font-bold mb-2 text-teal-600">
@@ -204,6 +218,23 @@ export default function CampaignView() {
                   </p>
                 </div>
 
+                <div className="bg-white p-6 rounded-2xl shadow border-t-4 border-green-500">
+                  <p className="text-xl font-bold mb-2 text-green-600">
+                    Raised Amount
+                  </p>
+                  <p className="text-3xl font-extrabold text-gray-900">
+                    ₹ {raisedAmount?.toLocaleString()}
+                  </p>
+
+                  <p className="text-sm text-gray-600 mt-1">
+                    {raisedAmount >= campaign.targetAmount
+                      ? "🎉 Campaign goal reached"
+                      : `₹ ${(
+                          campaign.targetAmount - raisedAmount
+                        ).toLocaleString()} more needed`}
+                  </p>
+                </div>
+
                 {/* Location */}
                 <div className="bg-white p-6 rounded-2xl shadow">
                   <p className="font-bold text-lg mb-3">Location & Details</p>
@@ -213,11 +244,17 @@ export default function CampaignView() {
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl shadow border-t-4 border-purple-500">
-                <p className="font-bold text-lg mb-3">Created By</p>
-                <p className="text-gray-800 text-base">👤 {campaign.User?.userName || "N/A"}</p>
-                <p className="text-gray-800 text-base mt-2">📧 {campaign.User?.userEmail || "N/A"}</p>
-                <p className="text-gray-800 text-base mt-2">📱 {campaign.User?.mobileNumber || "N/A"}</p>
-              </div>
+                  <p className="font-bold text-lg mb-3">Created By</p>
+                  <p className="text-gray-800 text-base">
+                    👤 {campaign.User?.userName || "N/A"}
+                  </p>
+                  <p className="text-gray-800 text-base mt-2">
+                    📧 {campaign.User?.userEmail || "N/A"}
+                  </p>
+                  <p className="text-gray-800 text-base mt-2">
+                    📱 {campaign.User?.mobileNumber || "N/A"}
+                  </p>
+                </div>
 
                 {/* Docs */}
                 <div className="bg-white p-6 rounded-2xl shadow border-t-4 border-blue-500">
@@ -255,9 +292,9 @@ export default function CampaignView() {
                     </p>
                   )}
                 </div>
-
               </div>
             </div>
+            {console.log(campaignDetails)}
 
             {/* DATA REVIEW */}
             <div className="mt-12 bg-white p-8 rounded-2xl shadow border-t-4 border-gray-400">
@@ -270,16 +307,21 @@ export default function CampaignView() {
                       {item.key}
                     </p>
                     <p className="font-medium text-gray-900 break-words">
-                      {item.value}
+                      {typeof item.value === "boolean"
+                        ? item.value
+                          ? "Yes"
+                          : "No"
+                        : typeof item.value === "string" &&
+                          item.value.includes("T")
+                        ? new Date(item.value).toLocaleDateString("en-IN")
+                        : item.value}
                     </p>
                   </div>
                 ))}
               </div>
             </div>
-
           </div>
         </div>
-
       </div>
     </div>
   );
