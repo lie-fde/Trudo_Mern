@@ -4,7 +4,7 @@ import AdminNavbar from "../../components/Admin/AdminNavbar.jsx";
 import { Search, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2'
-import { blockUser, fetchUsersList, unblockUser } from "../../services/adminService.js";
+import { blockUser, fetchUsersList, unblockUser ,deleteUser} from "../../services/adminService.js";
 
 export default function UsersList() {
   const [collapsed, setCollapsed] = useState(false);
@@ -89,6 +89,37 @@ const handleBlockUser = (id, isBlocked) => {
 };
 
 
+  const handleDeleteUser = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This user will be permanently removed!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete user",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteUser(id);
+
+                setUsers((prevUsers) =>
+          prevUsers.filter((user) => user._id !== id)
+        );
+
+          Swal.fire({
+            title: "Deleted!",
+            text: "User has been removed.",
+            icon: "success",
+          });
+
+        } catch (err) {
+          Swal.fire("Error", "Failed to delete user", "error");
+        }
+      }
+    });
+  };
+
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -124,9 +155,9 @@ const handleBlockUser = (id, isBlocked) => {
               />
             </div>
 
-            <button className="px-4 py-2 border text-gray-600 rounded-md hover:bg-gray-100">
+            {/* <button className="px-4 py-2 border text-gray-600 rounded-md hover:bg-gray-100">
               Filters
-            </button>
+            </button> */}
           </div>
 
           <div className="bg-white shadow rounded-lg overflow-hidden">
@@ -139,7 +170,7 @@ const handleBlockUser = (id, isBlocked) => {
                   <th className="p-4">Total Donated</th>
                   <th className="p-4">Status</th>
                   <th className="p-4">Block / Unblock</th>
-                  <th className="p-4">Action</th>
+                  <th className="p-4">Delete</th>
                 </tr>
               </thead>
 
@@ -158,8 +189,8 @@ const handleBlockUser = (id, isBlocked) => {
                     </td>
 
                     <td className="p-4">{user.mobileNumber}</td>
-                    <td className="p-4">{user.donationsCount || 0}</td>
-                    <td className="p-4">₹ {user.totalDonated || 0}</td>
+                    <td className="p-4">{user.totalDonations || 0}</td>
+                    <td className="p-4">₹ {user.totalAmountDonated || 0}</td>
 
                     <td className="p-4">
                       <span
@@ -187,14 +218,20 @@ const handleBlockUser = (id, isBlocked) => {
                     </td>
 
                     <td className="p-4">
-                      <button
+                     <button
+                onClick={()=>handleDeleteUser(user._id)}
+                className="px-4 py-1 rounded-full text-sm font-medium bg-red-600 text-white"
+              >
+                Delete
+              </button>
+                      {/* <button
                         onClick={() => navigate(`/admin/users/${user._id}`, {
       state: { userId: user._id }
     })}
                         className="p-2 rounded-full hover:bg-gray-200"
                       >
                         <Eye size={20} className="text-gray-600" />
-                      </button>
+                      </button> */}
                     </td>
 
                   </tr>
