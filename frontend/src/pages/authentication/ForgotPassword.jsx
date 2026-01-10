@@ -10,7 +10,7 @@ export default function ForgotPassword() {
   const navigate = useNavigate();
 
   const validateEmail = (value) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/; 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     return emailRegex.test(value);
   };
 
@@ -32,10 +32,10 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const res = await forgotPassword(email)
-      console.log(res.data.message)
+      const res = await forgotPassword(email);
+      console.log(res.data.message);
       setMessage(res.data.message);
-      console.log(message)
+      console.log(message);
       localStorage.setItem("resetEmail", email);
       navigate("/verify-otp-password");
     } catch (err) {

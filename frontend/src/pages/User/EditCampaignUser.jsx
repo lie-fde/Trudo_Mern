@@ -3,7 +3,10 @@ import { useForm } from "react-hook-form";
 import DropZone from "../../components/reusable/dropfile.jsx";
 import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../../api/api.js";
+import {
+  getUserCampaigns,
+  updateUserCampaign,
+} from "../../services/authService.js";
 
 export default function EditCampaignUser() {
   const { id } = useParams();
@@ -27,7 +30,7 @@ export default function EditCampaignUser() {
   useEffect(() => {
     async function loadCampaign() {
       try {
-        const res = await api.get(`/auth/users/campaigns/${id}`);
+        const res = await getUserCampaigns(id);
         const c = res.data.campaign;
 
         // step 1
@@ -101,10 +104,7 @@ export default function EditCampaignUser() {
     if (data.campaignDocs) formData.append("campaignDocs", data.campaignDocs);
 
     try {
-      await api.patch(`/auth/users/campaign/update/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
-      });
+      await updateUserCampaign(id, formData);
 
       Swal.fire("Success", "Campaign updated successfully", "success");
       navigate(`/mycampaigns`);

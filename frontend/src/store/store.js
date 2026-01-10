@@ -4,9 +4,9 @@ import adminAuthReducer from "./adminAuthSlice.js";
 import campaignRequestReducer from "./campaignRequestSlice.js";
 import campaignReducer from "./campaignSlice.js";
 import campaignPubliceReducer from "./campaignUserSlice.js";
-import eventRequestReducer from "./eventRequestSlice.js"
-import eventReducer from './eventSlice.js'
-import eventPublicReducer from "./eventUserSlice.js"
+import eventRequestReducer from "./eventRequestSlice.js";
+import eventReducer from "./eventSlice.js";
+import eventPublicReducer from "./eventUserSlice.js";
 
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // localStorage
@@ -34,9 +34,9 @@ export const store = configureStore({
     campaignRequests: campaignRequestReducer,
     campaign: campaignReducer,
     campaignPublic: campaignPubliceReducer,
-    eventRequests : eventRequestReducer,
-    event : eventReducer,
-    eventPublic: eventPublicReducer
+    eventRequests: eventRequestReducer,
+    event: eventReducer,
+    eventPublic: eventPublicReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

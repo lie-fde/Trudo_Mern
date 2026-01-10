@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import adminApi from "../api/adminApi.js";
 
-
 export const fetchPendingCampaigns = createAsyncThunk(
   "campaign/fetchPending",
   async (_, { rejectWithValue }) => {
@@ -14,25 +13,24 @@ export const fetchPendingCampaigns = createAsyncThunk(
   }
 );
 
-
-
-
 export const updateCampaignStatus = createAsyncThunk(
   "campaign/updateStatus",
   async ({ campaignId, status, rejectionReason }, { rejectWithValue }) => {
     // API call uses the 'status' variable:
-    const payload = { 
-      status, 
+    const payload = {
+      status,
       rejectionReason: rejectionReason || null,
     };
     try {
-      const res = await adminApi.patch(`/admin/campaigns/${campaignId}/status`, payload);
-    return res.data.campaign;
-      
+      const res = await adminApi.patch(
+        `/admin/campaigns/${campaignId}/status`,
+        payload
+      );
+      return res.data.campaign;
     } catch (error) {
-
-       return rejectWithValue(error.response?.data?.message || "Failed to update");
-      
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update"
+      );
     }
   }
 );
@@ -49,7 +47,7 @@ const campaignRequestSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-     
+
       .addCase(fetchPendingCampaigns.pending, (state) => {
         state.loading = true;
       })
@@ -62,13 +60,12 @@ const campaignRequestSlice = createSlice({
         state.error = action.payload;
       })
 
-    
       .addCase(updateCampaignStatus.fulfilled, (state, action) => {
-       if (action.payload && action.payload._id) {
-            state.campaigns = state.campaigns.filter(
-                (c) => c._id !== action.payload._id
-            );
-            state.error = null; 
+        if (action.payload && action.payload._id) {
+          state.campaigns = state.campaigns.filter(
+            (c) => c._id !== action.payload._id
+          );
+          state.error = null;
         }
         state.loading = false;
       })
@@ -80,9 +77,6 @@ const campaignRequestSlice = createSlice({
 });
 
 export default campaignRequestSlice.reducer;
-
-
-
 
 // export const updateCampaignStatus = createAsyncThunk(
 //   "campaign/updateStatus",

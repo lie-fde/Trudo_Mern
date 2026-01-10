@@ -13,11 +13,10 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-const { accessToken } = useSelector((state)=> state.auth)
-
+  const { accessToken } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    console.log(accessToken)
+    console.log(accessToken);
     if (accessToken) navigate("/");
   }, [navigate]);
 

@@ -18,7 +18,7 @@ const authSlice = createSlice({
       state.userEmail = action.payload.userEmail;
       state.mobileNumber = action.payload.mobileNumber;
       state.initialLoading = false;
-      state.isBlocked=false
+      state.isBlocked = false;
     },
     setBlocked: (state) => {
       state.isBlocked = true;

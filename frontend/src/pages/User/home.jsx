@@ -1,61 +1,3 @@
-// import React from "react";
-// import Navbar from "../../components/User/Navbar.jsx";
-// import frontImage from "../../assets/Front image .png";
-// import { useSelector } from "react-redux";
-// import { useNavigate } from "react-router-dom";
-
-// export default function Home() {
-//   const userName = useSelector((state) => state.auth.userName);
-
-//   const navigate = useNavigate();
-
-//   return (
-//     <div className="min-h-screen bg-[#f8f9fb] flex flex-col">
-//       <Navbar />
-//       <div className="flex flex-col lg:flex-row items-center justify-between px-10 lg:px-20 py-16 gap-10">
-//         <div className="lg:w-1/2">
-//           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-//             Transparent Giving <br />
-//             for a Better <br />
-//             Tomorrow | <span className="text-pink-600">Trudo</span>
-//           </h1>
-
-//           <p className="text-gray-600 mt-5 text-lg">
-//             Welcome back,{" "}
-//             <span className="font-semibold text-gray-800">{userName}</span> 👋
-//             Empower change with trust & security.
-//           </p>
-
-//         <div className="flex gap-3 mt-6">
-//   <button
-//     onClick={() => navigate("/create-campaign")}
-//     className="bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition"
-//   >
-//     Raise a Campaign
-//   </button>
-
-//   <button
-//     onClick={() => navigate("/create-event")}
-//     className="bg-black text-white px-8 py-3 rounded-md hover:bg-gray-800 transition"
-//   >
-//     Host an Event
-//   </button>
-// </div>
-
-//         </div>
-
-//         <div className="lg:w-1/2 flex justify-center">
-//           <img
-//             src={frontImage}
-//             alt="Donation Illustration"
-//             className="w-full max-w-lg drop-shadow-lg rounded-xl"
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
 import React, { useState, useEffect } from "react";
 import {
   Heart,
@@ -84,7 +26,7 @@ import { useNavigate } from "react-router-dom";
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -135,13 +77,17 @@ const Home = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-              <button className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-4 rounded-2xl font-bold text-lg transition-all shadow-xl shadow-emerald-600/20 active:scale-95 group"
-               onClick={()=> navigate("/events")}>
+              <button
+                className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-4 rounded-2xl font-bold text-lg transition-all shadow-xl shadow-emerald-600/20 active:scale-95 group"
+                onClick={() => navigate("/events")}
+              >
                 Join an Event{" "}
                 <ArrowRight className="group-hover:translate-x-1 transition-transform" />
               </button>
-              <button className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 px-10 py-4 rounded-2xl font-bold text-lg transition-all active:scale-95 shadow-sm"
-              onClick={()=> navigate("/create-campaign")}>
+              <button
+                className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 px-10 py-4 rounded-2xl font-bold text-lg transition-all active:scale-95 shadow-sm"
+                onClick={() => navigate("/create-campaign")}
+              >
                 Raise a Campaign
               </button>
             </div>
@@ -210,8 +156,10 @@ const Home = () => {
                   Funds Distributed Directly to Raisers
                 </li>
               </ul>
-              <button className="w-full mt-auto bg-white border border-emerald-200 text-emerald-700 py-4 rounded-xl font-bold hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
-                onClick={()=> navigate("/create-campaign")}>
+              <button
+                className="w-full mt-auto bg-white border border-emerald-200 text-emerald-700 py-4 rounded-xl font-bold hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                onClick={() => navigate("/create-campaign")}
+              >
                 Launch My Campaign
               </button>
             </div>
@@ -252,8 +200,10 @@ const Home = () => {
                   Digital Receipts & Certificates
                 </li>
               </ul>
-              <button className="w-full mt-auto bg-white border border-blue-200 text-blue-700 py-4 rounded-xl font-bold hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-                onClick={()=> navigate("/create-event")}>
+              <button
+                className="w-full mt-auto bg-white border border-blue-200 text-blue-700 py-4 rounded-xl font-bold hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                onClick={() => navigate("/create-event")}
+              >
                 Host an Event
               </button>
             </div>

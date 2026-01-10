@@ -1,15 +1,15 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate} from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
 import { logout } from "../store/authSlice";
 
 export default function ProtectedRoute({ children }) {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const { accessToken, isBlocked } = useSelector((state) => state.auth);
 
-   useEffect(() => {
+  useEffect(() => {
     if (isBlocked) {
       Swal.fire({
         icon: "error",
@@ -23,11 +23,11 @@ export default function ProtectedRoute({ children }) {
     }
   }, [isBlocked, dispatch]);
 
-  console.log(isBlocked)
+  console.log(isBlocked);
 
   if (!accessToken) return <Navigate to="/login" replace />;
 
-    if (isBlocked) {
+  if (isBlocked) {
     return null; // 🔥 wait until alert closes
   }
 

@@ -1,15 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/api";
 
-// Fetch campaigns that users should see
-// export const fetchPublicCampaigns = createAsyncThunk(
-//   "userCampaign/fetchPublic",
-//   async () => {
-//     const res = await api.get("/campaign/campaignslist");
-//     return res.data.campaigns;
-//   }
-// );
-
 export const fetchPublicCampaigns = createAsyncThunk(
   "userCampaign/fetchPublic",
   async ({ page = 1, limit = 6, search = "", sort = "created_desc" }) => {
