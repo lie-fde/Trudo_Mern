@@ -351,6 +351,8 @@ export const exportAdminEvents = async ({
 }) => {
   const andConditions = [];
 
+  andConditions.push({ status: { $ne: "Locked" } });
+
   // ---------------- DATE FILTER (Ticket.createdAt) ----------------
   if (from || to) {
     const createdAt = {};

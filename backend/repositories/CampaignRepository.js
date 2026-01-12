@@ -12,7 +12,7 @@ export const findAllCampaigns = async () =>
   await Campaign.find().populate("User");
 
 export const getPendingCampaigns = async () => {
-  return await Campaign.find({ status: "Pending", isDeleted: false }).populate(
+  return await Campaign.find({ status: "Pending", isDeleted: false }).sort({ createdAt: -1 }).populate(
     "User",
     "userName userEmail mobileNumber"
   );

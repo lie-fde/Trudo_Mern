@@ -7,7 +7,7 @@ import { logout } from "../store/authSlice";
 
 export default function ProtectedRoute({ children }) {
   const dispatch = useDispatch();
-  const { accessToken, isBlocked } = useSelector((state) => state.auth);
+  const { accessToken, isBlocked , isDeleted} = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (isBlocked) {
@@ -23,7 +23,20 @@ export default function ProtectedRoute({ children }) {
     }
   }, [isBlocked, dispatch]);
 
-  console.log(isBlocked);
+    useEffect(() => {
+    if (isDeleted) {
+      Swal.fire({
+        icon: "error",
+        title: "Account Deleted",
+        text: "Your account has been deleted by the admin.",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      }).then(() => {
+        dispatch(logout());
+      });
+    }
+  }, [isDeleted, dispatch]);
+
 
   if (!accessToken) return <Navigate to="/login" replace />;
 

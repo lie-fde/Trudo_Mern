@@ -58,9 +58,9 @@ export default function EditEventPage() {
       }
     });
 
-      if (data.eventImages instanceof File) {
-    formData.append("eventImages", data.eventImages);
-  }
+    if (data.eventImages instanceof File) {
+      formData.append("eventImages", data.eventImages);
+    }
     const confirm = await Swal.fire({
       title: "Update Event?",
       icon: "question",

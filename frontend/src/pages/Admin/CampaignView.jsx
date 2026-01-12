@@ -107,21 +107,20 @@ export default function CampaignView() {
   }, [id, dispatch]);
 
   useEffect(() => {
-  if (!id) return;
+    if (!id) return;
 
-  const fetchRaisedAmount = async () => {
-    try {
-      const res = await adminApi.get(`/campaign/raisedAmountAdmin/${id}`);
-      setRaisedAmount(res.data.raisedAmount || 0);
-    } catch (error) {
-      console.error("Failed to fetch raised amount", error);
-      setRaisedAmount(0);
-    }
-  };
+    const fetchRaisedAmount = async () => {
+      try {
+        const res = await adminApi.get(`/campaign/raisedAmountAdmin/${id}`);
+        setRaisedAmount(res.data.raisedAmount || 0);
+      } catch (error) {
+        console.error("Failed to fetch raised amount", error);
+        setRaisedAmount(0);
+      }
+    };
 
-  fetchRaisedAmount();
-}, [id]);
-
+    fetchRaisedAmount();
+  }, [id]);
 
   if (loading || !singleCampaign) {
     return <p className="p-10 text-center text-lg">Loading campaign...</p>;
@@ -162,7 +161,7 @@ export default function CampaignView() {
         className="flex-1 transition-all duration-300"
         style={{ marginLeft: collapsed ? 80 : 240, paddingTop: 72 }}
       >
-        <AdminNavbar collapsed={collapsed} />
+        <AdminNavbar collapsed={collapsed} setCollapsed={setCollapsed} />
 
         {/* MAIN PAGE CENTERED CONTAINER */}
         <div className="py-10 flex justify-center">

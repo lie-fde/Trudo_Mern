@@ -21,6 +21,13 @@ export default async function auth(req, res, next) {
       });
     }
 
+    if(user.isDeleted){
+      return res.status(403).json({
+        message:"Your account has been deleted by admin",
+        code:"USER_DELETED"
+      })
+    }
+
     if (!user) {
       console.log("❌ User not found for decoded token!");
       return res.status(401).json({ message: "User not found" });

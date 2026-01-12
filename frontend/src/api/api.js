@@ -5,7 +5,8 @@ import {
   setCredentials,
   startApiLoading,
   stopApiLoading,
-  setBlocked
+  setBlocked,
+  setDeleted
 } from "../store/authSlice";
 
 const api = axios.create({
@@ -42,6 +43,12 @@ api.interceptors.response.use(
 
     if(error.response?.status=== 403 && error.response?.data?.code === "USER_BLOCKED"){
       store.dispatch(setBlocked(true));
+      store.dispatch(logout());
+      return Promise.reject(error);
+    }
+
+       if(error.response?.status=== 403 && error.response?.data?.code === "USER_DELETED"){
+      store.dispatch(setDeleted(true));
       store.dispatch(logout());
       return Promise.reject(error);
     }

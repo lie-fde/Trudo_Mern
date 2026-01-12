@@ -16,7 +16,7 @@ export const updateEventRepo = async (eventId, updateData) => {
 };
 
 export const findPendingEventsRepo = async () => {
-  return await Events.find({ status: "Pending", isDeleted: false }).populate(
+  return await Events.find({ status: "Pending", isDeleted: false }).sort({createdAt:-1}).populate(
     "User",
     "userName userEmail mobileNumber"
   );

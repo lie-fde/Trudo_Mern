@@ -162,6 +162,9 @@ export default function EventFormAdmin({
             {...register("eventTime", { required: "Time is required" })}
             className="w-full mt-1 p-3 border rounded-md"
           />
+          {errors.eventTime && (
+            <p className="text-red-500 text-xs">{errors.eventTime.message}</p>
+          )}
         </div>
         <div>
           <label className="text-sm">
@@ -172,6 +175,9 @@ export default function EventFormAdmin({
             {...register("duration", { required: "Duration is required" })}
             className="w-full mt-1 p-3 border rounded-md"
           />
+          {errors.duration && (
+            <p className="text-red-500 text-xs">{errors.duration.message}</p>
+          )}
         </div>
       </div>
 
@@ -180,11 +186,15 @@ export default function EventFormAdmin({
           <label className="text-sm">
             Ticket Price (₹) <span className="text-red-500">*</span>
           </label>
+
           <input
             type="number"
             {...register("ticketPrice", { required: "Price is required" })}
             className="w-full mt-1 p-3 border rounded-md"
           />
+          {errors.ticketPrice && (
+            <p className="text-red-500 text-xs">{errors.ticketPrice.message}</p>
+          )}
         </div>
         <div>
           <label className="text-sm">
@@ -195,6 +205,11 @@ export default function EventFormAdmin({
             {...register("totalTickets", { required: "Tickets required" })}
             className="w-full mt-1 p-3 border rounded-md"
           />
+          {errors.totalTickets && (
+            <p className="text-red-500 text-xs">
+              {errors.totalTickets.message}
+            </p>
+          )}
         </div>
       </div>
 
@@ -224,7 +239,6 @@ export default function EventFormAdmin({
           watch={watch}
           setValue={setValue}
         />
-
       </div>
 
       {/* Hidden input to pass removed images to backend */}

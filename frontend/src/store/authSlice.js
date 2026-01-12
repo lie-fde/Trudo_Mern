@@ -8,6 +8,7 @@ const authSlice = createSlice({
     userEmail: null,
     mobileNumber: null,
     isBlocked: false,
+    isDeleted:false,
     initialLoading: true,
     apiLoading: false,
   },
@@ -19,9 +20,13 @@ const authSlice = createSlice({
       state.mobileNumber = action.payload.mobileNumber;
       state.initialLoading = false;
       state.isBlocked = false;
+      state.isDeleted=false;
     },
     setBlocked: (state) => {
       state.isBlocked = true;
+    },
+    setDeleted:(state)=>{
+      state.isDeleted=true;
     },
     logout: (state) => {
       state.accessToken = null;
@@ -49,6 +54,7 @@ export const {
   startApiLoading,
   stopApiLoading,
   setBlocked,
+  setDeleted
 } = authSlice.actions;
 
 export default authSlice.reducer;
