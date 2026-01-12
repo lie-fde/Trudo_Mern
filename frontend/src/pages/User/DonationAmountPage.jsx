@@ -1,29 +1,48 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Navbar from "../../components/User/Navbar";
 import Footer from "../../components/reusable/footer";
 import { fetchPublicSingleCampaign } from "../../store/campaignUserSlice";
 import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
+import { getCampaignRaisedAmount } from "../../services/authService";
 
 export default function DonationPage() {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const { singleCampaign, loading } = useSelector(
     (state) => state.campaignPublic
   );
 
-  const { userEmail ,mobileNumber} = useSelector((state)=> state.auth)
+  const { userEmail, mobileNumber } = useSelector((state) => state.auth);
 
   const [amount, setAmount] = useState("");
   const [errors, setErrors] = useState("");
+  const [raisedAmount, setRaisedAmount] = useState(0);
 
   useEffect(() => {
     dispatch(fetchPublicSingleCampaign(id));
   }, [id, dispatch]);
+
+  useEffect(() => {
+    const fetchRaisedAmount = async () => {
+      try {
+        const campaignId = id;
+        const res = await getCampaignRaisedAmount(campaignId);
+
+        setRaisedAmount(res.data.raisedAmount);
+      } catch (error) {
+        console.error("Failed to fetch raised amount", error);
+      }
+    };
+
+    if (id) {
+      fetchRaisedAmount();
+    }
+  }, [id]);
 
   if (loading || !singleCampaign) {
     return (
@@ -36,10 +55,13 @@ export default function DonationPage() {
   const campaign = singleCampaign;
 
   const validateAmount = (value) => {
+    const availableAmount = campaign.targetAmount - raisedAmount;
     if (!value) return "Amount is required";
     if (isNaN(value)) return "Amount must be a number";
     if (value < 100) return "Minimum donation is ₹100";
     if (value > 500000) return "Maximum donation is ₹5,00,000";
+    if (value > availableAmount)
+      return `Donation exceeds . Maximum ₹${availableAmount} can be donated`;
     return "";
   };
 
@@ -47,9 +69,8 @@ export default function DonationPage() {
     const validationError = validateAmount(amount);
     setErrors(validationError);
 
-    if (validationError === "") {
-      console.log("Proceed to payment page with amount:", amount);
-      console.log(userEmail,mobileNumber,singleCampaign._id)
+    if (validationError) {
+      return;
     }
 
     const { data } = await api.post("/payments/create-order", {
@@ -61,40 +82,37 @@ export default function DonationPage() {
 
     const { order, key, paymentDBId } = data;
 
-  const options = {
-    key,
-    amount: order.amount,
-    currency: order.currency,
-    order_id: order.id,
+    const options = {
+      key,
+      amount: order.amount,
+      currency: order.currency,
+      order_id: order.id,
 
-    handler: async function (response) {
-      // STEP 2: Verify payment
-      const verify = await api.post("/payments/verify-payment", {
-        razorpay_payment_id: response.razorpay_payment_id,
-        razorpay_order_id: response.razorpay_order_id,
-        razorpay_signature: response.razorpay_signature,
-        userEmail,
-        mobileNumber,
-        paymentDBId,
-        campaignId: singleCampaign._id
-      });
+      handler: async function (response) {
+        // STEP 2: Verify payment
+        const verify = await api.post("/payments/verify-payment", {
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_signature: response.razorpay_signature,
+          userEmail,
+          mobileNumber,
+          paymentDBId,
+          campaignId: singleCampaign._id,
+        });
 
-      console.log("Payment Verified:", verify.data);
+        console.log("Payment Verified:", verify.data);
 
-       navigate(`/donation/receipt/${verify.data.receiptId}`);
-    },
+        navigate(`/donation/receipt/${verify.data.receiptId}`);
+      },
 
-    prefill: {
-      email: userEmail,
-      contact: mobileNumber,
-    },
-  };
+      prefill: {
+        email: userEmail,
+        contact: mobileNumber,
+      },
+    };
 
-  const rzp = new window.Razorpay(options);
-  rzp.open();
-
-
-
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
   const tax = 0;
   const totalAmount = Number(amount || 0) + tax;

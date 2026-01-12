@@ -11,7 +11,9 @@ export const fetchPendingEvents = createAsyncThunk(
       const res = await adminApi.get("/events/pending");
       return res.data.events; // backend response must send { events: [...] }
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Failed to fetch events");
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch events"
+      );
     }
   }
 );
@@ -27,13 +29,14 @@ export const updateEventStatus = createAsyncThunk(
         status,
         rejectionReason: rejectionReason || null,
       };
-      console.log(eventId)
+      console.log(eventId);
 
       const res = await adminApi.patch(`/events/${eventId}/status`, payload);
       return res.data.event; // backend response must send { event: {...} }
-
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to update event");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update event"
+      );
     }
   }
 );

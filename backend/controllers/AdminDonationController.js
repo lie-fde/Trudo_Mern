@@ -78,7 +78,7 @@ export const exportAdminDonationReportController = async (req, res) => {
           `"${row.campaignName?.replace(/"/g, '""') || ""}"`,
           row.userEmail || "",
           `"${row.userName?.replace(/"/g, '""') || ""}"`,
-          dateStr,
+           `${dateStr}`,
           row.amount,
           row.receiptId || "",
           row.paymentId || "",

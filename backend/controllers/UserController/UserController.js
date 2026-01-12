@@ -101,14 +101,26 @@ export const resetPassword = async (req, res) => {
 
 export const googleCallbackController = async (req, res) => {
   try {
-    const { token, user } = await UserService.googleLoginService(req.user);
+    const { accessToken, user , refreshToken } = await UserService.googleLoginService(req.user);
 
-    return res.redirect(
-      `${
-        process.env.FRONTEND_URL
-      }/google-success?token=${token}&name=${encodeURIComponent(
-        user.name
-      )}&email=${encodeURIComponent(user.email)}`
+        res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,        // true in production
+      sameSite: "strict",
+      maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+    });
+
+    // return res.redirect(
+    //   `${
+    //     process.env.FRONTEND_URL
+    //   }/google-success?token=${token}&name=${encodeURIComponent(
+    //     user.name
+    //   )}&email=${encodeURIComponent(user.email)}`
+    // );
+
+     return res.redirect(
+      `${process.env.FRONTEND_URL}/google-success?accessToken=${accessToken}&name=${encodeURIComponent(
+        user.name)}&email=${encodeURIComponent(user.email)}`
     );
   } catch (err) {
     console.error("Google Auth Error:", err);
@@ -233,5 +245,25 @@ export const updateUserProfileController = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(400).json({ message: err.message });
+  }
+};
+
+
+export const changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { currentPassword, newPassword } = req.body;
+
+    await UserService.changePasswordService(userId, currentPassword, newPassword);
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };

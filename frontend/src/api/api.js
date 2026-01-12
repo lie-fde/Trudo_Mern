@@ -5,6 +5,8 @@ import {
   setCredentials,
   startApiLoading,
   stopApiLoading,
+  setBlocked,
+  setDeleted
 } from "../store/authSlice";
 
 const api = axios.create({
@@ -39,6 +41,18 @@ api.interceptors.response.use(
       store.dispatch(stopApiLoading());
     }
 
+    if(error.response?.status=== 403 && error.response?.data?.code === "USER_BLOCKED"){
+      store.dispatch(setBlocked(true));
+      store.dispatch(logout());
+      return Promise.reject(error);
+    }
+
+       if(error.response?.status=== 403 && error.response?.data?.code === "USER_DELETED"){
+      store.dispatch(setDeleted(true));
+      store.dispatch(logout());
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -57,8 +71,6 @@ api.interceptors.response.use(
           })
         );
 
-        // originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
-        // return api(originalRequest);
 
         api.defaults.headers.common.Authorization = `Bearer ${res.data.accessToken}`;
 
@@ -67,7 +79,7 @@ api.interceptors.response.use(
           Authorization: `Bearer ${res.data.accessToken}`,
         };
 
-        return axios(originalRequest);
+        return api(originalRequest);
       } catch (refreshError) {
         console.log("error");
         store.dispatch(stopApiLoading());

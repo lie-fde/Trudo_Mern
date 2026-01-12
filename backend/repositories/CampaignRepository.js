@@ -12,13 +12,14 @@ export const findAllCampaigns = async () =>
   await Campaign.find().populate("User");
 
 export const getPendingCampaigns = async () => {
-  return await Campaign.find({ status: "Pending", isDeleted: false }).populate(
+  return await Campaign.find({ status: "Pending", isDeleted: false }).sort({ createdAt: -1 }).populate(
     "User",
     "userName userEmail mobileNumber"
   );
 };
 
-export const getCampaignById = async (id) => {
+export const 
+getCampaignById = async (id) => {
   return await Campaign.findById(id).populate(
     "User",
     "userName userEmail mobileNumber"
@@ -264,4 +265,67 @@ export const getmMyCampaign = async (userId) => {
       },
     },
   ]);
+};
+
+
+export const calculateRaisedAmountRepo = async (campaignId) => {
+  const result = await Campaign.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(campaignId),
+        status: "Approved",
+        isDeleted: false,
+        isBlocked: false,
+      },
+    },
+
+    // 🔹 Get donation transactions
+    {
+      $lookup: {
+        from: "donationtransactions",
+        localField: "_id",
+        foreignField: "CampaignId",
+        as: "donations",
+      },
+    },
+
+    // 🔹 Get payment details
+    {
+      $lookup: {
+        from: "payments",
+        localField: "donations.paymentId",
+        foreignField: "_id",
+        as: "paymentDetails",
+      },
+    },
+
+    // 🔹 Calculate raisedAmount (ONLY successful payments)
+    {
+      $addFields: {
+        raisedAmount: {
+          $sum: {
+            $map: {
+              input: {
+                $filter: {
+                  input: { $ifNull: ["$paymentDetails", []] },
+                  as: "p",
+                  cond: { $eq: ["$$p.paymentStatus", "success"] },
+                },
+              },
+              as: "p",
+              in: "$$p.amount",
+            },
+          },
+        },
+      },
+    },
+
+    {
+      $project: {
+        raisedAmount: 1,
+      },
+    },
+  ]);
+
+  return result[0]?.raisedAmount || 0;
 };

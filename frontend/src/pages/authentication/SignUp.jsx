@@ -5,6 +5,7 @@ import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { googleSign, signUp } from "../../services/authService";
+import { useSelector } from "react-redux";
 
 export default function Signup() {
   const [showPass, setShowPass] = useState(false);
@@ -12,10 +13,11 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const { accessToken } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) navigate("/home");
+    console.log(accessToken);
+    if (accessToken) navigate("/");
   }, [navigate]);
 
   const {

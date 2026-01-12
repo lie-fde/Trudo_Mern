@@ -1,9 +1,10 @@
 import express from "express";
 import auth from "../middlewares/auth.js";
-import campaignController from "../controllers/UserController/campaignController.js";
+import campaignController, { checkCampaignFullController } from "../controllers/UserController/campaignController.js";
 import upload from "../middlewares/upload.js";
 import { getCampaigns } from "../controllers/publicController/publicController.js";
 import { getCampaignById } from "../controllers/UserController/campaignController.js";
+import adminAuth from "../middlewares/adminAuth.js";
 
 const router = express.Router();
 
@@ -20,5 +21,7 @@ router.post(
 
 router.get("/campaignslist", getCampaigns);
 router.get("/campaignslist/:id", getCampaignById);
+router.get("/raisedAmount/:campaignId",auth, checkCampaignFullController)
+router.get("/raisedAmountAdmin/:campaignId",adminAuth, checkCampaignFullController)
 
 export default router;

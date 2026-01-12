@@ -6,7 +6,13 @@ import adminApi from "../api/adminApi";
 // -----------------------------------------------------------
 export const fetchAllEvents = createAsyncThunk(
   "event/fetchAll",
-  async ({ search = "", page = 1, limit = 10, sort = "latest" ,category = ""} = {}) => {
+  async ({
+    search = "",
+    page = 1,
+    limit = 10,
+    sort = "latest",
+    category = "",
+  } = {}) => {
     const res = await adminApi.get(
       `/events?search=${search}&page=${page}&limit=${limit}&sort=${sort}&category=${category}`
     );
@@ -18,7 +24,6 @@ export const fetchAllEvents = createAsyncThunk(
     };
   }
 );
-
 
 // -----------------------------------------------------------
 // FETCH SINGLE EVENT
@@ -69,7 +74,6 @@ export const fetchSingleEvent = createAsyncThunk(
 //       });
 //   },
 // });
-
 
 const eventSlice = createSlice({
   name: "event",

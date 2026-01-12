@@ -1,10 +1,10 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import EventForm from "../../components/User/CreateEventuserComponent.jsx";
-import api from "../../api/api.js";
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { createEvent } from "../../services/authService.js";
 
 export default function CreateEventPage() {
   const {
@@ -45,9 +45,7 @@ export default function CreateEventPage() {
     if (data.eventImages) formData.append("eventImages", data.eventImages);
 
     try {
-      await api.post("/events/create", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await createEvent(formData);
 
       Swal.fire("Success", "Event created successfully!", "success");
       navigate("/");

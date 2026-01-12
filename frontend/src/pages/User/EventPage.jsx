@@ -1,18 +1,20 @@
-
-
-import React, { useEffect, useState } from "react";
-import { Search, Filter, ChevronLeft, ChevronRight , MapPin } from "lucide-react";
-
-import Navbar from "../../components/User/Navbar";
-import CTABanner from "../../components/User/CTABanner";
-import Trudofooter from "../../components/reusable/footer";
-import { fetchEventsApi } from "../../services/authService";
+import React, { useEffect, useState, lazy, Suspense } from "react";
+import {
+  Search,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+} from "lucide-react";
+import { fetchEventsApi, getEventsList } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
-import api from "../../api/api";
+import Loader from "../../components/reusable/loader";
 
-// ------------------------------------
-// Search Bar
-// ------------------------------------
+// 🔥 Lazy-loaded components
+const Navbar = lazy(() => import("../../components/User/Navbar"));
+const CTABanner = lazy(() => import("../../components/User/CTABanner"));
+const Trudofooter = lazy(() => import("../../components/reusable/footer"));
+
 const SearchBar = ({ search, setSearch, sort, setSort }) => (
   <div className="flex flex-col sm:flex-row gap-4 items-center justify-center max-w-4xl mx-auto my-10 px-4">
     <div className="relative w-full sm:flex-1">
@@ -37,17 +39,15 @@ const SearchBar = ({ search, setSearch, sort, setSort }) => (
   </div>
 );
 
-
-// ------------------------------------
-// Event Card
-// ------------------------------------
-const EventCard = ({ event ,navigate }) => (
-  <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 p-3 h-full flex flex-col"
-  onClick={()=>navigate(`/events/${event._id}`)}>
+const EventCard = ({ event, navigate }) => (
+  <div
+    className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 p-3 h-full flex flex-col"
+    onClick={() => navigate(`/events/${event._id}`)}
+  >
     {/* Image Container - Matching the padded look from the screenshot */}
     <div className="relative h-56 w-full rounded-xl overflow-hidden mb-3 group">
-      <img 
-        src={event.images[0]} 
+      <img
+        src={event.images[0]}
         alt={event.title}
         className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
       />
@@ -77,33 +77,32 @@ const EventCard = ({ event ,navigate }) => (
         {/* Tickets Remaining (Dummy Data as requested) */}
         <div className="text-center">
           <p className="text-red-500 font-medium text-sm">
-            55 Ticket Remaining
+            {event.totalTickets} Ticket Remaining
           </p>
         </div>
 
         {/* Divider */}
         <div className="h-px bg-gray-100 w-full my-1"></div>
-
+        {console.log(event)}
         {/* Created By & Venue */}
         <div className="flex flex-col gap-1">
-            <p className="text-sm text-gray-500 flex items-center justify-center gap-1">
-              Created by <span className="font-semibold text-gray-800">ABC Foundation</span>
+          <p className="text-sm text-gray-500 flex items-center justify-center gap-1">
+            Created by{" "}
+            <span className="font-semibold text-gray-800">
+              {event.createdBy}
+            </span>
+          </p>
+          {event.venue && (
+            <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-1 mt-1">
+              <MapPin size={12} /> {event.venue}
             </p>
-            {event.venue && (
-               <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-1 mt-1">
-                 <MapPin size={12} /> {event.venue}
-               </p>
-            )}
+          )}
         </div>
       </div>
     </div>
   </div>
 );
 
-
-// ------------------------------------
-// Pagination
-// ------------------------------------
 const Pagination = ({ page, totalPages, setPage }) => (
   <div className="flex items-center justify-center gap-4 my-12">
     <button
@@ -128,9 +127,6 @@ const Pagination = ({ page, totalPages, setPage }) => (
   </div>
 );
 
-// ------------------------------------
-// Main Page
-// ------------------------------------
 const EventPage = () => {
   const [events, setEvents] = useState([]);
   const [search, setSearch] = useState("");
@@ -138,41 +134,18 @@ const EventPage = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate()
-
-//   const loadEvents = async (sortValue = sort) => {
-//     try {
-//       setLoading(true);
-//       //   const res = await fetchEventsApi({
-//       //     page,
-//       //     limit: 8,
-//       //     search,
-//       //     sort: sortValue,
-//       //   });
-
-//       const res = await api.get("/events/list", {
-//         params: {
-//           page,
-//           limit: 8,
-//           search,
-//           sort: sortValue,
-//         },
-//       });
+  const navigate = useNavigate();
+  useEffect(() => {
+    console.log("EventPage mounted");
+  }, []);
 
   const loadEvents = async () => {
     try {
       setLoading(true);
 
-      const res = await api.get("/events/list", {
-        params: {
-          page,
-          limit: 8,
-          search,
-          sort,
-        },
-      });
+      const res = await getEventsList(page, 8, search, sort);
 
-       setEvents(res.data.events);
+      setEvents(res.data.events);
       setTotalPages(res.data.pagination.totalPages);
     } catch (err) {
       console.error(err);
@@ -181,17 +154,7 @@ const EventPage = () => {
     }
   };
 
-//       setEvents(res.data.events);
-//       setTotalPages(res.data.pagination.totalPages);
-//       setSort(sortValue);
-//     } catch (err) {
-//       console.error(err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-   useEffect(() => {
+  useEffect(() => {
     const delay = setTimeout(() => {
       setPage(1);
       loadEvents();
@@ -205,25 +168,25 @@ const EventPage = () => {
     loadEvents();
   }, [page]);
 
-  console.log(events)
   return (
+    // <Suspense fallback={<Loader/>}>
     <div className="min-h-screen bg-white text-gray-900">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 pb-20">
         <SearchBar
-        search={search}
-        setSearch={setSearch}
-        sort={sort}
-        setSort={setSort}
-      />
+          search={search}
+          setSearch={setSearch}
+          sort={sort}
+          setSort={setSort}
+        />
 
         {loading ? (
           <p className="text-center mt-10">Loading events...</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-8">
             {events.map((event) => (
-              <EventCard key={event._id} event={event} navigate={navigate}/>
+              <EventCard key={event._id} event={event} navigate={navigate} />
             ))}
           </div>
         )}
@@ -234,80 +197,8 @@ const EventPage = () => {
       <CTABanner />
       <Trudofooter />
     </div>
+    // </Suspense>
   );
 };
 
 export default EventPage;
-
-// import { useDispatch , useSelector } from "react-redux";
-// import { fetchPublicEvents } from "../../store/eventUserSlice";
-
-// const EventPage = () => {
-//   const dispatch = useDispatch();
-
-//   const {
-//     events,
-//     loading,
-//     pagination: { page, totalPages },
-//   } = useSelector((state) => state.eventPublic);
-
-//   const [search, setSearch] = useState("");
-//   const [sort, setSort] = useState("newest");
-
-//   useEffect(() => {
-//     dispatch(
-//       fetchPublicEvents({
-//         page,
-//         limit: 8,
-//         search,
-//         sort,
-//       })
-//     );
-//   }, [dispatch, page, search, sort]);
-
-//   return (
-//     <div className="min-h-screen bg-white text-gray-900">
-//       <Navbar />
-
-//       <main className="max-w-7xl mx-auto px-4 pb-20">
-//         <SearchBar
-//           search={search}
-//           setSearch={setSearch}
-//           onSearch={(value) => {
-//             setSort(value || sort);
-//           }}
-//         />
-
-//         {loading ? (
-//           <p className="text-center mt-10">Loading events...</p>
-//         ) : (
-//           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-//             {events.map((event) => (
-//               <EventCard key={event._id} event={event} />
-//             ))}
-//           </div>
-//         )}
-
-//         <Pagination
-//           page={page}
-//           totalPages={totalPages}
-//           setPage={(p) =>
-//             dispatch(
-//               fetchPublicEvents({
-//                 page: p,
-//                 limit: 8,
-//                 search,
-//                 sort,
-//               })
-//             )
-//           }
-//         />
-//       </main>
-
-//       <CTABanner />
-//       <Trudofooter />
-//     </div>
-//   );
-// };
-
-// export default EventPage

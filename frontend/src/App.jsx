@@ -8,12 +8,6 @@ import AdminRoutes from "./router/AdminRoutes.jsx";
 import { Routes, Route } from "react-router-dom";
 
 function App() {
-  // const initialLoading = useSelector((state) => state.auth.initialLoading); ;
-
-  // if (initialLoading) {
-  //     return <Loader/>;
-  // }
-
   return (
     <>
       <ToastContainer position="top-right" autoClose={2000} />

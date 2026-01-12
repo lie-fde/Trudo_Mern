@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/api";
 import Navbar from "../../components/User/Navbar";
 import Footer from "../../components/reusable/footer";
+import { getPaymentReceipt } from "../../services/authService";
 
 export default function ReceiptPage() {
   const { receiptId } = useParams();
@@ -14,7 +15,8 @@ export default function ReceiptPage() {
   useEffect(() => {
     async function fetchReceipt() {
       try {
-        const { data } = await api.get(`/payments/receipt/${receiptId}`);
+        const { data } = await getPaymentReceipt(receiptId);
+
         setReceipt(data);
       } catch (err) {
         console.log("Receipt load error:", err);

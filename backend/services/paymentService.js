@@ -7,6 +7,7 @@ import UserRepository from "../repositories/UserRepository.js";
 import { findCampaignById } from "../repositories/CampaignRepository.js";
 
 import { generateReceiptPDF } from "./pdfService.js";
+import { createOrderRepo } from "../repositories/PaymentRepository.js";
 
 export const getReceiptService = async (receiptId) => {
   // 1. Fetch donation record
@@ -47,4 +48,15 @@ export const getReceiptService = async (receiptId) => {
     ...receiptData,
     pdfUrl: cloudinaryReceiptUrl,
   };
+};
+
+export const createOrderService = async ({ amount }) => {
+  if (!amount) {
+    throw { status: 400, message: "Amount required" };
+  }
+
+  return await createOrderRepo({
+    amount,
+    currency: "INR",
+  });
 };

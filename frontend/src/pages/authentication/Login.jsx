@@ -41,7 +41,7 @@ export default function Login() {
           accessToken: response.data.accessToken,
           userName: response.data.user.userName,
           userEmail: response.data.user.userEmail,
-          mobileNumber:response.data.user.mobileNumber
+          mobileNumber: response.data.user.mobileNumber,
         })
       );
       toast.success("Logged in successfully!");

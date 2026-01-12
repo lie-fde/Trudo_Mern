@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import {
   User,
   ChevronLeft,
@@ -12,10 +12,24 @@ import {
   Ticket,
   Menu,
 } from "lucide-react";
-import Navbar from "../../components/User/Navbar";
-import Trudofooter from "../../components/reusable/footer";
 import api from "../../api/api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
+import Loader from "../../components/reusable/loader";
+import {
+  createPaymentOrder,
+  getUserEventById,
+  lockUserTicket,
+} from "../../services/authService";
+
+const Navbar = lazy(() => import("../../components/User/Navbar"));
+const Trudofooter = lazy(() => import("../../components/reusable/footer"));
+const PaymentModal = lazy(() =>
+  import("../../components/User/PaymentModal").then((m) => ({
+    default: m.PaymentModal,
+  }))
+);
 
 // Helper to format date
 const formatDate = (dateString) => {
@@ -33,7 +47,11 @@ const ImageGallery = ({ image, title }) => {
       <div className="w-full h-64 md:h-80 rounded-xl overflow-hidden relative">
         <img
           // Use dynamic image or a fallback if array is empty
-          src={image ? image : "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=1000"}
+          src={
+            image
+              ? image
+              : "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=1000"
+          }
           alt={title || "Event Image"}
           className="w-full h-full object-cover"
         />
@@ -47,7 +65,17 @@ const ImageGallery = ({ image, title }) => {
   );
 };
 
-const TicketCard = ({ value, setValue, event }) => (
+const TicketCard = ({
+  value,
+  setValue,
+  event,
+  baseAmount,
+  gstAmount,
+  totalAmount,
+  getTicket,
+  remainingTickets,
+  totalTickets,
+}) => (
   <div className="bg-white p-6 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-gray-100 sticky top-24">
     <h3 className="text-xl font-serif font-bold mb-6 text-gray-800">
       Join us to shape Tomorrow
@@ -60,7 +88,7 @@ const TicketCard = ({ value, setValue, event }) => (
           Date & Time
         </label>
         <div className="text-gray-600 text-sm border-b pb-2">
-           {/* Dynamic Date and Time */}
+          {/* Dynamic Date and Time */}
           {formatDate(event?.date)}, {event?.eventTime || "Time TBA"}
         </div>
       </div>
@@ -82,7 +110,9 @@ const TicketCard = ({ value, setValue, event }) => (
           Ticket Price
         </label>
         {/* Dynamic Price */}
-        <div className="text-gray-600 text-sm border-b pb-2">₹{event?.ticketPrice}</div>
+        <div className="text-gray-600 text-sm border-b pb-2">
+          ₹{event?.ticketPrice}
+        </div>
       </div>
 
       {/* Quantity */}
@@ -111,16 +141,24 @@ const TicketCard = ({ value, setValue, event }) => (
           </span>
         </div>
       </div>
+      <div className="text-sm text-gray-700 space-y-1">
+        <p>Base Price: ₹{baseAmount}</p>
+        <p>GST (18%): ₹{gstAmount}</p>
+        <p className="font-bold text-black">Total: ₹{totalAmount}</p>
+      </div>
 
       {/* Button */}
-      <button className="w-full py-3 rounded-full border border-gray-800 text-gray-800 font-bold hover:bg-gray-800 hover:text-white transition">
+      <button
+        className="w-full py-3 rounded-full border border-gray-800 text-gray-800 font-bold hover:bg-gray-800 hover:text-white transition"
+        onClick={getTicket}
+      >
         Get Tickets Now
       </button>
 
       {/* Remaining */}
       <div className="text-center text-red-400 text-xs font-medium">
-         {/* Using totalTickets as remaining since 'sold' count wasn't provided in JSON, or you can calculate if data exists */}
-        {event?.totalTickets} Tickets are remaining
+        {/* Using totalTickets as remaining since 'sold' count wasn't provided in JSON, or you can calculate if data exists */}
+        {remainingTickets} Tickets are remaining
       </div>
     </div>
   </div>
@@ -132,7 +170,9 @@ const CreatorBadge = ({ creatorName }) => (
       Created by
     </span>
     {/* Dynamic Creator Name */}
-    <span className="text-sm font-bold text-gray-800">{creatorName || "Unknown Host"}</span>
+    <span className="text-sm font-bold text-gray-800">
+      {creatorName || "Unknown Host"}
+    </span>
   </div>
 );
 
@@ -158,13 +198,21 @@ export default function EventViewUserPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [showPayment, setShowPayment] = useState(false);
+  const [lockExpiresAt, setLockExpiresAt] = useState(null);
+  const [ticketId, setTicketId] = useState(null);
+
   const { eventId } = useParams();
+
+  const navigate = useNavigate();
+  const { userEmail, mobileNumber } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchEvent = async () => {
       try {
         setLoading(true);
-        const res = await api.get(`/auth/users/events/${eventId}`);
+        const res = await getUserEventById(eventId);
+
         setEvent(res.data.event);
       } catch (err) {
         setError(err);
@@ -177,81 +225,161 @@ export default function EventViewUserPage() {
     fetchEvent();
   }, [eventId]);
 
-  // Loading state placeholder (Optional but good for UX)
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  const remainingTickets = event?.remainingTickets?.remainingTickets ?? 0;
+
+  const GST_RATE = 0.18;
+
+  const baseAmount = value * (event?.ticketPrice || 0);
+  const gstAmount = Math.round(baseAmount * GST_RATE);
+  const totalAmount = baseAmount + gstAmount;
+
+  const getTicket = async () => {
+    try {
+      const res = await lockUserTicket(eventId, value);
+
+      setTicketId(res.data.ticketId);
+      setLockExpiresAt(res.data.lockExpiresAt);
+      setShowPayment(true);
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Tickets Unavailable",
+        text: err.response?.data?.message || "Something went wrong",
+      });
+    }
+  };
+  const handleClosePayment = () => {
+    setShowPayment(false);
+    setTicketId(null);
+    setLockExpiresAt(null);
+  };
+
+  const handleExpire = () => {
+    setShowPayment(false);
+    setTicketId(null);
+    setLockExpiresAt(null);
+  };
+
+  const handlePayment = async () => {
+    // 1️⃣ Create order from backend
+    const res = await createPaymentOrder(totalAmount, userEmail, mobileNumber);
+
+    const { order, key, paymentId } = res.data;
+
+    const options = {
+      key,
+      order_id: order.id,
+      amount: order.amount,
+      currency: order.currency,
+
+      handler: async function (response) {
+        await api.post("/auth/users/payment/verify", {
+          ticketId,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          paymentId,
+          userEmail,
+          mobileNumber,
+          eventId,
+        });
+
+        Swal.fire("Success", "Ticket booked successfully", "success").then(() =>
+          navigate("/mytickets")
+        );
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-800">
-      <Navbar />
-      <main className="max-w-7xl mx-auto px-6 md:px-12 py-10">
-        {/* Dynamic Title */}
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-10 text-black">
-          {event?.title || "Event Title"}
-        </h1>
+    <Suspense fallback={<Loader />}>
+      <div className="min-h-screen bg-white font-sans text-gray-800">
+        <Navbar />
+        <main className="max-w-7xl mx-auto px-6 md:px-12 py-10">
+          {/* Dynamic Title */}
+          <h1 className="text-3xl md:text-4xl font-extrabold mb-10 text-black">
+            {event?.title || "Event Title"}
+          </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Left Content Column */}
-          <div className="lg:col-span-8">
-            {/* Dynamic Image Gallery */}
-            <ImageGallery 
-              image={event?.images?.[0]} 
-              title={event?.title} 
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            {/* Left Content Column */}
+            <div className="lg:col-span-8">
+              {/* Dynamic Image Gallery */}
+              <ImageGallery image={event?.images?.[0]} title={event?.title} />
 
-            <section className="mb-10">
-              <h2 className="text-2xl font-bold mb-4 text-black">
-                About the Event
-              </h2>
-              {/* Dynamic Description */}
-              <div className="space-y-3 text-sm leading-relaxed text-gray-700">
-                <p>{event?.description}</p>
+              <section className="mb-10">
+                <h2 className="text-2xl font-bold mb-4 text-black">
+                  About the Event
+                </h2>
+                {/* Dynamic Description */}
+                <div className="space-y-3 text-sm leading-relaxed text-gray-700">
+                  <p>{event?.description}</p>
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold mb-4 text-black">
+                  Who should attend
+                </h2>
+                {/* Keeping this static as the JSON didn't provide specific target audience data */}
+                <ul className="space-y-2 text-sm text-gray-700 list-none">
+                  {[
+                    "Entrepreneurs, Innovators & Startups",
+                    "Software Developers & Engineers",
+                    "Industry Professionals & Enthusiasts",
+                    "Students & Academics interested in cutting-edge tech",
+                  ].map((item, i) => (
+                    <li key={i} className="flex gap-2 items-center">
+                      <span className="w-1.5 h-1.5 bg-gray-800 rounded-full"></span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              {/* Dynamic Creator Badge (Assuming User object is nested in event based on logs) */}
+              <CreatorBadge creatorName={event?.User?.userName} />
+
+              <div className="mt-12 text-center text-lg font-medium text-gray-800">
+                {/* Dynamic Contact Number */}
+                For More details Please Contact :{" "}
+                {event?.User?.mobileNumber || "N/A"}
               </div>
-            </section>
+            </div>
 
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-black">
-                Who should attend
-              </h2>
-              {/* Keeping this static as the JSON didn't provide specific target audience data */}
-              <ul className="space-y-2 text-sm text-gray-700 list-none">
-                {[
-                  "Entrepreneurs, Innovators & Startups",
-                  "Software Developers & Engineers",
-                  "Industry Professionals & Enthusiasts",
-                  "Students & Academics interested in cutting-edge tech",
-                ].map((item, i) => (
-                  <li key={i} className="flex gap-2 items-center">
-                    <span className="w-1.5 h-1.5 bg-gray-800 rounded-full"></span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            {/* Dynamic Creator Badge (Assuming User object is nested in event based on logs) */}
-            <CreatorBadge creatorName={event?.User?.userName} />
-
-            <div className="mt-12 text-center text-lg font-medium text-gray-800">
-              {/* Dynamic Contact Number */}
-              For More details Please Contact : {event?.User?.mobileNumber || "N/A"}
+            {/* Right Sidebar Column (Ticket Card) */}
+            <div className="lg:col-span-4 relative">
+              <div className="lg:-mt-24 z-10 relative">
+                <TicketCard
+                  value={value}
+                  setValue={setValue}
+                  event={event}
+                  baseAmount={baseAmount}
+                  gstAmount={gstAmount}
+                  getTicket={getTicket}
+                  totalAmount={totalAmount}
+                  remainingTickets={remainingTickets}
+                />
+              </div>
             </div>
           </div>
+          {showPayment && (
+            <PaymentModal
+              totalAmount={totalAmount}
+              lockExpiresAt={lockExpiresAt}
+              onPay={handlePayment}
+              onClose={handleClosePayment}
+              onExpire={handleExpire}
+            />
+          )}
+        </main>
 
-          {/* Right Sidebar Column (Ticket Card) */}
-          <div className="lg:col-span-4 relative">
-            <div className="lg:-mt-24 z-10 relative">
-              <TicketCard 
-                value={value} 
-                setValue={setValue} 
-                event={event} 
-              />
-            </div>
-          </div>
-        </div>
-      </main>
-
-      <ActionStrip />
-      <Trudofooter />
-    </div>
+        <ActionStrip />
+        <Trudofooter />
+      </div>
+    </Suspense>
   );
 }

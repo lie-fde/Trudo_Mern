@@ -2,13 +2,12 @@ import React from "react";
 import { ChevronRight, ChevronLeft , Download , ChevronDown , Search} from "lucide-react";
 import { useState } from "react";
 
-export const DataTable = ({ item }) => {
+export const DataTable = ({ item, loading }) => {
   return (
-    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-      
-      {/* Table Header */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+    <div className="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="overflow-x-auto w-full">
+        {/* Added min-width to ensure columns don't collapse on mobile */}
+        <table className="w-full text-left border-collapse min-w-[800px]">
           <thead>
             <tr className="bg-gray-50/50 border-b border-gray-100">
               <th className="py-4 px-6 text-xs font-bold text-green-600 uppercase tracking-wide">
@@ -33,48 +32,44 @@ export const DataTable = ({ item }) => {
           </thead>
 
           <tbody className="divide-y divide-gray-50">
-            {item.map((row, idx) => (
-              <tr key={idx} className="hover:bg-gray-50/80 transition-colors group">
-                
-                {/* Campaign ID */}
-                <td className="py-4 px-6 text-sm font-bold text-gray-700">
-                  #{String(row.campaignId).slice(-4)}
-                </td>
-
-                {/* Campaign Name */}
-                <td className="py-4 px-6 text-sm font-medium text-gray-600">
-                  {row.campaignName}
-                </td>
-
-                {/* Email */}
-                <td className="py-4 px-6 text-sm text-gray-500 group-hover:text-gray-700">
-                  {row.userEmail}
-                </td>
-
-                {/* Username */}
-                <td className="py-4 px-6 text-sm font-bold text-gray-600">
-                  {row.userName}
-                </td>
-
-                {/* Date */}
-                <td className="py-4 px-6 text-sm font-bold text-gray-700 text-center">
-                  {new Date(row.date).toLocaleDateString()}
-                </td>
-
-                {/* Amount */}
-                <td className="py-4 px-6 text-sm font-bold text-gray-800 text-right">
-                  ₹{row.amount}
-                </td>
+            {loading ? (
+              <tr>
+                <td colSpan="6" className="py-10 text-center text-gray-400">Loading donations...</td>
               </tr>
-            ))}
+            ) : item.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="py-10 text-center text-gray-400">No donations found.</td>
+              </tr>
+            ) : (
+              item.map((row, idx) => (
+                <tr key={idx} className="hover:bg-gray-50/80 transition-colors group">
+                  <td className="py-4 px-6 text-sm font-bold text-gray-700">
+                    #{String(row.campaignId || "").slice(-4)}
+                  </td>
+                  <td className="py-4 px-6 text-sm font-medium text-gray-600">
+                    {row.campaignName}
+                  </td>
+                  <td className="py-4 px-6 text-sm text-gray-500 group-hover:text-gray-700">
+                    {row.userEmail}
+                  </td>
+                  <td className="py-4 px-6 text-sm font-bold text-gray-600">
+                    {row.userName}
+                  </td>
+                  <td className="py-4 px-6 text-sm font-bold text-gray-700 text-center">
+                    {row.date ? new Date(row.date).toLocaleDateString() : "N/A"}
+                  </td>
+                  <td className="py-4 px-6 text-sm font-bold text-gray-800 text-right">
+                    ₹{row.amount}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
-
     </div>
   );
 };
-
 
 export const StatsCardReport = ({ title, value, icon: Icon, color, bg }) => (
   <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 transition-transform hover:-translate-y-1 duration-200">

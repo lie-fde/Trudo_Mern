@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Navbar from "../components/User/Navbar"; 
+import Navbar from "../components/User/Navbar";
 
 export default function NotFound() {
   return (
@@ -8,10 +8,7 @@ export default function NotFound() {
       <Navbar />
 
       <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
-        
-        <h1 className="text-6xl font-bold text-gray-900 mb-4">
-          404 Not Found
-        </h1>
+        <h1 className="text-6xl font-bold text-gray-900 mb-4">404 Not Found</h1>
 
         <p className="text-gray-600 max-w-md mb-6">
           Your visited page was not found. You may go back home.

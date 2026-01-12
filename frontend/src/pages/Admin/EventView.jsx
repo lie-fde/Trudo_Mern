@@ -94,8 +94,6 @@ export default function EventView() {
     return <p className="p-10 text-center text-lg">Loading Event...</p>;
   }
 
-  console.log(singleEvent);
-
   const event = cleanMongoData(singleEvent);
 
   const mediaList = (event.images || []).map((url) => ({
@@ -133,7 +131,7 @@ export default function EventView() {
         className="flex-1 transition-all duration-300"
         style={{ marginLeft: collapsed ? 80 : 240, paddingTop: 72 }}
       >
-        <AdminNavbar collapsed={collapsed} />
+        <AdminNavbar collapsed={collapsed} setCollapsed={setCollapsed} />
 
         <div className="py-10 flex justify-center">
           <div className="w-full max-w-[1000px] px-4">

@@ -7,8 +7,8 @@ const adminAuthSlice = createSlice({
     adminName: null,
     adminEmail: null,
 
-    adminInitialLoading: true,  
-    adminApiLoading: false,     
+    adminInitialLoading: true,
+    adminApiLoading: false,
   },
 
   reducers: {
@@ -18,7 +18,6 @@ const adminAuthSlice = createSlice({
       state.adminEmail = action.payload.adminEmail;
       state.adminInitialLoading = false;
     },
-
 
     adminLogout: (state) => {
       state.adminAccessToken = null;
