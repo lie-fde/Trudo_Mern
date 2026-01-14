@@ -293,7 +293,7 @@ export default function CampaignView() {
                 </div>
               </div>
             </div>
-            {console.log(campaignDetails)}
+     
 
             {/* DATA REVIEW */}
             <div className="mt-12 bg-white p-8 rounded-2xl shadow border-t-4 border-gray-400">
