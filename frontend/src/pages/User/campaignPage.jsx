@@ -9,6 +9,8 @@ const Navbar = lazy(() => import("../../components/User/Navbar.jsx"));
 const CTABanner = lazy(() => import("../../components/User/CTABanner.jsx"));
 const Trudofooter = lazy(() => import("../../components/reusable/footer"));
 
+// Hello 
+
 const CampaignCard = ({ campaign }) => {
   const progress =
     campaign.raisedAmount && campaign.targetAmount
