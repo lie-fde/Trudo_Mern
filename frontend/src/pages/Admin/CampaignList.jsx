@@ -19,6 +19,7 @@ import {
   unblockCampaign,
   deleteCampaign,
 } from "../../services/adminService";
+import { useDebounce } from "../../hooks/debouncehook";
 
 export default function CampaignsPage() {
   const dispatch = useDispatch();
@@ -30,13 +31,26 @@ export default function CampaignsPage() {
   const [sort, setSort] = useState("latest");
   const [page, setPage] = useState(1);
   const [collapsed, setCollapsed] = useState(window.innerWidth < 768);
+  const debouncedSearch = useDebounce(search, 500);
 
   const ITEMS_PER_PAGE = 6;
 
   // Fetch campaigns on load
+  // useEffect(() => {
+  //   dispatch(fetchAllCampaigns());
+  // }, [dispatch]);
+
   useEffect(() => {
-    dispatch(fetchAllCampaigns());
-  }, [dispatch]);
+  dispatch(
+    fetchAllCampaigns({
+      search: debouncedSearch,
+      category,
+      sort,
+      page,
+      limit: ITEMS_PER_PAGE,
+    })
+  );
+}, [debouncedSearch, category, sort, page, dispatch]);
 
   const { campaigns, loading } = useSelector((state) => state.campaign);
 

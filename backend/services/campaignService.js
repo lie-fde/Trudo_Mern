@@ -81,9 +81,13 @@ export const updateCampaignStatusService = async (id, updateData) => {
   return updated;
 };
 
-export const getCampaignsAdmin = async () => {
-  const campaigns = await findCampaignsAdmin();
-  return campaigns;
+// export const getCampaignsAdmin = async () => {
+//   const campaigns = await findCampaignsAdmin();
+//   return campaigns;
+// };
+
+export const getCampaignsAdmin = async (query) => {
+  return await findCampaignsAdmin(query);
 };
 
 export const blockCampaignService = async (id) => {

@@ -39,7 +39,7 @@ const adminLogin = async (adminEmail, password) => {
 const getAllUsers = async () => {
   const users = await UserRepository.findAllUsers();
 
-  if (!users || users.length == 0) {
+  if (!users || users.length === 0) {
     return [];
   }
 

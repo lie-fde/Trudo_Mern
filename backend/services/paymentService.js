@@ -8,6 +8,7 @@ import { findCampaignById } from "../repositories/CampaignRepository.js";
 
 import { generateReceiptPDF } from "./pdfService.js";
 import { createOrderRepo } from "../repositories/PaymentRepository.js";
+import {HTTP_STATUS} from "../constants/httpStatusCodes.js"
 
 export const getReceiptService = async (receiptId) => {
   // 1. Fetch donation record
@@ -52,7 +53,7 @@ export const getReceiptService = async (receiptId) => {
 
 export const createOrderService = async ({ amount }) => {
   if (!amount) {
-    throw { status: 400, message: "Amount required" };
+    throw { status: HTTP_STATUS.BAD_REQUEST, message: "Amount required" };
   }
 
   return await createOrderRepo({

@@ -6,7 +6,7 @@ import {
   deleteCampaignService,
   updateCampaignService,
 } from "../../services/campaignService.js";
-import UserService from "../../services/UserService.js";
+import { HTTP_STATUS } from "../../constants/httpStatusCodes.js";
 
 export const adminLogin = async (req, res) => {
   try {
@@ -20,16 +20,16 @@ export const adminLogin = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "strict",
-      maxAge: 2 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({
+    res.status(HTTP_STATUS.OK).json({
       message: "Login Successful",
       adminAccessToken,
       admin,
     });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ message: error.message });
   }
 };
 
@@ -37,13 +37,13 @@ export const fetchAllUsers = async (req, res) => {
   try {
     const users = await AdminService.getAllUsers();
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Users fetched successfully",
       users,
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: error.message,
     });
@@ -55,12 +55,12 @@ export const fetchUser = async (req, res) => {
     const { id } = req.params;
     const user = await AdminService.getUserById(id);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       user,
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: error.message,
     });
@@ -72,13 +72,13 @@ export const softDelete = async (req, res) => {
     const { id } = req.params;
     const result = await AdminService.softDeleteUser(id);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "User soft deleted successfully",
       data: result,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: error.message,
     });
@@ -90,13 +90,13 @@ export const block = async (req, res) => {
     const { id } = req.params;
     const result = await AdminService.blockUser(id);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "User blocked successfully",
       data: result,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       success: false,
       message: error.message,
     });
@@ -108,13 +108,13 @@ export const unblock = async (req, res) => {
     const { id } = req.params;
     const result = await AdminService.unblockUser(id);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "User unblocked successfully",
       data: result,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       success: false,
       message: error.message,
     });
@@ -124,12 +124,12 @@ export const unblock = async (req, res) => {
 export const adminRefreshTokenController = async (req, res) => {
   try {
     const response = await AdminService.refreshAdminAccessToken(
-      req.cookies.adminrefreshToken
+      req.cookies.adminrefreshToken,
     );
 
-    return res.status(200).json(response);
+    return res.status(HTTP_STATUS.OK).json(response);
   } catch (err) {
-    return res.status(401).json({ message: err.message });
+    return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: err.message });
   }
 };
 
@@ -140,34 +140,64 @@ export const adminLogoutController = (req, res) => {
     sameSite: "strict",
   });
 
-  return res.status(200).json({ message: "Admin logged out successfully" });
+  return res
+    .status(HTTP_STATUS.OK)
+    .json({ message: "Admin logged out successfully" });
 };
+
+// export const getCampaignsAdminController = async (req, res, next) => {
+//   try {
+//     const campaigns = await getCampaignsAdmin();
+
+//     return res.status(HTTP_STATUS.OK).json({
+//       success: true,
+//       campaigns,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 export const getCampaignsAdminController = async (req, res, next) => {
   try {
-    const campaigns = await getCampaignsAdmin();
+    const {
+      search = "",
+      category = "",
+      sort = "latest",
+      page = 1,
+      limit = 6,
+    } = req.query;
+
+    const data = await getCampaignsAdmin({
+      search,
+      category,
+      sort,
+      page: Number(page),
+      limit: Number(limit),
+    });
 
     return res.status(200).json({
       success: true,
-      campaigns,
+      ...data,
     });
   } catch (error) {
     next(error);
   }
 };
 
+
 export const blockCampaignController = async (req, res) => {
   try {
     const { id } = req.params;
     const result = await blockCampaignService(id);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Campaign blocked successfully",
       data: result,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       success: false,
       message: error.message,
     });
@@ -179,13 +209,13 @@ export const unblockCampaignController = async (req, res) => {
     const { id } = req.params;
     const result = await unblockCampaignService(id);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Campaign Unblocked successfully",
       data: result,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       success: false,
       message: error.message,
     });
@@ -197,13 +227,13 @@ export const deleteCampaignController = async (req, res) => {
     const { id } = req.params;
     const result = await deleteCampaignService(id);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Campaign deleted successfully",
       data: result,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       success: false,
       message: error.message,
     });
@@ -218,7 +248,7 @@ export const updateCampaignController = async (req, res) => {
       files: req.files,
     });
 
-    return res.status(201).json({
+    return res.status(HTTP_STATUS.CREATED).json({
       success: true,
       message: "Campaign updated successfully",
       data: result,
@@ -226,7 +256,7 @@ export const updateCampaignController = async (req, res) => {
   } catch (err) {
     console.error("Campaign Create Error:", err.message);
 
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to update campaign",
       error: err.message,
@@ -241,16 +271,16 @@ export const updateAdminProfileController = async (req, res) => {
     const updatedUser = await AdminService.updateAdminProfileService(
       userId,
       req.body,
-      avatar
+      avatar,
     );
     console.log(updatedUser);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       message: "Profile updated successfully",
       data: updatedUser,
     });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ message: err.message });
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: err.message });
   }
 };

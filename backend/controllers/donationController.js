@@ -2,6 +2,7 @@ import {
   getDonationHistoryService,
   getDonationStatsService,
 } from "../services/DonationService.js";
+import { HTTP_STATUS } from "../constants/httpStatusCodes.js";
 
 export const getDonationHistoryController = async (req, res) => {
   try {
@@ -13,13 +14,13 @@ export const getDonationHistoryController = async (req, res) => {
 
     const result = await getDonationHistoryService(userId, page, limit, search);
 
-    res.status(200).json({
+    res.status(HTTP_STATUS.OK).json({
       success: true,
       ...result,
     });
   } catch (error) {
     console.error("Donation History Error:", error);
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Internal Server Error",
     });
@@ -32,13 +33,13 @@ export const getDonationStatsController = async (req, res) => {
 
     const stats = await getDonationStatsService(userId);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       stats,
     });
   } catch (error) {
     console.error("Donation stats error:", error);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to fetch donation stats",
     });

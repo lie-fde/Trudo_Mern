@@ -40,6 +40,7 @@ import { getMyTickets, lockTicketController , cancelTicket } from "../controller
 import { createOrderController, verifyPaymentEvent } from "../controllers/paymentController.js";
 import { changePasswordValidator } from "../Validators/Profile.validators.js";
 import { verifyTicket } from "../services/TicketService.js";
+import { HTTP_STATUS } from "../constants/httpStatusCodes.js";
 
 const router = express.Router();
 
@@ -115,7 +116,7 @@ router.patch(
       if (err) {
         console.error("MULTER ERROR:", err);
         return res
-          .status(400)
+          .status(HTTP_STATUS.BAD_REQUEST)
           .json({ message: "Upload failed", error: err.message });
       }
       next();

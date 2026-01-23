@@ -1,5 +1,5 @@
 import { lockTicketService , fetchMyTickets , cancelTicketService, getAdminEventReportService, EventReportStatsService, exportAdminEventReportService } from "../services/TicketService.js";
-
+import { HTTP_STATUS } from "../constants/httpStatusCodes.js";
 export const lockTicketController = async (req, res) => {
   try {
     const result = await lockTicketService({
@@ -8,12 +8,12 @@ export const lockTicketController = async (req, res) => {
       quantity: req.body.quantity,
     });
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       ...result,
     });
   } catch (err) {
-    return res.status(err.status || 500).json({
+    return res.status(err.status || HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       code: err.code,
       message: err.message,
@@ -33,7 +33,7 @@ export const cancelTicket = async (req, res) => {
     await cancelTicketService(req.params.ticketId, req.user.id,userEmail);
     res.json({ success: true, message: "Ticket cancelled successfully" });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: err.message });
   }
 };
 
@@ -70,13 +70,13 @@ export const getAdminEventReportController = async (req, res) => {
       to,
     });
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       ...result,
     });
   } catch (err) {
     console.error("Admin Event Report Error:", err);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to fetch event report",
     });
@@ -87,9 +87,9 @@ export const getAdminEventReportController = async (req, res) => {
 export const getEventReportStats = async (req, res) => {
   try {
     const response = await EventReportStatsService();
-    return res.status(200).json(response);
+    return res.status(HTTP_STATUS.OK).json(response);
   } catch (error) {
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: error.message || "Internal Server Error",
     });
@@ -146,10 +146,10 @@ export const exportAdminEventReportController = async (req, res) => {
       "attachment; filename=event_report.csv"
     );
 
-    return res.status(200).send(csv);
+    return res.status(HTTP_STATUS.OK).send(csv);
   } catch (err) {
     console.error("Admin Event Export Error:", err);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to export event report",
     });

@@ -1,4 +1,5 @@
 import { body, validationResult } from "express-validator";
+import { HTTP_STATUS } from "../constants/httpStatusCodes.js";
 
 export const changePasswordValidator = [
   body("currentPassword")
@@ -18,7 +19,7 @@ export const changePasswordValidator = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         success: false,
         message: errors.array()[0].msg,
       });

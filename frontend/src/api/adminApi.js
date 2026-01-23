@@ -7,6 +7,7 @@ import {
   startAdminApiLoading,
   stopAdminApiLoading,
 } from "../store/adminAuthSlice";
+import { HTTP_STATUS } from "../constants/httpsconstants.js";
 
 const adminApi = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -42,7 +43,7 @@ adminApi.interceptors.response.use(
     }
 
  
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === HTTP_STATUS.UNAUTHORIZED && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {

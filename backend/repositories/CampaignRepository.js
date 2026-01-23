@@ -170,17 +170,67 @@ export const findPublicCampaignById = async (campaignId) => {
     .lean();
 };
 
-export const findCampaignsAdmin = async () => {
-  return Campaign.find({
+// export const findCampaignsAdmin = async () => {
+//   return Campaign.find({
+//     status: "Approved",
+//     isDeleted: false,
+//   })
+//     .select(
+//       "_id title image category status targetAmount isBlocked isDeleted createdAt"
+//     )
+//     .sort({ createdAt: -1 })
+//     .lean();
+// };
+
+export const findCampaignsAdmin = async ({
+  search,
+  category,
+  sort,
+  page,
+  limit,
+}) => {
+  const filter = {
     status: "Approved",
     isDeleted: false,
-  })
-    .select(
-      "_id title image category status targetAmount isBlocked isDeleted createdAt"
-    )
-    .sort({ createdAt: -1 })
-    .lean();
+  };
+
+  // 🔍 Search by title (case-insensitive)
+  if (search) {
+    filter.title = { $regex: search, $options: "i" };
+  }
+
+  // 🏷 Category filter
+  if (category) {
+    filter.category = category;
+  }
+
+  // 🔃 Sorting
+  let sortQuery = { createdAt: -1 };
+  if (sort === "amountAsc") sortQuery = { targetAmount: 1 };
+  if (sort === "amountDesc") sortQuery = { targetAmount: -1 };
+
+  // 📄 Pagination
+  const skip = (page - 1) * limit;
+
+  const [campaigns, totalDocs] = await Promise.all([
+    Campaign.find(filter)
+      .select("_id title image category targetAmount isBlocked createdAt")
+      .sort(sortQuery)
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+
+    Campaign.countDocuments(filter),
+  ]);
+
+  return {
+    campaigns,
+    totalDocs,
+    totalPages: Math.ceil(totalDocs / limit),
+    currentPage: page,
+  };
 };
+
 
 export const blockCampaignRepository = async (id) => {
   return await Campaign.findByIdAndUpdate(

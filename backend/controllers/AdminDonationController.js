@@ -3,6 +3,7 @@ import {
   exportAdminDonationReportService,
   DonationReportStatsService,
 } from "../services/adminDonationService.js";
+import { HTTP_STATUS } from "../constants/httpStatusCodes.js";
 
 export const getAdminDonationReportController = async (req, res) => {
   try {
@@ -32,13 +33,13 @@ export const getAdminDonationReportController = async (req, res) => {
       to,
     });
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       ...result,
     });
   } catch (err) {
     console.error("Admin Donation Report Error:", err);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to fetch donation report",
     });
@@ -91,10 +92,10 @@ export const exportAdminDonationReportController = async (req, res) => {
       "Content-Disposition",
       "attachment; filename=donation_report.csv"
     );
-    return res.status(200).send(csv);
+    return res.status(HTTP_STATUS.OK).send(csv);
   } catch (err) {
     console.error("Admin Donation Export Error:", err);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to export donation report",
     });
@@ -104,9 +105,9 @@ export const exportAdminDonationReportController = async (req, res) => {
 export const getDonationReportStats = async (req, res) => {
   try {
     const response = await DonationReportStatsService();
-    return res.status(200).json(response);
+    return res.status(HTTP_STATUS.OK).json(response);
   } catch (error) {
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: error.message || "Internal Server Error",
     });
