@@ -22,7 +22,7 @@ const adminLogin = async (adminEmail, password) => {
     process.env.JWT_REFRESH_SECRET,
     {
       expiresIn: "2d",
-    }
+    },
   );
 
   return {
@@ -36,14 +36,12 @@ const adminLogin = async (adminEmail, password) => {
   };
 };
 
-const getAllUsers = async () => {
-  const users = await UserRepository.findAllUsers();
-
-  if (!users || users.length === 0) {
-    return [];
-  }
-
-  return users;
+const getAllUsers = async ({ search, page, limit }) => {
+  return await UserRepository.findAllUsers({
+    search,
+    page,
+    limit,
+  });
 };
 
 const getUserById = async (id) => {
@@ -121,7 +119,7 @@ const updateAdminProfileService = async (userId, data, avatar) => {
 
   const updatedUser = await UserRepository.updateUserProfileRepo(
     userId,
-    updateData
+    updateData,
   );
 
   if (!updatedUser) throw new Error("User not found");

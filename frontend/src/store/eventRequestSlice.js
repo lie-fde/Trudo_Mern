@@ -1,21 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import adminApi from "../api/adminApi.js";
 
-/* --------------------------------------------------------------
-   FETCH ALL PENDING EVENTS
-----------------------------------------------------------------*/
 export const fetchPendingEvents = createAsyncThunk(
   "events/fetchPending",
-  async (_, { rejectWithValue }) => {
+  async ({ search = "" }, { rejectWithValue }) => {
     try {
-      const res = await adminApi.get("/events/pending");
-      return res.data.events; // backend response must send { events: [...] }
+      const res = await adminApi.get("/events/pending", {
+        params: { search },
+      });
+      return res.data.events;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch events"
+        err.response?.data?.message || "Failed to fetch events",
       );
     }
-  }
+  },
 );
 
 /* --------------------------------------------------------------
@@ -35,10 +34,10 @@ export const updateEventStatus = createAsyncThunk(
       return res.data.event; // backend response must send { event: {...} }
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to update event"
+        error.response?.data?.message || "Failed to update event",
       );
     }
-  }
+  },
 );
 
 /* --------------------------------------------------------------
@@ -74,7 +73,7 @@ const eventRequestSlice = createSlice({
       .addCase(updateEventStatus.fulfilled, (state, action) => {
         if (action.payload && action.payload._id) {
           state.events = state.events.filter(
-            (e) => e._id !== action.payload._id
+            (e) => e._id !== action.payload._id,
           );
         }
         state.loading = false;

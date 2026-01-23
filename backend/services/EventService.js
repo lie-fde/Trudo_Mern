@@ -98,14 +98,14 @@ export const updateEventService = async (eventId, req) => {
   return await updateEventRepo(eventId, updateData);
 };
 
-export const getPendingEventsService = async () => {
-  return await findPendingEventsRepo();
+export const getPendingEventsService = async (search) => {
+  return await findPendingEventsRepo(search);
 };
 
 export const updateEventStatusService = async (
   eventId,
   status,
-  rejectionReason
+  rejectionReason,
 ) => {
   const updateData = {
     status,
@@ -127,9 +127,9 @@ export const getSingleEventService = async (eventId) => {
     };
   }
 
-  const remainingTickets = await getEventWithRemainingTicketsRepo(eventId)
+  const remainingTickets = await getEventWithRemainingTicketsRepo(eventId);
 
-  if(remainingTickets) event.remainingTickets= remainingTickets
+  if (remainingTickets) event.remainingTickets = remainingTickets;
 
   return {
     success: true,

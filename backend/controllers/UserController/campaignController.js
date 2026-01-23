@@ -5,7 +5,7 @@ import {
   getCampaignDetailsrepo,
   updateCampaignStatusService,
   getUserCampaignsService,
-  checkCampaignFullService
+  checkCampaignFullService,
 } from "../../services/campaignService.js";
 
 const createCampaign = async (req, res) => {
@@ -32,10 +32,19 @@ export default { createCampaign };
 
 export const getPendingCampaigns = async (req, res) => {
   try {
-    const campaigns = await getPendingRequests();
-    return res.status(HTTP_STATUS.OK).json({ success: true, campaigns });
+    const { search = "" } = req.query;
+
+    const campaigns = await getPendingRequests(search);
+
+    return res.status(HTTP_STATUS.OK).json({
+      success: true,
+      campaigns,
+    });
   } catch (err) {
-    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: err.message });
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
@@ -44,7 +53,9 @@ export const getCampaignById = async (req, res) => {
     const campaign = await getCampaignDetailsrepo(req.params.id);
     return res.status(HTTP_STATUS.OK).json({ success: true, campaign });
   } catch (err) {
-    return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: err.message });
+    return res
+      .status(HTTP_STATUS.NOT_FOUND)
+      .json({ success: false, message: err.message });
   }
 };
 
@@ -59,7 +70,7 @@ export const updateCampaignStatus = async (req, res) => {
 
     const updatedCampaign = await updateCampaignStatusService(
       req.params.id,
-      updateData
+      updateData,
     );
 
     return res.status(HTTP_STATUS.OK).json({
@@ -68,7 +79,9 @@ export const updateCampaignStatus = async (req, res) => {
       updatedCampaign,
     });
   } catch (err) {
-    return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: err.message });
+    return res
+      .status(HTTP_STATUS.BAD_REQUEST)
+      .json({ success: false, message: err.message });
   }
 };
 
@@ -91,28 +104,24 @@ export const getUserCampaignsController = async (req, res) => {
   }
 };
 
-
-
 export const checkCampaignFullController = async (req, res) => {
   try {
     const { campaignId } = req.params;
 
-    if (!campaignId) throw new Error("No campaign ID") ;
+    if (!campaignId) throw new Error("No campaign ID");
 
     const raisedAmount = await checkCampaignFullService(campaignId);
 
     return res.status(HTTP_STATUS.OK).json({
-      success:true,
+      success: true,
       raisedAmount,
-      message:"Raised amount calculated successfully"
-    })
-
-
+      message: "Raised amount calculated successfully",
+    });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      success:false,
-      message:error.message
-    })
+      success: false,
+      message: error.message,
+    });
   }
 };

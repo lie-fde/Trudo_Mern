@@ -3,14 +3,16 @@ import adminApi from "../api/adminApi.js";
 
 export const fetchPendingCampaigns = createAsyncThunk(
   "campaign/fetchPending",
-  async (_, { rejectWithValue }) => {
+  async ({ search = "" }, { rejectWithValue }) => {
     try {
-      const res = await adminApi.get("/admin/campaigns/pending");
+      const res = await adminApi.get("/admin/campaigns/pending", {
+        params: { search },
+      });
       return res.data.campaigns;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch");
     }
-  }
+  },
 );
 
 export const updateCampaignStatus = createAsyncThunk(
@@ -24,15 +26,15 @@ export const updateCampaignStatus = createAsyncThunk(
     try {
       const res = await adminApi.patch(
         `/admin/campaigns/${campaignId}/status`,
-        payload
+        payload,
       );
       return res.data.campaign;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to update"
+        error.response?.data?.message || "Failed to update",
       );
     }
-  }
+  },
 );
 
 const campaignRequestSlice = createSlice({
@@ -63,7 +65,7 @@ const campaignRequestSlice = createSlice({
       .addCase(updateCampaignStatus.fulfilled, (state, action) => {
         if (action.payload && action.payload._id) {
           state.campaigns = state.campaigns.filter(
-            (c) => c._id !== action.payload._id
+            (c) => c._id !== action.payload._id,
           );
           state.error = null;
         }
@@ -77,17 +79,3 @@ const campaignRequestSlice = createSlice({
 });
 
 export default campaignRequestSlice.reducer;
-
-// export const updateCampaignStatus = createAsyncThunk(
-//   "campaign/updateStatus",
-//   async ({ campaignId, status }, { rejectWithValue }) => {
-//     try {
-//       const res = await adminApi.patch(`/admin/campaigns/${campaignId}/status`, {
-//         status,
-//       });
-//       return res.data.updatedCampaign;
-//     } catch (err) {
-//       return rejectWithValue(err.response?.data?.message || "Failed to update");
-//     }
-//   }
-// );

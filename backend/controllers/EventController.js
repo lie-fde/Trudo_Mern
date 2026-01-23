@@ -52,8 +52,10 @@ export const createEventController = async (req, res) => {
 
 export const getPendingEventsController = async (req, res, next) => {
   try {
-    const events = await getPendingEventsService();
-    console.log(events);
+    const { search = "" } = req.query;
+
+    const events = await getPendingEventsService(search);
+
     return res.status(HTTP_STATUS.OK).json({
       success: true,
       events,
@@ -79,7 +81,7 @@ export const updateEventStatusController = async (req, res, next) => {
     const updatedEvent = await updateEventStatusService(
       eventId,
       status,
-      rejectionReason
+      rejectionReason,
     );
 
     if (!updatedEvent) {
@@ -208,7 +210,9 @@ export const getEventsUserController = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server Error" });
+    return res
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: "Server Error" });
   }
 };
 
@@ -231,9 +235,11 @@ export const updateEventController = async (req, res) => {
       event: updatedEvent,
     });
   } catch (err) {
-    return res.status(err.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: err.message || "Server Error",
-    });
+    return res
+      .status(err.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      .json({
+        success: false,
+        message: err.message || "Server Error",
+      });
   }
 };

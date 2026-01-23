@@ -1,13 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import adminApi from "../api/adminApi";
 
-// export const fetchAllCampaigns = createAsyncThunk(
-//   "campaign/fetchAll",
-//   async () => {
-//     const res = await adminApi.get("/admin/campaigns");
-//     return res.data.campaigns;
-//   }
-// );
 
 export const fetchAllCampaigns = createAsyncThunk(
   "campaign/fetchAll",
@@ -57,7 +50,7 @@ const campaignSlice = createSlice({
       .addCase(fetchAllCampaigns.fulfilled, (state, action) => {
         state.loading = false;
 
-        state.campaigns = action.payload.campaigns; // ✅ ARRAY
+        state.campaigns = action.payload.campaigns; 
         state.totalDocs = action.payload.totalDocs;
         state.totalPages = action.payload.totalPages;
         state.currentPage = action.payload.currentPage;

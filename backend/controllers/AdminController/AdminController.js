@@ -35,12 +35,18 @@ export const adminLogin = async (req, res) => {
 
 export const fetchAllUsers = async (req, res) => {
   try {
-    const users = await AdminService.getAllUsers();
+    const { search = "", page = 1, limit = 7 } = req.query;
+
+    const data = await AdminService.getAllUsers({
+      search,
+      page: Number(page),
+      limit: Number(limit),
+    });
 
     return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Users fetched successfully",
-      users,
+      ...data,
     });
   } catch (error) {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
@@ -145,19 +151,6 @@ export const adminLogoutController = (req, res) => {
     .json({ message: "Admin logged out successfully" });
 };
 
-// export const getCampaignsAdminController = async (req, res, next) => {
-//   try {
-//     const campaigns = await getCampaignsAdmin();
-
-//     return res.status(HTTP_STATUS.OK).json({
-//       success: true,
-//       campaigns,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 export const getCampaignsAdminController = async (req, res, next) => {
   try {
     const {
@@ -184,7 +177,6 @@ export const getCampaignsAdminController = async (req, res, next) => {
     next(error);
   }
 };
-
 
 export const blockCampaignController = async (req, res) => {
   try {

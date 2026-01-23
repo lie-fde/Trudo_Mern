@@ -15,11 +15,56 @@ export const updateEventRepo = async (eventId, updateData) => {
   return await Events.findByIdAndUpdate(eventId, updateData, { new: true });
 };
 
-export const findPendingEventsRepo = async () => {
-  return await Events.find({ status: "Pending", isDeleted: false }).sort({createdAt:-1}).populate(
-    "User",
-    "userName userEmail mobileNumber"
-  );
+export const findPendingEventsRepo = async (search) => {
+  const pipeline = [
+    {
+      $match: {
+        status: "Pending",
+        isDeleted: false,
+      },
+    },
+
+    {
+      $lookup: {
+        from: "users",
+        localField: "User",
+        foreignField: "_id",
+        as: "User",
+      },
+    },
+    { $unwind: "$User" },
+
+    // 🔍 BACKEND SEARCH
+    ...(search
+      ? [
+          {
+            $match: {
+              $or: [
+                { "User.userName": { $regex: search, $options: "i" } },
+                { "User.userEmail": { $regex: search, $options: "i" } },
+                { "User.mobileNumber": { $regex: search, $options: "i" } },
+              ],
+            },
+          },
+        ]
+      : []),
+
+    { $sort: { createdAt: -1 } },
+
+    {
+      $project: {
+        status: 1,
+        createdAt: 1,
+        User: {
+          userName: 1,
+          userEmail: 1,
+          mobileNumber: 1,
+        },
+      },
+    },
+  ];
+
+  return await Events.aggregate(pipeline);
 };
 
 export const updateEventStatusRepo = async (eventId, updateData) => {
@@ -47,7 +92,7 @@ export const unblockEventRepository = async (id) => {
   return await Events.findByIdAndUpdate(
     id,
     { isBlocked: false },
-    { new: true }
+    { new: true },
   );
 };
 
@@ -97,7 +142,7 @@ export const getEventsUserRepo = async ({
           isNearby: -1,
           createdAt: -1,
         },
-      }
+      },
     );
   } else {
     // 🔥 Normal sorting
