@@ -13,6 +13,7 @@ import {
 } from "../repositories/EventRepo.js";
 import { getEventWithRemainingTicketsRepo } from "../repositories/TicketRepo.js";
 import User from "../repositories/UserRepository.js";
+import { HTTP_STATUS } from "../constants/httpStatusCodes.js";
 
 export const createEventService = async (id, body, file) => {
   if (!file) {
@@ -31,7 +32,7 @@ export const createEventService = async (id, body, file) => {
   // 3. Check if input date is Today or Earlier
   if (inputDate.getTime() <= today.getTime()) {
     throw {
-      statusCode: 400,
+      statusCode: HTTP_STATUS.BAD_REQUEST,
       message:
         "Events must be scheduled for a future date (cannot be today or in the past)",
     };
@@ -71,7 +72,7 @@ export const updateEventService = async (eventId, req) => {
   // 3. Check if input date is Today or Earlier
   if (inputDate.getTime() < today.getTime()) {
     throw {
-      statusCode: 400,
+      statusCode: HTTP_STATUS.BAD_REQUEST,
       message:
         "Events must be scheduled for a future date (cannot be today or in the past)",
     };
@@ -97,14 +98,14 @@ export const updateEventService = async (eventId, req) => {
   return await updateEventRepo(eventId, updateData);
 };
 
-export const getPendingEventsService = async () => {
-  return await findPendingEventsRepo();
+export const getPendingEventsService = async (search) => {
+  return await findPendingEventsRepo(search);
 };
 
 export const updateEventStatusService = async (
   eventId,
   status,
-  rejectionReason
+  rejectionReason,
 ) => {
   const updateData = {
     status,
@@ -121,18 +122,18 @@ export const getSingleEventService = async (eventId) => {
   if (!event) {
     return {
       success: false,
-      statusCode: 404,
+      statusCode: HTTP_STATUS.NOT_FOUND,
       message: "Event not found",
     };
   }
 
-  const remainingTickets = await getEventWithRemainingTicketsRepo(eventId)
+  const remainingTickets = await getEventWithRemainingTicketsRepo(eventId);
 
-  if(remainingTickets) event.remainingTickets= remainingTickets
+  if (remainingTickets) event.remainingTickets = remainingTickets;
 
   return {
     success: true,
-    statusCode: 200,
+    statusCode: HTTP_STATUS.OK,
     data: event,
   };
 };

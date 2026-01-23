@@ -35,6 +35,7 @@ import {
 import { updateEventValidator } from "../Validators/event.validators.js";
 import { exportAdminEventReportController, getAdminEventReportController, getEventReportStats } from "../controllers/TicketController.js";
 import { getMonthlyDonationGraph, getYearlyDonationGraphController } from "../controllers/DonationGraphController.js";
+import { HTTP_STATUS } from "../constants/httpStatusCodes.js";
 
 const router = express.Router();
 
@@ -74,7 +75,7 @@ router.patch(
       if (err) {
         console.error("MULTER ERROR:", err);
         return res
-          .status(400)
+          .status(HTTP_STATUS.BAD_REQUEST)
           .json({ message: "Upload failed", error: err.message });
       }
       next();
@@ -95,7 +96,7 @@ router.post(
       if (err) {
         console.error("MULTER ERROR:", err);
         return res
-          .status(400)
+          .status(HTTP_STATUS.BAD_REQUEST)
           .json({ message: "Upload failed", error: err.message });
       }
       next();

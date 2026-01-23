@@ -176,7 +176,7 @@ export default function MyTickets() {
             qrCode: t.qrCode,
           }));
 
-        console.log(res.data.data);
+   
 
         setEvents([
           ...normalize(active),
@@ -328,7 +328,7 @@ export default function MyTickets() {
     }
   };
 
-  console.log("Events", events.title);
+
 
   // Reset page on filter change
   useEffect(() => {

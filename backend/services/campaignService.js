@@ -56,8 +56,8 @@ export const createCampaignService = async (req) => {
   return await createCampaignrepo(campaignData);
 };
 
-export const getPendingRequests = async () => {
-  return await getPendingCampaigns();
+export const getPendingRequests = async (search) => {
+  return await getPendingCampaigns(search);
 };
 
 export const getCampaignDetailsrepo = async (campaignId) => {
@@ -81,9 +81,8 @@ export const updateCampaignStatusService = async (id, updateData) => {
   return updated;
 };
 
-export const getCampaignsAdmin = async () => {
-  const campaigns = await findCampaignsAdmin();
-  return campaigns;
+export const getCampaignsAdmin = async (query) => {
+  return await findCampaignsAdmin(query);
 };
 
 export const blockCampaignService = async (id) => {
@@ -154,15 +153,14 @@ export const getUserCampaignsService = async (userId) => {
   return campaigns;
 };
 
-
 export const checkCampaignFullService = async (campaignId) => {
-  const campaign = await findCampaignById(campaignId)
+  const campaign = await findCampaignById(campaignId);
 
   if (!campaign) {
     throw new Error("Campaign not found");
   }
 
-  const raisedAmount = await calculateRaisedAmountRepo(campaignId)
+  const raisedAmount = await calculateRaisedAmountRepo(campaignId);
 
-  return raisedAmount
+  return raisedAmount;
 };

@@ -6,8 +6,9 @@ import {
   startApiLoading,
   stopApiLoading,
   setBlocked,
-  setDeleted
+  setDeleted,
 } from "../store/authSlice";
+import { HTTP_STATUS } from "../constants/httpsconstants";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -18,7 +19,6 @@ api.interceptors.request.use((config) => {
   if (!config.url.includes("refresh-token")) {
     store.dispatch(startApiLoading());
   }
-
   const token = store.getState().auth.accessToken;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -41,25 +41,34 @@ api.interceptors.response.use(
       store.dispatch(stopApiLoading());
     }
 
-    if(error.response?.status=== 403 && error.response?.data?.code === "USER_BLOCKED"){
+    if (
+      error.response?.status === HTTP_STATUS.FORBIDDEN &&
+      error.response?.data?.code === "USER_BLOCKED"
+    ) {
       store.dispatch(setBlocked(true));
       store.dispatch(logout());
       return Promise.reject(error);
     }
 
-       if(error.response?.status=== 403 && error.response?.data?.code === "USER_DELETED"){
+    if (
+      error.response?.status === HTTP_STATUS.FORBIDDEN &&
+      error.response?.data?.code === "USER_DELETED"
+    ) {
       store.dispatch(setDeleted(true));
       store.dispatch(logout());
       return Promise.reject(error);
     }
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
 
       try {
         const res = await axios.get(
           `${import.meta.env.VITE_API_URL}/auth/users/refresh-token`,
-          { withCredentials: true }
+          { withCredentials: true },
         );
 
         store.dispatch(
@@ -68,9 +77,8 @@ api.interceptors.response.use(
             userName: res.data.userName,
             userEmail: res.data.userEmail,
             mobileNumber: res.data.mobileNumber,
-          })
+          }),
         );
-
 
         api.defaults.headers.common.Authorization = `Bearer ${res.data.accessToken}`;
 
@@ -88,7 +96,7 @@ api.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

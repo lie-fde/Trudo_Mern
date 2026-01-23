@@ -8,9 +8,9 @@ import {
   createOrderService,
 } from "../services/paymentService.js";
 import UserRepository from "../repositories/UserRepository.js";
-import QRCode from "qrcode";
 import { generateAndUploadQR } from "../middlewares/qrCodeUpload.js";
 import sendTicketEmail from "../utils/sendTicketEmail.js";
+import { HTTP_STATUS } from "../constants/httpStatusCodes.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -41,7 +41,7 @@ export const createOrder = async (req, res) => {
     });
   } catch (err) {
     console.error("Error creating order:", err);
-    res.status(500).json({ success: false, message: "Failed to create order" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to create order" });
   }
 };
 
@@ -68,7 +68,7 @@ export const verifyPayment = async (req, res) => {
 
     if (expectedSign !== razorpay_signature) {
       return res
-        .status(400)
+        .status(HTTP_STATUS.BAD_REQUEST)
         .json({ success: false, message: "Invalid signature" });
     }
 
@@ -106,7 +106,7 @@ export const verifyPayment = async (req, res) => {
     });
   } catch (err) {
     console.error("Verification failed:", err);
-    res.status(500).json({ success: false });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false });
   }
 };
 
@@ -119,7 +119,7 @@ export const getReceipt = async (req, res) => {
     res.json(data);
   } catch (error) {
     console.error("Receipt Error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Server error" });
   }
 };
 
@@ -131,13 +131,13 @@ export const createOrderController = async (req, res) => {
 
     console.log(result);
 
-    res.status(200).json({
+    res.status(HTTP_STATUS.OK).json({
       success: true,
       key: process.env.RAZORPAY_KEY_ID,
       ...result,
     });
   } catch (err) {
-    res.status(err.status || 500).json({
+    res.status(err.status || HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: err.message,
     });
@@ -178,7 +178,7 @@ export const verifyPaymentEvent = async (req, res) => {
 
     if (expectedSignature !== razorpay_signature) {
       console.error("❌ SIGNATURE MISMATCH");
-      throw { status: 400, message: "Invalid payment signature" };
+      throw { status: HTTP_STATUS.BAD_REQUEST, message: "Invalid payment signature" };
     }
 
     console.log("✅ SIGNATURE VERIFIED");
@@ -201,7 +201,7 @@ export const verifyPaymentEvent = async (req, res) => {
 
     if (!ticket) {
       console.error("❌ TICKET NOT FOUND");
-      throw { status: 400, message: "Invalid ticket state" };
+      throw { status: HTTP_STATUS.BAD_REQUEST, message: "Invalid ticket state" };
     }
 
     console.log("🎟️ TICKET STATUS BEFORE:", ticket.status);
@@ -210,7 +210,7 @@ export const verifyPaymentEvent = async (req, res) => {
 
     if (ticket.status !== "Locked") {
       console.error("❌ TICKET NOT IN LOCKED STATE");
-      throw { status: 400, message: "Invalid ticket state" };
+      throw { status: HTTP_STATUS.BAD_REQUEST, message: "Invalid ticket state" };
     }
 
     const qrText = `${process.env.FRONTEND_URL}/ticket/${ticket._id}`;
@@ -239,7 +239,7 @@ export const verifyPaymentEvent = async (req, res) => {
       qrCodeImageUrl: ticket.qrCode
     });
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Payment verified and ticket activated",
       ticketId: ticket._id,

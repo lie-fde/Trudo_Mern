@@ -1,17 +1,18 @@
+import { HTTP_STATUS } from "../../constants/httpStatusCodes.js";
 import {
   createCampaignService,
   getPendingRequests,
   getCampaignDetailsrepo,
   updateCampaignStatusService,
   getUserCampaignsService,
-  checkCampaignFullService
+  checkCampaignFullService,
 } from "../../services/campaignService.js";
 
 const createCampaign = async (req, res) => {
   try {
     const result = await createCampaignService(req);
 
-    return res.status(201).json({
+    return res.status(HTTP_STATUS.CREATED).json({
       success: true,
       message: "Campaign created successfully",
       data: result,
@@ -19,7 +20,7 @@ const createCampaign = async (req, res) => {
   } catch (err) {
     console.error("Campaign Create Error:", err.message);
 
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to create campaign",
       error: err.message,
@@ -31,19 +32,30 @@ export default { createCampaign };
 
 export const getPendingCampaigns = async (req, res) => {
   try {
-    const campaigns = await getPendingRequests();
-    return res.status(200).json({ success: true, campaigns });
+    const { search = "" } = req.query;
+
+    const campaigns = await getPendingRequests(search);
+
+    return res.status(HTTP_STATUS.OK).json({
+      success: true,
+      campaigns,
+    });
   } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
 export const getCampaignById = async (req, res) => {
   try {
     const campaign = await getCampaignDetailsrepo(req.params.id);
-    return res.status(200).json({ success: true, campaign });
+    return res.status(HTTP_STATUS.OK).json({ success: true, campaign });
   } catch (err) {
-    return res.status(404).json({ success: false, message: err.message });
+    return res
+      .status(HTTP_STATUS.NOT_FOUND)
+      .json({ success: false, message: err.message });
   }
 };
 
@@ -58,16 +70,18 @@ export const updateCampaignStatus = async (req, res) => {
 
     const updatedCampaign = await updateCampaignStatusService(
       req.params.id,
-      updateData
+      updateData,
     );
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: `Campaign ${status} successfully`,
       updatedCampaign,
     });
   } catch (err) {
-    return res.status(400).json({ success: false, message: err.message });
+    return res
+      .status(HTTP_STATUS.BAD_REQUEST)
+      .json({ success: false, message: err.message });
   }
 };
 
@@ -77,41 +91,37 @@ export const getUserCampaignsController = async (req, res) => {
 
     const campaigns = await getUserCampaignsService(userId);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       data: campaigns,
     });
   } catch (err) {
     console.error("Error fetching user campaigns:", err);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to fetch campaigns",
     });
   }
 };
 
-
-
 export const checkCampaignFullController = async (req, res) => {
   try {
     const { campaignId } = req.params;
 
-    if (!campaignId) throw new Error("No campaign ID") ;
+    if (!campaignId) throw new Error("No campaign ID");
 
     const raisedAmount = await checkCampaignFullService(campaignId);
 
-    return res.status(200).json({
-      success:true,
+    return res.status(HTTP_STATUS.OK).json({
+      success: true,
       raisedAmount,
-      message:"Raised amount calculated successfully"
-    })
-
-
+      message: "Raised amount calculated successfully",
+    });
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({
-      success:false,
-      message:error.message
-    })
+    console.log(error);
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message,
+    });
   }
 };

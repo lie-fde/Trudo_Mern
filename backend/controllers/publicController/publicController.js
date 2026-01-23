@@ -2,6 +2,7 @@ import {
   getPublicCampaigns,
   getSinglePublicCampaign,
 } from "../../services/publicCampaignService.js";
+import { HTTP_STATUS } from "../../constants/httpStatusCodes.js";
 
 export const getCampaigns = async (req, res, next) => {
   try {
@@ -19,7 +20,7 @@ export const getCampaigns = async (req, res, next) => {
       sort,
     });
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       ...data,
     });
@@ -34,7 +35,7 @@ export const getSingleCampaign = async (req, res, next) => {
 
     const campaign = await getSinglePublicCampaign(id);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       campaign,
     });

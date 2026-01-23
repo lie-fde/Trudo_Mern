@@ -6,13 +6,17 @@ import {
 } from "../../store/campaignRequestSlice.js";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { Search } from "lucide-react";
 
 import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
 import AdminNavbar from "../../components/Admin/AdminNavbar.jsx";
+import { useDebounce } from "../../hooks/debouncehook.jsx";
 
 export default function CampaignRequestList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
 
   const [collapsed, setCollapsed] = useState(false);
   // Add state to track mobile view for dynamic margin adjustment
@@ -27,8 +31,9 @@ export default function CampaignRequestList() {
   const { campaigns, loading } = useSelector((state) => state.campaignRequests);
 
   useEffect(() => {
-    dispatch(fetchPendingCampaigns());
-  }, [dispatch]);
+  dispatch(fetchPendingCampaigns({ search: debouncedSearch }));
+}, [dispatch, debouncedSearch]);
+
 
   const handleStatus = (id, status) => {
     dispatch(updateCampaignStatus({ campaignId: id, status }));
@@ -60,13 +65,13 @@ export default function CampaignRequestList() {
             campaignId,
             status: "Rejected",
             rejectionReason: rejectionReason,
-          })
+          }),
         );
 
         Swal.fire(
           "Rejected!",
           "The campaign request has been rejected and the reason has been logged.",
-          "error"
+          "error",
         );
 
         dispatch(fetchPendingCampaigns());
@@ -89,13 +94,13 @@ export default function CampaignRequestList() {
           updateCampaignStatus({
             campaignId,
             status: "Approved",
-          })
+          }),
         );
 
         Swal.fire(
           "Approved!",
           "The campaign request has been successfully approved and removed from the list.",
-          "success"
+          "success",
         );
         dispatch(fetchPendingCampaigns());
       }
@@ -122,7 +127,19 @@ export default function CampaignRequestList() {
             Campaign Request
           </h1>
 
-          {loading && <p className="mb-4">Loading...</p>}
+          <div className="mb-6 w-full sm:w-80 relative">
+            <Search
+              size={18}
+              className="absolute left-3 top-2.5 text-gray-400"
+            />
+            <input
+              type="text"
+              placeholder="Search by user name or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border rounded-md focus:ring-1 focus:ring-green-600 outline-none"
+            />
+          </div>
 
           <div className="bg-white shadow rounded-xl overflow-hidden">
             {/* Added overflow-x-auto to handle the grid on small screens */}
@@ -142,6 +159,11 @@ export default function CampaignRequestList() {
                     <p>Action</p>
                   </div>
                 </div>
+                {loading && (
+                  <div className="flex items-center justify-center h-40">
+                    <p className="text-gray-500 text-sm">Loading...</p>
+                  </div>
+                )}
                 {campaigns.map((c, i) => (
                   <div
                     key={i}
@@ -173,8 +195,8 @@ export default function CampaignRequestList() {
                           c.status === "Approved"
                             ? "bg-green-100 text-green-700"
                             : c.status === "Rejected"
-                            ? "bg-red-100 text-red-600"
-                            : "bg-yellow-100 text-yellow-700"
+                              ? "bg-red-100 text-red-600"
+                              : "bg-yellow-100 text-yellow-700"
                         }`}
                       >
                         {c.status}

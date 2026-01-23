@@ -11,18 +11,62 @@ export const findCampaignById = async (id) =>
 export const findAllCampaigns = async () =>
   await Campaign.find().populate("User");
 
-export const getPendingCampaigns = async () => {
-  return await Campaign.find({ status: "Pending", isDeleted: false }).sort({ createdAt: -1 }).populate(
-    "User",
-    "userName userEmail mobileNumber"
-  );
+export const getPendingCampaigns = async (search) => {
+  const matchStage = {
+    status: "Pending",
+    isDeleted: false,
+  };
+
+  const pipeline = [
+    { $match: matchStage },
+
+    {
+      $lookup: {
+        from: "users",
+        localField: "User",
+        foreignField: "_id",
+        as: "User",
+      },
+    },
+    { $unwind: "$User" },
+
+    // 🔍 Backend search
+    ...(search
+      ? [
+          {
+            $match: {
+              $or: [
+                { "User.userName": { $regex: search, $options: "i" } },
+                { "User.userEmail": { $regex: search, $options: "i" } },
+                { "User.mobileNumber": { $regex: search, $options: "i" } },
+              ],
+            },
+          },
+        ]
+      : []),
+
+    { $sort: { createdAt: -1 } },
+
+    {
+      $project: {
+        User: {
+          userName: 1,
+          userEmail: 1,
+          mobileNumber: 1,
+        },
+        status: 1,
+        createdAt: 1,
+      },
+    },
+  ];
+
+  return await Campaign.aggregate(pipeline);
 };
 
-export const 
-getCampaignById = async (id) => {
+export const getCampaignById = async (id) => {
   return await Campaign.findById(id).populate(
     "User",
-    "userName userEmail mobileNumber"
+    "userName userEmail mobileNumber",
   );
 };
 
@@ -40,18 +84,6 @@ export const updateStatus = async (id, updateData) => {
 
   return await Campaign.findByIdAndUpdate(id, updateFields, { new: true });
 };
-
-// export const findPublicCampaigns = async () => {
-//   return Campaign.find({
-//     status: "Approved",
-//     isDeleted: false,
-//     isBlocked: false,
-//   })
-//     .select("title image targetAmount createdAt")
-//     .sort({ createdAt: -1 })
-//     .lean();
-// };
-
 
 export const findPublicCampaigns = async ({ page, limit, search, sort }) => {
   const skip = (page - 1) * limit;
@@ -158,8 +190,6 @@ export const findPublicCampaigns = async ({ page, limit, search, sort }) => {
   };
 };
 
-
-
 export const findPublicCampaignById = async (campaignId) => {
   return Campaign.findOne({
     _id: campaignId,
@@ -170,23 +200,60 @@ export const findPublicCampaignById = async (campaignId) => {
     .lean();
 };
 
-export const findCampaignsAdmin = async () => {
-  return Campaign.find({
+export const findCampaignsAdmin = async ({
+  search,
+  category,
+  sort,
+  page,
+  limit,
+}) => {
+  const filter = {
     status: "Approved",
     isDeleted: false,
-  })
-    .select(
-      "_id title image category status targetAmount isBlocked isDeleted createdAt"
-    )
-    .sort({ createdAt: -1 })
-    .lean();
+  };
+
+  // 🔍 Search by title (case-insensitive)
+  if (search) {
+    filter.title = { $regex: search, $options: "i" };
+  }
+
+  // 🏷 Category filter
+  if (category) {
+    filter.category = category;
+  }
+
+  // 🔃 Sorting
+  let sortQuery = { createdAt: -1 };
+  if (sort === "amountAsc") sortQuery = { targetAmount: 1 };
+  if (sort === "amountDesc") sortQuery = { targetAmount: -1 };
+
+  // 📄 Pagination
+  const skip = (page - 1) * limit;
+
+  const [campaigns, totalDocs] = await Promise.all([
+    Campaign.find(filter)
+      .select("_id title image category targetAmount isBlocked createdAt")
+      .sort(sortQuery)
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+
+    Campaign.countDocuments(filter),
+  ]);
+
+  return {
+    campaigns,
+    totalDocs,
+    totalPages: Math.ceil(totalDocs / limit),
+    currentPage: page,
+  };
 };
 
 export const blockCampaignRepository = async (id) => {
   return await Campaign.findByIdAndUpdate(
     id,
     { isBlocked: true },
-    { new: true }
+    { new: true },
   );
 };
 
@@ -194,7 +261,7 @@ export const unblockCampaignRepository = async (id) => {
   return await Campaign.findByIdAndUpdate(
     id,
     { isBlocked: false },
-    { new: true }
+    { new: true },
   );
 };
 
@@ -202,7 +269,7 @@ export const deleteCampaignRepository = async (id) => {
   return await Campaign.findByIdAndUpdate(
     id,
     { isDeleted: true },
-    { new: true }
+    { new: true },
   );
 };
 
@@ -266,7 +333,6 @@ export const getmMyCampaign = async (userId) => {
     },
   ]);
 };
-
 
 export const calculateRaisedAmountRepo = async (campaignId) => {
   const result = await Campaign.aggregate([

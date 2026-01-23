@@ -1,6 +1,14 @@
 import adminApi from "../api/adminApi.js";
 
-export const fetchUsersList = () => adminApi.get("/admin/users");
+export const fetchUsersList = ({ search = "", page = 1, limit = 7 }) => {
+  return adminApi.get("/admin/users", {
+    params: {
+      search,
+      page,
+      limit,
+    },
+  });
+};
 
 export const blockUser = (id) => adminApi.patch(`/admin/users/block/${id}`);
 

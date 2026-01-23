@@ -5,6 +5,7 @@ import Payment from "../models/Payment.js";
 import Events from "../models/Events.js";
 import { deleteQR } from "../middlewares/qrCodeUpload.js";
 import sendMail from "../utils/sendMail.js";
+import { HTTP_STATUS } from "../constants/httpStatusCodes.js";
 
 export const lockTicketService = async ({
   userId,
@@ -13,14 +14,14 @@ export const lockTicketService = async ({
 }) => {
   if (!eventId || !quantity) {
     throw {
-      status: 400,
+      status: HTTP_STATUS.BAD_REQUEST,
       message: "Event ID and quantity are required",
     };
   }
 
   if (quantity < 1 || quantity > 5) {
     throw {
-      status: 400,
+      status: HTTP_STATUS.BAD_REQUEST,
       message: "Minimum 1 and maximum 5 tickets allowed",
     };
   }
@@ -33,19 +34,19 @@ export const lockTicketService = async ({
     });
   } catch (err) {
     if (err.message === "EVENT_NOT_FOUND") {
-      throw { status: 404, message: "Event not found" };
+      throw { status: HTTP_STATUS.NOT_FOUND, message: "Event not found" };
     }
 
     if (err.message.startsWith("NOT_ENOUGH_TICKETS")) {
       const available = err.message.split(":")[1];
       throw {
-        status: 400,
+        status: HTTP_STATUS.BAD_REQUEST,
         code: "TICKETS_NOT_AVAILABLE",
         message: `Only ${available} tickets left`,
       };
     }
 
-    throw { status: 500, message: "Server error" };
+    throw { status: HTTP_STATUS.INTERNAL_SERVER_ERROR, message: "Server error" };
   }
 };
 
@@ -109,7 +110,7 @@ export const verifyTicket = async (req, res) => {
     .populate("eventId");
 
   if (!ticket) {
-    return res.status(404).json({
+    return res.status(HTTP_STATUS.NOT_FOUND).json({
       valid: false,
       message: "Invalid ticket",
     });

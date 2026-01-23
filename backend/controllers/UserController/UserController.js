@@ -1,13 +1,14 @@
 import UserService from "../../services/UserService.js";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import { HTTP_STATUS } from "../../constants/httpStatusCodes.js";
 
 export const register = async (req, res) => {
   try {
     const user = await UserService.signup(req.body);
-    res.status(201).json(user);
+    res.status(HTTP_STATUS.CREATED).json(user);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ message: error.message });
   }
 };
 
@@ -16,9 +17,9 @@ export const otpVerify = async (req, res) => {
     const { email, otp } = req.body;
     const result = await UserService.verifyOtp(email, otp);
 
-    res.status(200).json(result);
+    res.status(HTTP_STATUS.OK).json(result);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ message: error.message });
   }
 };
 
@@ -27,9 +28,9 @@ export const resendOtp = async (req, res) => {
     const { email } = req.body;
     const result = await UserService.resendOtp(email);
 
-    res.status(200).json(result);
+    res.status(HTTP_STATUS.OK).json(result);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ message: error.message });
   }
 };
 
@@ -38,9 +39,9 @@ export const resendOtpPassword = async (req, res) => {
     const { email } = req.body;
     const result = await UserService.resendPasswordOtp(email);
 
-    res.status(200).json(result);
+    res.status(HTTP_STATUS.OK).json(result);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ message: error.message });
   }
 };
 
@@ -56,16 +57,16 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "strict",
-      maxAge: 2 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({
+    res.status(HTTP_STATUS.OK).json({
       message: "Login Successful",
       accessToken,
       user,
     });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ message: error.message });
   }
 };
 
@@ -73,9 +74,9 @@ export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
     const response = await UserService.forgotPassword(email);
-    res.status(200).json(response);
+    res.status(HTTP_STATUS.OK).json(response);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ message: error.message });
   }
 };
 
@@ -83,9 +84,9 @@ export const verifyPasswordOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
     const response = await UserService.verifyPasswordOtp(email, otp);
-    res.status(200).json(response);
+    res.status(HTTP_STATUS.OK).json(response);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ message: error.message });
   }
 };
 
@@ -93,9 +94,9 @@ export const resetPassword = async (req, res) => {
   try {
     const { email, newPassword } = req.body;
     const response = await UserService.resetPassword(email, newPassword);
-    res.status(200).json(response);
+    res.status(HTTP_STATUS.OK).json(response);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ message: error.message });
   }
 };
 
@@ -107,16 +108,8 @@ export const googleCallbackController = async (req, res) => {
       httpOnly: true,
       secure: true,        // true in production
       sameSite: "strict",
-      maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 2 days
     });
-
-    // return res.redirect(
-    //   `${
-    //     process.env.FRONTEND_URL
-    //   }/google-success?token=${token}&name=${encodeURIComponent(
-    //     user.name
-    //   )}&email=${encodeURIComponent(user.email)}`
-    // );
 
      return res.redirect(
       `${process.env.FRONTEND_URL}/google-success?accessToken=${accessToken}&name=${encodeURIComponent(
@@ -135,12 +128,12 @@ export const fetchUsersforPagination = async (req, res) => {
 
     const data = await UserService.getAllUsersPaginated(page, limit);
 
-    res.status(200).json({
+    res.status(HTTP_STATUS.OK).json({
       message: "success",
       data,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       message: error.message,
     });
   }
@@ -151,9 +144,9 @@ export const refreshTokenController = async (req, res) => {
     const response = await UserService.refreshAccessToken(
       req.cookies.refreshToken
     );
-    return res.status(200).json(response);
+    return res.status(HTTP_STATUS.OK).json(response);
   } catch (err) {
-    return res.status(401).json({ message: err.message });
+    return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: err.message });
   }
 };
 
@@ -164,17 +157,17 @@ export const logoutController = (req, res) => {
     sameSite: "strict",
   });
 
-  return res.status(200).json({ message: "Logged out successfully" });
+  return res.status(HTTP_STATUS.OK).json({ message: "Logged out successfully" });
 };
 
 export const getMe = async (req, res) => {
   try {
     const response = await UserService.getMeUser(req.user.id);
     return res
-      .status(200)
+      .status(HTTP_STATUS.OK)
       .json({ userName: response.userName, userEmail: response.userEmail });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: error.message });
   }
 };
 
@@ -184,13 +177,13 @@ export const getUserProfileController = async (req, res) => {
 
     const user = await UserService.getUserProfileService(id);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "User profile fetched successfully",
       data: user,
     });
   } catch (err) {
-    return res.status(404).json({
+    return res.status(HTTP_STATUS.NOT_FOUND).json({
       success: false,
       message: err.message,
     });
@@ -201,20 +194,18 @@ export const sendOtpControllerProfile = async (req, res) => {
   try {
     const { email } = req.query;
     if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Email is required" });
     }
     const result = await UserService.sendOtpServiceProfile(email);
-    res.status(200).json(result);
+    res.status(HTTP_STATUS.OK).json(result);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ message: err.message });
     console.log(err);
   }
 };
 
 export const verifyOtpControllerProfile = async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("REQ.USER:", req.user);
     const { newEmail, otp } = req.body;
     const userId = req.user._id;
     const result = await UserService.verifyOtpServiceProfile(
@@ -222,9 +213,9 @@ export const verifyOtpControllerProfile = async (req, res) => {
       newEmail,
       otp
     );
-    res.status(200).json(result);
+    res.status(HTTP_STATUS.OK).json(result);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ message: err.message });
   }
 };
 
@@ -238,13 +229,13 @@ export const updateUserProfileController = async (req, res) => {
       avatar
     );
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       message: "Profile updated successfully",
       data: updatedUser,
     });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ message: err.message });
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: err.message });
   }
 };
 
@@ -256,12 +247,12 @@ export const changePassword = async (req, res) => {
 
     await UserService.changePasswordService(userId, currentPassword, newPassword);
 
-    res.status(200).json({
+    res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Password updated successfully",
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(HTTP_STATUS.BAD_REQUEST).json({
       success: false,
       message: error.message,
     });

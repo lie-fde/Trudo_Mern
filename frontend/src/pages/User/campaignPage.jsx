@@ -4,10 +4,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchPublicCampaigns } from "../../store/campaignUserSlice.js";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../components/reusable/loader.jsx";
+import { useDebounce } from "../../hooks/debouncehook.jsx";
 
 const Navbar = lazy(() => import("../../components/User/Navbar.jsx"));
 const CTABanner = lazy(() => import("../../components/User/CTABanner.jsx"));
 const Trudofooter = lazy(() => import("../../components/reusable/footer"));
+
 
 const CampaignCard = ({ campaign }) => {
   const progress =
@@ -89,17 +91,19 @@ export default function CampaignPage() {
     (state) => state.campaignPublic
   );
 
+  const deboundedSearch = useDebounce(searchTerm,500)
+
   // Fetch campaigns when search, pagination, or sort changes
   useEffect(() => {
     dispatch(
       fetchPublicCampaigns({
         page: currentPage,
         limit: 6,
-        search: searchTerm,
+        search: deboundedSearch,
         sort,
       })
     );
-  }, [dispatch, searchTerm, currentPage, sort]);
+  }, [dispatch, deboundedSearch, currentPage, sort]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);

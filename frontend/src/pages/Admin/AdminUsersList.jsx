@@ -3,18 +3,26 @@ import AdminSidebar from "../../components/Admin/AdminSidebar.jsx";
 import AdminNavbar from "../../components/Admin/AdminNavbar.jsx";
 import { Search, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2'
-import { blockUser, fetchUsersList, unblockUser ,deleteUser} from "../../services/adminService.js";
+import Swal from "sweetalert2";
+import {
+  blockUser,
+  fetchUsersList,
+  unblockUser,
+  deleteUser,
+} from "../../services/adminService.js";
+import { useDebounce } from "../../hooks/debouncehook.jsx";
 
 export default function UsersList() {
   const [collapsed, setCollapsed] = useState(false);
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 7; 
+  const usersPerPage = 7;
 
   const navigate = useNavigate();
+  const debouncedSearch = useDebounce(search, 500);
 
   // Handle screen resize for sidebar logic
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
@@ -28,75 +36,70 @@ export default function UsersList() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetchUsersList()
-        setUsers(res.data.users);
+        const res = await fetchUsersList({
+          search: debouncedSearch,
+          page: currentPage,
+          limit: usersPerPage,
+        });
+
+        if (res.data.success) {
+          setUsers(res.data.users);
+          setTotalPages(res.data.totalPages);
+        }
       } catch (err) {
         console.log("Error fetching users:", err);
       }
     };
+
     fetchUsers();
-  }, []);
-
-  const filteredUsers = users.filter((u) =>
-    u.userName.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
-
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  }, [debouncedSearch, currentPage]);
 
   const goToPage = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
   };
 
+  const handleBlockUser = (id, isBlocked) => {
+    Swal.fire({
+      title: isBlocked ? "Unblock this user?" : "Block this user?",
+      text: isBlocked
+        ? "This user will regain access to their account."
+        : "The user will not be able to access their account.",
+      icon: isBlocked ? "info" : "warning",
+      showCancelButton: true,
+      confirmButtonColor: isBlocked ? "#16a34a" : "#f59e0b",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: isBlocked ? "Yes, unblock user" : "Yes, block user",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          if (!isBlocked) {
+            await blockUser(id);
+          } else {
+            await unblockUser(id);
+          }
 
-const handleBlockUser = (id, isBlocked) => {
-  Swal.fire({
-    title: isBlocked ? "Unblock this user?" : "Block this user?",
-    text: isBlocked 
-      ? "This user will regain access to their account." 
-      : "The user will not be able to access their account.",
-    icon: isBlocked ? "info" : "warning",
-    showCancelButton: true,
-    confirmButtonColor: isBlocked ? "#16a34a" : "#f59e0b",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: isBlocked ? "Yes, unblock user" : "Yes, block user",
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
+          Swal.fire({
+            title: isBlocked ? "Unblocked!" : "Blocked!",
+            text: isBlocked
+              ? "User has been unblocked successfully."
+              : "User has been blocked successfully.",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          });
 
-        if (!isBlocked) {
-          await blockUser(id)
-        } else {
-          await unblockUser(id)
+          setUsers((prev) =>
+            prev.map((user) =>
+              user._id === id ? { ...user, isBlocked: !isBlocked } : user,
+            ),
+          );
+        } catch (err) {
+          Swal.fire("Error", "Failed to update user status", "error");
         }
-
-        Swal.fire({
-          title: isBlocked ? "Unblocked!" : "Blocked!",
-          text: isBlocked 
-            ? "User has been unblocked successfully."
-            : "User has been blocked successfully.",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-
-        setUsers((prev) =>
-          prev.map((user) =>
-            user._id === id ? { ...user, isBlocked: !isBlocked } : user
-          )
-        );
-
-      } catch (err) {
-        Swal.fire("Error", "Failed to update user status", "error");
       }
-    }
-  });
-};
-
+    });
+  };
 
   const handleDeleteUser = (id) => {
     Swal.fire({
@@ -112,23 +115,19 @@ const handleBlockUser = (id, isBlocked) => {
         try {
           await deleteUser(id);
 
-                setUsers((prevUsers) =>
-          prevUsers.filter((user) => user._id !== id)
-        );
+          setUsers((prevUsers) => prevUsers.filter((user) => user._id !== id));
 
           Swal.fire({
             title: "Deleted!",
             text: "User has been removed.",
             icon: "success",
           });
-
         } catch (err) {
           Swal.fire("Error", "Failed to delete user", "error");
         }
       }
     });
   };
-
 
   return (
     <div className="bg-gray-50 min-h-screen flex">
@@ -139,19 +138,24 @@ const handleBlockUser = (id, isBlocked) => {
       <div
         className="flex-1 transition-all duration-300 w-full"
         style={{
-          marginLeft: isMobile ? 0 : (collapsed ? 80 : 240),
+          marginLeft: isMobile ? 0 : collapsed ? 80 : 240,
           paddingTop: 72, // navbar height
         }}
       >
-        <AdminNavbar collapsed={collapsed} setCollapsed={setCollapsed}/>
+        <AdminNavbar collapsed={collapsed} setCollapsed={setCollapsed} />
 
         <div className="p-4 sm:p-8 mt-1">
           <h1 className="text-xl sm:text-2xl font-semibold mb-1">Users List</h1>
-          <p className="text-xs sm:text-sm text-gray-500 mb-6">Dashboard / Users</p>
+          <p className="text-xs sm:text-sm text-gray-500 mb-6">
+            Dashboard / Users
+          </p>
 
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div className="relative w-full sm:w-72">
-              <Search size={18} className="absolute left-3 top-2.5 text-gray-400" />
+              <Search
+                size={18}
+                className="absolute left-3 top-2.5 text-gray-400"
+              />
               <input
                 type="text"
                 placeholder="Search user..."
@@ -159,7 +163,7 @@ const handleBlockUser = (id, isBlocked) => {
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
-                  setCurrentPage(1); 
+                  setCurrentPage(1);
                 }}
               />
             </div>
@@ -182,7 +186,7 @@ const handleBlockUser = (id, isBlocked) => {
                 </thead>
 
                 <tbody className="divide-y divide-gray-100">
-                  {currentUsers.map((user, i) => (
+                  {users.map((user, i) => (
                     <tr key={i} className="hover:bg-gray-50 transition-colors">
                       <td className="p-4 flex items-center gap-3">
                         <img
@@ -191,14 +195,24 @@ const handleBlockUser = (id, isBlocked) => {
                           alt="avatar"
                         />
                         <div className="min-w-0">
-                          <p className="font-medium truncate">{user.userName}</p>
-                          <p className="text-xs text-gray-500 truncate">{user.userEmail}</p>
+                          <p className="font-medium truncate">
+                            {user.userName}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">
+                            {user.userEmail}
+                          </p>
                         </div>
                       </td>
 
-                      <td className="p-4 text-sm whitespace-nowrap">{user.mobileNumber}</td>
-                      <td className="p-4 text-sm">{user.totalDonations || 0}</td>
-                      <td className="p-4 text-sm font-semibold text-gray-700">₹ {user.totalAmountDonated || 0}</td>
+                      <td className="p-4 text-sm whitespace-nowrap">
+                        {user.mobileNumber}
+                      </td>
+                      <td className="p-4 text-sm">
+                        {user.totalDonations || 0}
+                      </td>
+                      <td className="p-4 text-sm font-semibold text-gray-700">
+                        ₹ {user.totalAmountDonated || 0}
+                      </td>
 
                       <td className="p-4">
                         <span
@@ -214,7 +228,9 @@ const handleBlockUser = (id, isBlocked) => {
 
                       <td className="p-4">
                         <button
-                          onClick={() => handleBlockUser(user._id, user.isBlocked)}
+                          onClick={() =>
+                            handleBlockUser(user._id, user.isBlocked)
+                          }
                           className={`w-24 py-1.5 rounded-md text-xs font-bold transition-all ${
                             user.isBlocked
                               ? "bg-green-600 hover:bg-green-700 text-white"
@@ -227,7 +243,7 @@ const handleBlockUser = (id, isBlocked) => {
 
                       <td className="p-4">
                         <button
-                          onClick={()=>handleDeleteUser(user._id)}
+                          onClick={() => handleDeleteUser(user._id)}
                           className="px-4 py-1.5 rounded-md text-xs font-bold bg-red-600 hover:bg-red-700 text-white transition-all"
                         >
                           Delete
@@ -256,7 +272,9 @@ const handleBlockUser = (id, isBlocked) => {
                   key={i}
                   onClick={() => goToPage(i + 1)}
                   className={`px-3 py-1 border rounded text-sm transition-colors ${
-                    currentPage === i + 1 ? "bg-green-600 text-white" : "hover:bg-gray-100"
+                    currentPage === i + 1
+                      ? "bg-green-600 text-white"
+                      : "hover:bg-gray-100"
                   }`}
                 >
                   {i + 1}
@@ -272,7 +290,6 @@ const handleBlockUser = (id, isBlocked) => {
               Next
             </button>
           </div>
-
         </div>
       </div>
     </div>

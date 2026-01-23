@@ -12,80 +12,31 @@ const findByIdEvent = async (userId) => await User.findById(userId);
 const updatePassword = async (email, hashedPassword) => {
   return await User.updateOne(
     { userEmail: email },
-    { $set: { password: hashedPassword } }
+    { $set: { password: hashedPassword } },
   );
 };
 
-// const findAllUsers = async () => {
-//   return await User.find({ isDeleted: false, isAdmin: false });
-// };
+const findAllUsers = async ({ search, page, limit }) => {
+  const matchStage = {
+    isDeleted: false,
+    isAdmin: false,
+  };
 
-// const findAllUsers = async () => {
-//   return await DonationTransaction.aggregate([
-//     // Join Payment
-//     {
-//       $lookup: {
-//         from: "payments",
-//         localField: "paymentId",
-//         foreignField: "_id",
-//         as: "payment",
-//       },
-//     },
-//     { $unwind: "$payment" },
+  // 🔍 Backend search (username / email / mobile)
+  if (search) {
+    matchStage.$or = [
+      { userName: { $regex: search, $options: "i" } },
+      { userEmail: { $regex: search, $options: "i" } },
+      { mobileNumber: { $regex: search, $options: "i" } },
+    ];
+  }
 
-//     // Only successful payments
-//     {
-//       $match: {
-//         "payment.paymentStatus": "success",
-//       },
-//     },
+  const skip = (page - 1) * limit;
 
-//     // Group by User
-//     {
-//       $group: {
-//         _id: "$UserId",
-//         totalDonations: { $sum: 1 },
-//         totalAmountDonated: { $sum: "$payment.amount" },
-//       },
-//     },
+  const pipeline = [
+    { $match: matchStage },
 
-//     // Join User details
-//     {
-//       $lookup: {
-//         from: "users",
-//         localField: "_id",
-//         foreignField: "_id",
-//         as: "user",
-//       },
-//     },
-//     { $unwind: "$user" },
-
-//     // Shape output
-//     {
-//       $project: {
-//         _id: 0,
-//         _id: "$user._id",
-//         userName: "$user.userName",
-//         userEmail: "$user.userEmail",
-//         mobileNumber:"$user.mobileNumber",
-//         totalDonations: 1,
-//         totalAmountDonated: 1,
-//       },
-//     },
-//   ]);
-// };
-
-const findAllUsers = async () => {
-  return await User.aggregate([
-    // 1️⃣ Only active non-admin users
-    {
-      $match: {
-        isDeleted: false,
-        isAdmin: false,
-      },
-    },
-
-    // 2️⃣ Join Donation Transactions
+    // Join Donation Transactions
     {
       $lookup: {
         from: "donationtransactions",
@@ -95,7 +46,7 @@ const findAllUsers = async () => {
       },
     },
 
-    // 3️⃣ Join successful Payments
+    // Join successful Payments
     {
       $lookup: {
         from: "payments",
@@ -116,7 +67,7 @@ const findAllUsers = async () => {
       },
     },
 
-    // 4️⃣ Calculate totals
+    // Calculate totals
     {
       $addFields: {
         totalDonations: { $size: "$successfulPayments" },
@@ -126,18 +77,38 @@ const findAllUsers = async () => {
       },
     },
 
-    // 5️⃣ Final response shape
+    // Sort latest users
+    { $sort: { createdAt: -1 } },
+
+    // Pagination
+    { $skip: skip },
+    { $limit: limit },
+
+    // Final shape
     {
       $project: {
         _id: 1,
         userName: 1,
-        userEmail: 1,          // ✅ from User
-        mobileNumber: 1,   // ✅ from User
+        userEmail: 1,
+        mobileNumber: 1,
         totalDonations: 1,
         totalAmountDonated: 1,
+        isBlocked: 1,
       },
     },
+  ];
+
+  const [users, totalDocs] = await Promise.all([
+    User.aggregate(pipeline),
+    User.countDocuments(matchStage),
   ]);
+
+  return {
+    users,
+    totalDocs,
+    totalPages: Math.ceil(totalDocs / limit),
+    currentPage: page,
+  };
 };
 
 const blockUser = async (id) => {
@@ -163,7 +134,7 @@ const updateUserEmailRepo = async (userId, newEmail) => {
   return await User.findByIdAndUpdate(
     userId,
     { userEmail: newEmail },
-    { new: true }
+    { new: true },
   );
 };
 
@@ -171,11 +142,11 @@ const updateUserProfileRepo = async (userId, updateData) => {
   return await User.findByIdAndUpdate(
     userId,
     { $set: updateData },
-    { new: true }
+    { new: true },
   );
 };
 
- const updateUserPassword = (id, password) => {
+const updateUserPassword = (id, password) => {
   return User.findByIdAndUpdate(id, { password });
 };
 
@@ -194,5 +165,5 @@ export default {
   updateUserEmailRepo,
   updateUserProfileRepo,
   findByIdEvent,
-  updateUserPassword
+  updateUserPassword,
 };

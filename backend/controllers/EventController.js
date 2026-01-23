@@ -11,13 +11,14 @@ import {
   updateEventService,
 } from "../services/EventService.js";
 import { validationResult } from "express-validator";
+import { HTTP_STATUS } from "../constants/httpStatusCodes.js";
 
 export const createEventController = async (req, res) => {
   try {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      return res.status(422).json({
+      return res.status(HTTP_STATUS.UNPROCESSABLE_ENTITY).json({
         success: false,
         errors: errors.array(),
       });
@@ -26,7 +27,7 @@ export const createEventController = async (req, res) => {
     const id = req.admin?._id || req.user?._id;
 
     if (!req.file || req.file.length === 0) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         success: false,
         message: "At least one event image is required",
       });
@@ -36,13 +37,13 @@ export const createEventController = async (req, res) => {
 
     const event = await createEventService(id, req.body, file);
 
-    res.status(201).json({
+    res.status(HTTP_STATUS.CREATED).json({
       success: true,
       message: "Event created successfully",
       event,
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(HTTP_STATUS.BAD_REQUEST).json({
       success: false,
       message: err.message,
     });
@@ -51,9 +52,11 @@ export const createEventController = async (req, res) => {
 
 export const getPendingEventsController = async (req, res, next) => {
   try {
-    const events = await getPendingEventsService();
-    console.log(events);
-    return res.status(200).json({
+    const { search = "" } = req.query;
+
+    const events = await getPendingEventsService(search);
+
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       events,
     });
@@ -66,7 +69,7 @@ export const updateEventStatusController = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({
+      return res.status(HTTP_STATUS.UNPROCESSABLE_ENTITY).json({
         success: false,
         errors: errors.array(),
       });
@@ -78,17 +81,17 @@ export const updateEventStatusController = async (req, res, next) => {
     const updatedEvent = await updateEventStatusService(
       eventId,
       status,
-      rejectionReason
+      rejectionReason,
     );
 
     if (!updatedEvent) {
-      return res.status(404).json({
+      return res.status(HTTP_STATUS.NOT_FOUND).json({
         success: false,
         message: "Event not found",
       });
     }
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Event status updated successfully",
       event: updatedEvent,
@@ -111,7 +114,7 @@ export const getSingleEventController = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching event:", error);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Internal server error",
     });
@@ -123,13 +126,13 @@ export const getAllEvents = async (req, res) => {
     const data = await getAllEventsService(req.query);
     console.log("CATEGORY RECEIVED:", req.query.category);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       ...data,
     });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Server Error",
     });
@@ -141,13 +144,13 @@ export const blockEventController = async (req, res) => {
     const { eventId } = req.params;
     const result = await blockEventService(eventId);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Event blocked successfully",
       data: result,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       success: false,
       message: error.message,
     });
@@ -159,13 +162,13 @@ export const unblockEventController = async (req, res) => {
     const { eventId } = req.params;
     const result = await unblockEventService(eventId);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Event Unblocked successfully",
       data: result,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       success: false,
       message: error.message,
     });
@@ -177,13 +180,13 @@ export const deleteEventController = async (req, res) => {
     const { eventId } = req.params;
     const result = await deleteEventService(eventId);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Event deleted successfully",
       data: result,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       success: false,
       message: error.message,
     });
@@ -195,7 +198,7 @@ export const getEventsUserController = async (req, res) => {
     const id = req.user._id;
     const data = await getEventsUserService(req.query, id);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       events: data.events,
       pagination: {
@@ -207,7 +210,9 @@ export const getEventsUserController = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ success: false, message: "Server Error" });
+    return res
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: "Server Error" });
   }
 };
 
@@ -215,7 +220,7 @@ export const updateEventController = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         success: false,
         errors: errors.array(),
       });
@@ -224,15 +229,17 @@ export const updateEventController = async (req, res) => {
 
     const updatedEvent = await updateEventService(eventId, req);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Event updated successfully",
       event: updatedEvent,
     });
   } catch (err) {
-    return res.status(err.statusCode || 500).json({
-      success: false,
-      message: err.message || "Server Error",
-    });
+    return res
+      .status(err.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      .json({
+        success: false,
+        message: err.message || "Server Error",
+      });
   }
 };

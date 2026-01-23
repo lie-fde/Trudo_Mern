@@ -391,6 +391,7 @@ import {
   deleteEvent,
 } from "../../services/adminService";
 import { fetchAllEvents } from "../../store/eventSlice";
+import { useDebounce } from "../../hooks/debouncehook";
 
 export default function EventsPage() {
   const dispatch = useDispatch();
@@ -402,6 +403,7 @@ export default function EventsPage() {
   const [sort, setSort] = useState("latest");
   const [page, setPage] = useState(1);
   const [sidebarOpen, setSidebarOpen] = useState(false); // For Mobile Sidebar toggle
+  const debouncedSearch = useDebounce(search, 500);
 
   const limit = 5;
 
@@ -414,14 +416,14 @@ export default function EventsPage() {
   useEffect(() => {
     dispatch(
       fetchAllEvents({
-        search,
+        search:debouncedSearch,
         page,
         limit,
         sort,
         category,
       })
     );
-  }, [search, sort, page, category, dispatch]);
+  }, [debouncedSearch, sort, page, category, dispatch]);
 
   const handleBlockCampaign = (eventId, isBlocked) => {
     Swal.fire({

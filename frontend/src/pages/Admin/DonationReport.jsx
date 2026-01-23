@@ -15,6 +15,7 @@ import {
 } from "../../components/reusable/DonationReport.jsx";
 import Pagination from "../../components/reusable/Pagination.jsx";
 import adminApi from "../../api/adminApi.js";
+import { useDebounce } from "../../hooks/debouncehook.jsx";
 
 const DonationReport = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -27,6 +28,7 @@ const DonationReport = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [loading, setLoading] = useState(false);
+  const debouncedSearch = useDebounce(search, 500);
 
   const [stats, setStats] = useState({
     TotalUsers: 0,
@@ -42,7 +44,7 @@ const DonationReport = () => {
         params: {
           page,
           limit,
-          search,
+          search:debouncedSearch,
           campaign: campaignFilter,
           from: fromDate,
           to: toDate,
@@ -61,7 +63,7 @@ const DonationReport = () => {
 
   useEffect(() => {
     fetchDonations();
-  }, [page, search, campaignFilter, fromDate, toDate]);
+  }, [page, debouncedSearch, campaignFilter, fromDate, toDate]);
 
   useEffect(() => {
     async function loadStats() {
