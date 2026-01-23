@@ -16,7 +16,6 @@ export default function Signup() {
   const { accessToken } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    console.log(accessToken);
     if (accessToken) navigate("/");
   }, [navigate]);
 
@@ -39,7 +38,7 @@ export default function Signup() {
         data.fullName,
         data.email,
         data.mobile,
-        data.password
+        data.password,
       );
 
       setMessage(response.data.message);
@@ -161,13 +160,21 @@ export default function Signup() {
                 }`}
                 {...register("password", {
                   required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters",
+                  validate: (value) => {
+                    if (/\s/.test(value))
+                      return "Password cannot contain spaces";
+                    if (value.length < 8)
+                      return "Password must be at least 8 characters";
+                    if (!/[A-Z]/.test(value))
+                      return "Password must include at least one uppercase letter";
+                    if (!/[a-z]/.test(value))
+                      return "Password must include at least one lowercase letter";
+                    if (!/\d/.test(value))
+                      return "Password must include at least one number";
+                    if (!/[@$!%*?&]/.test(value))
+                      return "Password must include at least one special character (@$!%*?&)";
+                    return true;
                   },
-                  validate: (value) =>
-                    noSpacesPattern.test(value) ||
-                    "Password cannot contain spaces",
                 })}
               />
               <button
