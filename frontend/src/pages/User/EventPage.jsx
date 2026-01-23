@@ -83,7 +83,7 @@ const EventCard = ({ event, navigate }) => (
 
         {/* Divider */}
         <div className="h-px bg-gray-100 w-full my-1"></div>
-        {console.log(event)}
+      
         {/* Created By & Venue */}
         <div className="flex flex-col gap-1">
           <p className="text-sm text-gray-500 flex items-center justify-center gap-1">
@@ -135,10 +135,6 @@ const EventPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  useEffect(() => {
-    console.log("EventPage mounted");
-  }, []);
-
   const loadEvents = async () => {
     try {
       setLoading(true);

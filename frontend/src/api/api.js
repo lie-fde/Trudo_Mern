@@ -19,7 +19,6 @@ api.interceptors.request.use((config) => {
   if (!config.url.includes("refresh-token")) {
     store.dispatch(startApiLoading());
   }
-  // console.log("EVENT PAGE TOKEN:", store.getState().auth?.accessToken);
   const token = store.getState().auth.accessToken;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
