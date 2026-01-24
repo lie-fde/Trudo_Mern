@@ -25,7 +25,7 @@ export default function CampaignsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Frontend State
+  // State
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [sort, setSort] = useState("latest");
@@ -35,6 +35,12 @@ export default function CampaignsPage() {
 
   const ITEMS_PER_PAGE = 6;
 
+  // Redux State (Now using backend pagination values)
+  const { campaigns, loading, totalDocs, totalPages } = useSelector(
+    (state) => state.campaign
+  );
+
+  // Fetch campaigns from backend
   useEffect(() => {
     dispatch(
       fetchAllCampaigns({
@@ -43,13 +49,23 @@ export default function CampaignsPage() {
         sort,
         page,
         limit: ITEMS_PER_PAGE,
-      }),
+      })
     );
   }, [debouncedSearch, category, sort, page, dispatch]);
 
-  const { campaigns, loading } = useSelector((state) => state.campaign);
+  // Helper to refresh the current view after actions
+  const refreshData = () => {
+    dispatch(
+      fetchAllCampaigns({
+        search: debouncedSearch,
+        category,
+        sort,
+        page,
+        limit: ITEMS_PER_PAGE,
+      })
+    );
+  };
 
-  // Logic for Block/Unblock
   const handleBlockCampaign = (campaignId, isBlocked) => {
     Swal.fire({
       title: isBlocked ? "Unlist this campaign?" : "Block this campaign?",
@@ -60,9 +76,7 @@ export default function CampaignsPage() {
       showCancelButton: true,
       confirmButtonColor: isBlocked ? "#16a34a" : "#f59e0b",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: isBlocked
-        ? "Yes, unlist campaign"
-        : "Yes, block campaign",
+      confirmButtonText: isBlocked ? "Yes, unlist campaign" : "Yes, block campaign",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -78,7 +92,7 @@ export default function CampaignsPage() {
             timer: 1500,
             showConfirmButton: false,
           });
-          dispatch(fetchAllCampaigns());
+          refreshData(); // Re-fetch with current filters/page
         } catch (err) {
           Swal.fire("Error", "Failed to update status", "error");
         }
@@ -86,7 +100,6 @@ export default function CampaignsPage() {
     });
   };
 
-  // Logic for Delete
   const handleDeleteCampaign = (campaignId) => {
     Swal.fire({
       title: "Delete this campaign?",
@@ -107,7 +120,7 @@ export default function CampaignsPage() {
             timer: 1500,
             showConfirmButton: false,
           });
-          dispatch(fetchAllCampaigns());
+          refreshData(); // Re-fetch
         } catch (err) {
           Swal.fire("Error", "Failed to delete campaign", "error");
         }
@@ -115,43 +128,14 @@ export default function CampaignsPage() {
     });
   };
 
-  // Filter & Sort Processing
-  let filtered = campaigns.filter((item) =>
-    item.title.toLowerCase().includes(search.toLowerCase()),
-  );
-
-  if (category) {
-    filtered = filtered.filter((item) => item.category === category);
-  }
-
-  if (sort === "amountDesc") {
-    filtered = [...filtered].sort((a, b) => b.targetAmount - a.targetAmount);
-  } else if (sort === "amountAsc") {
-    filtered = [...filtered].sort((a, b) => a.targetAmount - b.targetAmount);
-  } else if (sort === "latest") {
-    filtered = [...filtered].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-    );
-  }
-
-  // Pagination Logic
-  const totalDocs = filtered.length;
-  const totalPages = Math.ceil(totalDocs / ITEMS_PER_PAGE);
-  const paginatedCampaigns = filtered.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE,
-  );
-
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) setPage(newPage);
   };
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans text-gray-900">
-      {/* SIDEBAR */}
       <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
-      {/* MAIN CONTENT */}
       <div
         className={`flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ${
           collapsed ? "md:ml-20" : "md:ml-64"
@@ -160,13 +144,11 @@ export default function CampaignsPage() {
         <AdminNavbar collapsed={collapsed} setCollapsed={setCollapsed} />
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8 mt-16">
-          {/* Breadcrumb */}
           <div className="text-sm text-gray-500 mb-6 hidden sm:block">
             <span>Dashboard</span> <span className="mx-2">&gt;</span>
             <span className="text-black font-semibold">Campaigns</span>
           </div>
 
-          {/* Header + Search */}
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
               <h1 className="text-2xl md:text-3xl font-extrabold border-b-4 border-black pb-1">
@@ -179,7 +161,7 @@ export default function CampaignsPage() {
                   value={search}
                   onChange={(e) => {
                     setSearch(e.target.value);
-                    setPage(1);
+                    setPage(1); // Reset to first page on search
                   }}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-full focus:ring-2 focus:ring-gray-200 outline-none transition-all"
                 />
@@ -195,19 +177,16 @@ export default function CampaignsPage() {
             </button>
           </div>
 
-          {/* Filter + Sort Container */}
           <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-4">
             <div className="flex items-center gap-2 border border-gray-200 rounded-full px-5 py-2.5 bg-white shadow-sm w-full sm:w-auto">
-              <span className="font-bold text-sm whitespace-nowrap">
-                Filter By
-              </span>
+              <span className="font-bold text-sm whitespace-nowrap">Filter By</span>
               <div className="h-4 w-px bg-gray-300 mx-3"></div>
               <select
                 className="text-sm outline-none bg-transparent font-medium text-gray-700 cursor-pointer w-full"
                 value={category}
                 onChange={(e) => {
                   setCategory(e.target.value);
-                  setPage(1);
+                  setPage(1); // Reset to first page on filter
                 }}
               >
                 <option value="">All Categories</option>
@@ -222,94 +201,47 @@ export default function CampaignsPage() {
               <span className="font-bold text-sm">Sort</span>
               <div className="h-4 w-px bg-gray-300 mx-1"></div>
               <div className="flex gap-4">
-                <button
-                  onClick={() => setSort("amountDesc")}
-                  className={`text-sm whitespace-nowrap ${
-                    sort === "amountDesc"
-                      ? "font-bold text-black"
-                      : "text-gray-500"
-                  }`}
-                >
-                  Amount High-Low
-                </button>
-                <button
-                  onClick={() => setSort("amountAsc")}
-                  className={`text-sm whitespace-nowrap ${
-                    sort === "amountAsc"
-                      ? "font-bold text-black"
-                      : "text-gray-500"
-                  }`}
-                >
-                  Amount Low-High
-                </button>
-                <button
-                  onClick={() => setSort("latest")}
-                  className={`text-sm whitespace-nowrap ${
-                    sort === "latest" ? "font-bold text-black" : "text-gray-500"
-                  }`}
-                >
-                  Latest
-                </button>
+                {["amountDesc", "amountAsc", "latest"].map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => {
+                      setSort(option);
+                      setPage(1);
+                    }}
+                    className={`text-sm whitespace-nowrap ${
+                      sort === option ? "font-bold text-black" : "text-gray-500"
+                    }`}
+                  >
+                    {option === "amountDesc" ? "Amount High-Low" : option === "amountAsc" ? "Amount Low-High" : "Latest"}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* CONTENT SECTION (Table/Card) */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            {/* DESKTOP TABLE */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-black text-white">
                   <tr>
-                    <th className="py-5 px-6 text-left text-sm uppercase tracking-wider">
-                      Image
-                    </th>
-                    <th className="py-5 px-6 text-left text-sm uppercase tracking-wider">
-                      Campaign Name
-                    </th>
-                    <th className="py-5 px-6 text-left text-sm uppercase tracking-wider">
-                      Category
-                    </th>
-                    <th className="py-5 px-6 text-center text-sm uppercase tracking-wider">
-                      List Status
-                    </th>
-                    <th className="py-5 px-6 text-center text-sm uppercase tracking-wider">
-                      Action
-                    </th>
+                    <th className="py-5 px-6 text-left text-sm uppercase tracking-wider">Image</th>
+                    <th className="py-5 px-6 text-left text-sm uppercase tracking-wider">Campaign Name</th>
+                    <th className="py-5 px-6 text-left text-sm uppercase tracking-wider">Category</th>
+                    <th className="py-5 px-6 text-center text-sm uppercase tracking-wider">List Status</th>
+                    <th className="py-5 px-6 text-center text-sm uppercase tracking-wider">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {loading ? (
-                    <tr>
-                      <td
-                        colSpan="5"
-                        className="text-center py-12 text-gray-500"
-                      >
-                        Loading data...
-                      </td>
-                    </tr>
-                  ) : paginatedCampaigns.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan="5"
-                        className="text-center py-12 text-gray-500"
-                      >
-                        No results found
-                      </td>
-                    </tr>
+                    <tr><td colSpan="5" className="text-center py-12 text-gray-500">Loading data...</td></tr>
+                  ) : campaigns.length === 0 ? (
+                    <tr><td colSpan="5" className="text-center py-12 text-gray-500">No results found</td></tr>
                   ) : (
-                    paginatedCampaigns.map((item) => (
-                      <tr
-                        key={item._id}
-                        className="hover:bg-gray-50 transition"
-                      >
+                    campaigns.map((item) => (
+                      <tr key={item._id} className="hover:bg-gray-50 transition">
                         <td className="py-4 px-6">
                           <img
-                            src={
-                              Array.isArray(item.image)
-                                ? item.image[0]
-                                : item.image
-                            }
+                            src={Array.isArray(item.image) ? item.image[0] : item.image}
                             className="w-12 h-12 rounded-xl object-cover border"
                             alt=""
                           />
@@ -317,25 +249,17 @@ export default function CampaignsPage() {
                         <td className="py-4 px-6 font-semibold text-gray-800">
                           <span
                             className="underline cursor-pointer hover:text-blue-600 transition"
-                            onClick={() =>
-                              navigate(`/admin/campaigns-request/${item._id}`)
-                            }
+                            onClick={() => navigate(`/admin/campaigns-request/${item._id}`)}
                           >
                             {item.title}
                           </span>
                         </td>
-                        <td className="py-4 px-6 text-gray-600">
-                          {item.category}
-                        </td>
+                        <td className="py-4 px-6 text-gray-600">{item.category}</td>
                         <td className="py-4 px-6 text-center">
                           <button
-                            onClick={() =>
-                              handleBlockCampaign(item._id, item.isBlocked)
-                            }
+                            onClick={() => handleBlockCampaign(item._id, item.isBlocked)}
                             className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                              item.isBlocked
-                                ? "bg-green-600 text-white"
-                                : "bg-red-600 text-white"
+                              item.isBlocked ? "bg-green-600 text-white" : "bg-red-600 text-white"
                             }`}
                           >
                             {item.isBlocked ? "UNBLOCK" : "BLOCK"}
@@ -344,9 +268,7 @@ export default function CampaignsPage() {
                         <td className="py-4 px-6">
                           <div className="flex justify-center gap-3">
                             <button
-                              onClick={() =>
-                                navigate(`/admin/campaigns/edit/${item._id}`)
-                              }
+                              onClick={() => navigate(`/admin/campaigns/edit/${item._id}`)}
                               className="p-2 border rounded-lg hover:bg-gray-100 text-gray-600 transition"
                             >
                               <Edit size={16} />
@@ -368,78 +290,48 @@ export default function CampaignsPage() {
 
             {/* MOBILE CARD VIEW */}
             <div className="md:hidden divide-y divide-gray-100">
-              {loading ? (
-                <div className="text-center py-12 text-gray-500">
-                  Loading...
-                </div>
-              ) : paginatedCampaigns.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  No campaigns found
-                </div>
-              ) : (
-                paginatedCampaigns.map((item) => (
-                  <div key={item._id} className="p-4 flex flex-col gap-4">
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={
-                          Array.isArray(item.image) ? item.image[0] : item.image
-                        }
-                        className="w-16 h-16 rounded-xl object-cover border"
-                        alt=""
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h3
-                          className="font-bold text-gray-900 truncate"
-                          onClick={() =>
-                            navigate(`/admin/campaigns-request/${item._id}`)
-                          }
-                        >
-                          {item.title}
-                        </h3>
-                        <p className="text-xs text-gray-500">{item.category}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between mt-2">
-                      <button
-                        onClick={() =>
-                          handleBlockCampaign(item._id, item.isBlocked)
-                        }
-                        className={`px-4 py-1.5 rounded-full text-[10px] font-bold ${
-                          item.isBlocked
-                            ? "bg-green-600 text-white"
-                            : "bg-red-600 text-white"
-                        }`}
-                      >
-                        {item.isBlocked ? "UNBLOCK" : "BLOCK"}
-                      </button>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() =>
-                            navigate(`/admin/campaigns/edit/${item._id}`)
-                          }
-                          className="p-2 border rounded-lg text-gray-600"
-                        >
-                          <Edit size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteCampaign(item._id)}
-                          className="p-2 border border-red-100 rounded-lg text-red-500"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+              {!loading && campaigns.map((item) => (
+                <div key={item._id} className="p-4 flex flex-col gap-4">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={Array.isArray(item.image) ? item.image[0] : item.image}
+                      className="w-16 h-16 rounded-xl object-cover border"
+                      alt=""
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-gray-900 truncate" onClick={() => navigate(`/admin/campaigns-request/${item._id}`)}>
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-gray-500">{item.category}</p>
                     </div>
                   </div>
-                ))
-              )}
+                  <div className="flex items-center justify-between mt-2">
+                    <button
+                      onClick={() => handleBlockCampaign(item._id, item.isBlocked)}
+                      className={`px-4 py-1.5 rounded-full text-[10px] font-bold ${
+                        item.isBlocked ? "bg-green-600 text-white" : "bg-red-600 text-white"
+                      }`}
+                    >
+                      {item.isBlocked ? "UNBLOCK" : "BLOCK"}
+                    </button>
+                    <div className="flex gap-2">
+                      <button onClick={() => navigate(`/admin/campaigns/edit/${item._id}`)} className="p-2 border rounded-lg text-gray-600">
+                        <Edit size={16} />
+                      </button>
+                      <button onClick={() => handleDeleteCampaign(item._id)} className="p-2 border border-red-100 rounded-lg text-red-500">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row justify-between items-center mt-8 gap-4 text-sm text-gray-500">
             <p>
-              Showing {Math.min(paginatedCampaigns.length, totalDocs)} of{" "}
-              {totalDocs} campaigns
+              Showing {campaigns.length} of {totalDocs} campaigns
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -455,9 +347,7 @@ export default function CampaignsPage() {
                     key={i}
                     onClick={() => handlePageChange(i + 1)}
                     className={`w-9 h-9 rounded-lg font-bold ${
-                      page === i + 1
-                        ? "bg-black text-white"
-                        : "bg-white border text-gray-600"
+                      page === i + 1 ? "bg-black text-white" : "bg-white border text-gray-600"
                     }`}
                   >
                     {i + 1}
