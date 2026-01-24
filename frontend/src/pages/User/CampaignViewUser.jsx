@@ -289,7 +289,11 @@ export default function CampaignViewUser() {
                         {key.replace(/([A-Z])/g, " $1").trim()}
                       </p>
                       <p className="font-medium text-gray-900 break-words">
-                        {value ?? "N/A"}
+                        {/* {value ?? "N/A"} */}
+                        {typeof value === "string" &&
+                          value.includes("T")
+                        ? new Date(value).toLocaleDateString("en-IN")
+                        : value}
                       </p>
                     </div>
                   ))}

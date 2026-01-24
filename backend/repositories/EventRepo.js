@@ -1,4 +1,5 @@
 import Events from "../models/Events.js";
+import User from "../models/User.js";
 
 export const createEventRepo = async (eventData) =>
   await Events.create(eventData);
@@ -153,11 +154,34 @@ export const getEventsUserRepo = async ({
     });
   }
 
-  pipeline.push({
-    $addFields: {
-      createdBy: { $literal: userName },
+
+ pipeline.push(
+    {
+      $lookup: {
+        from: "users",
+        localField: "User",   
+        foreignField: "_id",
+        as: "user",
+      },
     },
-  });
+    {
+      $unwind: {
+        path: "$user",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $addFields: {
+        createdBy: "$user.userName",
+      },
+    },
+    {
+      $project: {
+        user: 0,   
+        User: 0,  
+      },
+    }
+  );
 
   pipeline.push({
     $facet: {

@@ -12,6 +12,15 @@ export default function ReceiptPage() {
 
   const navigate = useNavigate();
 
+    useEffect(() => {
+    document.body.style.overflow = "auto";
+    document.documentElement.style.overflow = "auto";
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
   useEffect(() => {
     async function fetchReceipt() {
       try {

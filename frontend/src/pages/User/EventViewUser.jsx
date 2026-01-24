@@ -176,14 +176,20 @@ const CreatorBadge = ({ creatorName }) => (
   </div>
 );
 
-const ActionStrip = () => (
+const ActionStrip = ({ shareOnWhatsApp, event, shareEventNormally }) => (
   <div className="bg-gray-200/50 py-10 mt-12 flex justify-center gap-6">
-    <button className="bg-black text-white px-8 py-3 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition shadow-lg">
+    <button
+      className="bg-black text-white px-8 py-3 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition shadow-lg"
+      onClick={() => shareOnWhatsApp(event)}
+    >
       <MessageCircle className="text-green-400 fill-current" size={20} />
       <span className="font-medium">Whatsapp</span>
     </button>
 
-    <button className="bg-black text-white px-8 py-3 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition shadow-lg">
+    <button
+      className="bg-black text-white px-8 py-3 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition shadow-lg"
+      onClick={() => shareEventNormally(event)}
+    >
       <Share2 className="text-white" size={20} />
       <span className="font-medium">Share</span>
     </button>
@@ -206,6 +212,8 @@ export default function EventViewUserPage() {
 
   const navigate = useNavigate();
   const { userEmail, mobileNumber } = useSelector((state) => state.auth);
+
+  const FRONTEND_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -294,6 +302,50 @@ export default function EventViewUserPage() {
     rzp.open();
   };
 
+  const getEventShareUrl = (eventId) => {
+    return `${FRONTEND_URL}/events/${eventId}`;
+  };
+
+  const shareOnWhatsApp = (event) => {
+    const eventUrl = getEventShareUrl(event._id);
+
+    const message = `✨ *${event.title}* ✨
+
+📍 *Venue:* ${event.venue}
+📅 *Date:* ${new Date(event.date).toDateString()}
+⏰ *Time:* ${event.eventTime}
+🎟️ *Price:* ₹${event.ticketPrice}
+
+━━━━━━━━━━━━━━━
+👉 *View Event & Book Tickets*
+${eventUrl}
+
+🔥 Limited seats! Don’t miss it.`;
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
+  const copyEventLink = async (eventId) => {
+    const eventUrl = getEventShareUrl(eventId);
+    await navigator.clipboard.writeText(eventUrl);
+    alert("Event link copied!");
+  };
+
+  const shareEventNormally = async (event) => {
+    const eventUrl = getEventShareUrl(event._id);
+
+    if (navigator.share) {
+      await navigator.share({
+        title: event.title,
+        text: `📍 ${event.venue} | 🎟️ ₹${event.ticketPrice}`,
+        url: eventUrl,
+      });
+    } else {
+      copyEventLink(event._id);
+    }
+  };
+
   return (
     <Suspense fallback={<Loader />}>
       <div className="min-h-screen bg-white font-sans text-gray-800">
@@ -377,7 +429,11 @@ export default function EventViewUserPage() {
           )}
         </main>
 
-        <ActionStrip />
+        <ActionStrip
+          shareOnWhatsApp={shareOnWhatsApp}
+          event={event}
+          shareEventNormally={shareEventNormally}
+        />
         <Trudofooter />
       </div>
     </Suspense>
